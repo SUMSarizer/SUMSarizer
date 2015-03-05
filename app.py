@@ -44,10 +44,11 @@ app.config['SECRET_KEY'] = 'ilovecookies'
 app.config['STORMPATH_API_KEY_ID'] = environ.get('STORMPATH_API_KEY_ID')
 app.config['STORMPATH_API_KEY_SECRET'] = environ.get('STORMPATH_API_KEY_SECRET')
 app.config['STORMPATH_APPLICATION'] = environ.get('STORMPATH_APPLICATION')
+app.config['STORMPATH_ENABLE_REGISTRATION'] = False
+app.config['STORMPATH_ENABLE_LOGIN'] = False
+app.config['STORMPATH_ENABLE_LOGOUT'] = False
 
 stormpath_manager = StormpathManager(app)
-stormpath_manager.login_view = '.login'
-
 
 ##### Website
 @app.route('/')
@@ -98,16 +99,16 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
 
-    try:
-        _user = User.from_login(
-            request.form.get('email'),
-            request.form.get('password'),
-        )
-    except StormpathError, err:
-        return render_template('login.html', error=err.message)
-
-    login_user(_user, remember=True)
-    return redirect(request.args.get('next') or url_for('dashboard'))
+    # try:
+    #     _user = User.from_login(
+    #         request.form.get('email'),
+    #         request.form.get('password'),
+    #     )
+    # except StormpathError, err:
+    #     return render_template('login.html', error=err.message)
+    #
+    # login_user(_user, remember=True)
+    # return redirect(request.args.get('next') or url_for('dashboard'))
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -143,4 +144,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
