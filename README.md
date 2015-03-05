@@ -26,9 +26,7 @@ Pull the initial `.env`
 
 	heroku config:pull --overwrite --interactive
 
-If you add config items:
-
-	heroku config:push
+If you add config items, add them in the management CLI. There are some settings that will only apply to the production server, and you don't want to overwrite them.
 
 Run
 ---
@@ -61,8 +59,19 @@ to genereate the migration file. Inspect the migration file in `migrations/versi
 
 	python manage.py db upgrade
 
+Running the migration on prod:
 
+	heroku run python manage.py db upgrade
 
 Database set up notes
 ---
+
+Added db from the addons page:
+
+	https://addons.heroku.com/heroku-postgresql#hobby-dev
+
+To see credentials:
+
+	heroku pg:credentials DATABASE
+
 
