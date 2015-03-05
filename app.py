@@ -1,23 +1,7 @@
 """
-    app.py
-    ~~~~~~
-
-    This simple sample application provides a bare-bones website that allows
-    you to:
-
-    - Create new user accounts.
-    - Log into existing user accounts.
-    - View a simple dashboard page that displays user information.
-    - Edit your user information on said dashboard page.
-    - Log out of the website.
-
-    Please see the README for more information of how to run and use this
-    sample application.
 """
 
-
-from os import environ
-
+import os
 from flask import (
     Flask,
     redirect,
@@ -26,7 +10,6 @@ from flask import (
     url_for,
     jsonify
 )
-
 from flask.ext.stormpath import (
     StormpathManager,
     User,
@@ -35,20 +18,12 @@ from flask.ext.stormpath import (
     logout_user,
     user,
 )
-
+from flask.ext.sqlalchemy import SQLAlchemy
 from stormpath.error import Error as StormpathError
 
-
 app = Flask(__name__)
-app.debug = True
-app.config['SECRET_KEY'] = 'ilovecookies'
-app.config['STORMPATH_API_KEY_ID'] = environ.get('STORMPATH_API_KEY_ID')
-app.config['STORMPATH_API_KEY_SECRET'] = environ.get('STORMPATH_API_KEY_SECRET')
-app.config['STORMPATH_APPLICATION'] = environ.get('STORMPATH_APPLICATION')
-app.config['STORMPATH_ENABLE_REGISTRATION'] = False
-app.config['STORMPATH_ENABLE_LOGIN'] = False
-app.config['STORMPATH_ENABLE_LOGOUT'] = False
-
+app.config.from_object(os.environ.get('APP_SETTINGS'))
+db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
 ##### Website
