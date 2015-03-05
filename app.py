@@ -99,16 +99,16 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
 
-    # try:
-    #     _user = User.from_login(
-    #         request.form.get('email'),
-    #         request.form.get('password'),
-    #     )
-    # except StormpathError, err:
-    #     return render_template('login.html', error=err.message)
-    #
-    # login_user(_user, remember=True)
-    # return redirect(request.args.get('next') or url_for('dashboard'))
+    try:
+        _user = User.from_login(
+            request.form.get('email'),
+            request.form.get('password'),
+        )
+    except StormpathError, err:
+        return render_template('login.html', error=err.message)
+
+    login_user(_user, remember=True)
+    return redirect(request.args.get('next') or url_for('dashboard'))
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
