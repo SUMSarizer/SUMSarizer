@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="row">
+  <div class="col-lg-6 col-lg-offset-3">
+		<h1>Welcome to the SUMS Labeller</h1>
+		<span>
+		<a href="{{url_for('login')}}" class="btn btn-default">Login</a>
+		</span>
+		<span>
+		<a href="{{url_for('register')}}" class="btn btn-default">Register New Account</a>
+		</span>
+  </div>
+</div>
+{% endblock %}

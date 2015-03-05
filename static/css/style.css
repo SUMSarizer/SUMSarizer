@@ -1,0 +1,67 @@
+.header { margin: 10px 0 20px 0;}
+h1 { font-size: 24px; border-bottom: 1px solid #4e5d6c; padding: 5px; margin-bottom: 30px; }
+
+#welcome {
+  margin-top: 6em;
+}
+
+#welcome li {
+  font-size: 1.5em;
+}
+
+.register, .login, .dashboard {
+  margin-top: 6em;
+}
+
+.register-fail, .login-fail {
+  margin-bottom: 1em;
+}
+
+.login .last-p {
+  margin-bottom: 2em;
+}
+
+.dashboard h2 {
+  font-weight: bold;
+}
+
+.dashboard .data {
+  color: #DF691A;
+  font-weight: bold;
+}
+
+.jumbotron h1 {
+  text-align: center;
+}
+
+.bigbutton {
+  text-align: center;
+  padding: 24px 48px;
+  font-size: 24px;
+  line-height: 1.33;
+  border-radius: 0;
+}
+
+footer p {
+  margin-right: 6em;
+  text-align: right !important;
+  text-transform: uppercase !important;
+  font-weight: 500 !important;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif !important;
+  font-size: 13px !important;
+  color: #fff !important;
+}
+
+footer p span {
+  vertical-align: bottom !important;
+}
+
+footer p img {
+  align: top !important;
+  vertical-align: top !important;
+}
+
+footer p img.lock {
+  align: bottom !important;
+  vertical-align: middle !important;
+}
