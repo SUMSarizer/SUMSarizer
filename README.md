@@ -18,6 +18,18 @@ Config
 
 The file `.env` contains API ids and secrets.
 
+Install the config plugin:
+
+	heroku plugins:install git://github.com/ddollar/heroku-config.git
+
+Pull the initial `.env`
+
+	heroku config:pull --overwrite --interactive
+
+If you add config items:
+
+	heroku config:push
+
 Run
 ---
 
