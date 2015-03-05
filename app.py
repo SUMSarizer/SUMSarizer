@@ -24,6 +24,7 @@ from flask import (
     render_template,
     request,
     url_for,
+    jsonify
 )
 
 from flask.ext.stormpath import (
@@ -130,6 +131,11 @@ def dashboard():
         user.save()
 
     return render_template('dashboard.html')
+
+@app.route('/api', methods=['GET'])
+@login_required
+def api():
+  return jsonify({'hello': 'world'})
 
 
 @app.route('/logout')
