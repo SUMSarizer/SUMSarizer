@@ -37,3 +37,15 @@ Run
 	source .env
 	python app.py
 
+Run like prod:
+
+	foreman start
+
+Deploy
+---
+
+	git push heroku master
+
+Make sure there is a web process running:
+
+	heroku ps:scale web=1
