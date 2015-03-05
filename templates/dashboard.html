@@ -11,14 +11,11 @@
 				</div>
 				
 				<ul>
+					{% for dataset in datasets %}
 					<li>
-						<p><a href="#">My first data set</a></p>
-						<p>2015-01-01</p>
+						<p><a href="#">{{ dataset.title }}</a></p>
 					</li>
-					<li>
-						<p><a href="#">My second data set</a></p>
-						<p>2015-02-02</p>
-					</li>
+					{% endfor %}
 				</ul>
 				
       </div>

@@ -35,7 +35,7 @@ Run
 
 	source venv/bin/activate
 	source .env
-	python app.py
+	python run.py
 
 Run like prod:
 
@@ -49,3 +49,20 @@ Deploy
 Make sure there is a web process running:
 
 	heroku ps:scale web=1
+
+Migrations
+---
+
+Change a model file in `models.py`, then run:
+
+	python manage.py db migrate
+
+to genereate the migration file. Inspect the migration file in `migrations/versions/...py` If it looks good, run it with:
+
+	python manage.py db upgrade
+
+
+
+Database set up notes
+---
+

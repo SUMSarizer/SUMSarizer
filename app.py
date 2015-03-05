@@ -26,6 +26,8 @@ app.config.from_object(os.environ.get('APP_SETTINGS'))
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
+from models import Datasets
+
 ##### Website
 @app.route('/')
 def index():
@@ -91,21 +93,20 @@ def login():
 @login_required
 def dashboard():
     """
-    This view renders a simple dashboard page for logged in users.
-
-    Users can see their personal information on this page, as well as store
-    additional data to their account (if they so choose).
     """
-    if request.method == 'POST':
-        if request.form.get('birthday'):
-            user.custom_data['birthday'] = request.form.get('birthday')
+    
+    datasets = Datasets.query.limit(10).all()
 
-        if request.form.get('color'):
-            user.custom_data['color'] = request.form.get('color')
+    # if request.method == 'POST':
+    #     if request.form.get('birthday'):
+    #         user.custom_data['birthday'] = request.form.get('birthday')
+    #
+    #     if request.form.get('color'):
+    #         user.custom_data['color'] = request.form.get('color')
+    #
+    #     user.save()
 
-        user.save()
-
-    return render_template('dashboard.html')
+    return render_template('dashboard.html', datasets=datasets)
 
 @app.route('/api', methods=['GET'])
 @login_required
@@ -123,6 +124,3 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-
-if __name__ == '__main__':
-    app.run(debug=True)
