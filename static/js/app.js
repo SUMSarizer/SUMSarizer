@@ -10,6 +10,9 @@ angular.module('myApp', [
 	var vm = this;
 	vm.submit = function () {
 		
+		vm.uploading = true;
+		vm.complete = false;
+		
 		var elInput = document.getElementById('files');
 		var files = Array.prototype.slice.call(elInput.files);
 		var uploadJobs = files.map(function (file, index) {
@@ -34,11 +37,16 @@ angular.module('myApp', [
 		function nextJob () {
 			
 			$timeout(function () {
-				vm.uploadCount = uploadJobs.length;
+				vm.uploadCount = uploadJobs.length+1;
 			});
 						
 			var job = uploadJobs.pop();
-			if (job) job();
+			if (job) {
+				job();
+			} else {
+				vm.complete = true;
+				vm.uploading = false;
+			}
 		}
 	
 		nextJob();

@@ -13,6 +13,9 @@
 			<div ng-if="vm.uploadCount">
 				Uploads remaining: {[{ vm.uploadCount }]}
 			</div>
+			<div ng-if="vm.complete">
+				Upload complete
+			</div>
     </div>
     <div class="modal-footer">
         <button class="btn btn-success" ng-click="vm.submit()">Upload</button>
