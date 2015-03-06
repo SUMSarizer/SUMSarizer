@@ -1,11 +1,16 @@
+angular.module('myApp', [])
+
+.config(function($interpolateProvider){
+ $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
+})
+
+.controller('DashboardCtrl', function ($scope) {
+  $scope.uploadCount = 4;
+});
+
+
 $('#myform').on('submit', function (e) {
 	e.preventDefault();
-	
-	// var formElement = document.getElementById("myform");
-	// var formData = new FormData(formElement);
-	// var request = new XMLHttpRequest();
-	// request.open("POST", "/upload");
-	// request.send(new FormData(formElement));
 	
 	var elInput = document.getElementById('files');
 	var files = Array.prototype.slice.call(elInput.files);
@@ -16,6 +21,9 @@ $('#myform').on('submit', function (e) {
 			var request = new XMLHttpRequest();
 			request.open("POST", "/upload", true);
 			request.onload = function (e) {
+				
+				// show message in UI
+				
 				console.log('uploaded');
 				console.log(e);
 				console.log(request.status);
@@ -33,38 +41,4 @@ $('#myform').on('submit', function (e) {
 	}
 	
 	nextJob();
-	
-	
-	// var count = 0;
-	// $('input[type="file"]').on('ajax', function(){
-	//   var $this = $(this);
-	//
-	//   if (typeof this.files[count] === 'undefined') { return false; }
-	//
-	//   $.ajax({
-	//     'type':'POST',
-	// 		'url': '/upload',
-	//     'data': (new FormData()).append('file', this.files[count]),
-	//     'contentType': false,
-	//     'processData': false,
-	//     'xhr': function() {
-	//       var xhr = $.ajaxSettings.xhr();
-	//       if(xhr.upload){
-	//         // xhr.upload.addEventListener('progress', progressbar, false);
-	//       }
-	//       return xhr;
-	//      },
-	//     'success': function(){
-	//       count++;
-	//         $this.trigger('ajax');
-	//     },
-	// 		'error': function (e) {
-	//       count++;
-	//       $this.trigger('ajax');
-	// 			console.log(e);
-	// 			console.log(e.statusText);
-	// 		}
-	//   });
-	// }).trigger('ajax');
-
 });

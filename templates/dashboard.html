@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <div class="">
+  <div class="" ng-controller="DashboardCtrl as vm">
     <div class="row">
       <div class="col-lg-12">
         <h1>Data Sets</h1>
@@ -13,6 +13,10 @@
 						<input id="files" type="file" name="file" multiple>
 						<input type="submit" />
 					</form>
+				</div>
+				
+				<div>
+					Uploads remaining: {[{ vm.uploadCount }]}
 				</div>
 				
 				<ul>
