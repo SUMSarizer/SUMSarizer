@@ -6,7 +6,7 @@ angular.module('myApp', [
  $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
 })
 
-.controller('ModalInstanceCtrl', function ($scope, $modalInstance, $timeout) {
+.controller('ModalInstanceCtrl', function ($scope, $modalInstance, $timeout, $window) {
 	var vm = this;
 	vm.submit = function () {
 		
@@ -53,6 +53,7 @@ angular.module('myApp', [
 	};
 	
   vm.cancel = function () {
+		$window.location.reload();
     $modalInstance.dismiss('cancel');
   };
 })
