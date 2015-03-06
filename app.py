@@ -94,7 +94,10 @@ def login():
 def dashboard():
     """
     """
-    datasets = Datasets.query.limit(10).all()
+    datasets = Datasets.query\
+      .order_by(Datasets.created_at.desc())\
+      .limit(10)\
+      .all()
 
     return render_template('dashboard.html', datasets=datasets)
 

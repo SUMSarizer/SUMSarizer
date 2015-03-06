@@ -5,7 +5,7 @@ class Datasets(db.Model):
   __tablename__ = 'datasets'
 
   id = db.Column(db.Integer, primary_key=True)
-  created_at = db.Column(db.Date, default=datetime.datetime.now)
+  created_at = db.Column(db.DateTime, default=datetime.datetime.now)
   title = db.Column(db.Unicode)
   
   notes = db.relationship('Notes')
@@ -38,7 +38,7 @@ class Notes(db.Model):
   __tablename__ = 'notes'
   
   id = db.Column(db.Integer, primary_key=True)
-  created_at = db.Column(db.Date, default=datetime.datetime.now)
+  created_at = db.Column(db.DateTime, default=datetime.datetime.now)
   text = db.Column(db.Unicode)
   
   dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
@@ -50,8 +50,8 @@ class DataPoints(db.Model):
   __tablename__ = 'datapoints'
   
   id = db.Column(db.Integer, primary_key=True)
-  created_at = db.Column(db.Date, default=datetime.datetime.now)
-  timestamp = db.Column(db.Date)
+  created_at = db.Column(db.DateTime, default=datetime.datetime.now)
+  timestamp = db.Column(db.DateTime)
   unit = db.Column(db.String(16))
   value = db.Column(db.Float)
   
