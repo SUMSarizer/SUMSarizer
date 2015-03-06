@@ -92,7 +92,7 @@ def login():
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
-    page = int(request.args.get('page', 0))
+    page = int(request.args.get('page') or 1)
     
     datasets = Datasets.query\
       .order_by(Datasets.created_at.desc())\

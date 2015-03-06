@@ -52,7 +52,7 @@
 				<ul>
 					{% for dataset in datasets %}
 					<li>
-						<p><a href="#">{{ dataset.title }}</a></p>
+						<p><a href="{{url_for('dataset', id=dataset.id)}}">{{ dataset.title }}</a></p>
 					</li>
 					{% endfor %}
 				</ul>
