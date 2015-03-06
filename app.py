@@ -94,12 +94,15 @@ def login():
 def dashboard():
     """
     """
+    page = int(request.args.get('page', 0))
+    
     datasets = Datasets.query\
       .order_by(Datasets.created_at.desc())\
-      .limit(10)\
-      .all()
+      .paginate(page, per_page=15)
 
-    return render_template('dashboard.html', datasets=datasets)
+    return render_template('dashboard.html', 
+      datasets=datasets.items,
+      pagination=datasets)
 
 @app.route('/upload', methods=['POST'])
 @login_required
