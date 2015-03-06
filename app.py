@@ -105,14 +105,20 @@ def dashboard():
 @app.route('/dataset/<id>', methods=['GET'])
 @login_required
 def dataset(id):
-    
+    import json
+    import time
     # TODO: only allowed to access my own data sets
     dataset = Datasets.query.get(id)
+    
+    graph_points = [
+      [time.mktime(x.timestamp.timetuple()), x.value] for x in dataset.data_points
+    ]
 
     return render_template('dataset.html', 
       dataset=dataset,
       notes=dataset.notes,
-      points=dataset.data_points)
+      points=dataset.data_points,
+      points_json=json.dumps(graph_points))
 
 @app.route('/upload', methods=['POST'])
 @login_required

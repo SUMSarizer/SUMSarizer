@@ -77,3 +77,56 @@ angular.module('myApp', [
 	};
 	
 });
+
+
+
+
+
+$('#plot').highcharts({
+     chart: {
+         type: 'scatter',
+         zoomType: 'xy'
+     },
+     title: {
+         text: 'Stove temperature by time'
+     },
+     xAxis: {
+         title: {
+             enabled: true,
+             text: 'Time (s)'
+         },
+         startOnTick: true,
+         endOnTick: true,
+         showLastLabel: true
+     },
+     yAxis: {
+         title: {
+             text: 'Temp (C)'
+         }
+     },
+     plotOptions: {
+         scatter: {
+             marker: {
+                 radius: 5,
+                 states: {
+                     hover: {
+                         enabled: true,
+                         lineColor: 'rgb(100,100,100)'
+                     }
+                 }
+             },
+             states: {
+                 hover: {
+                     marker: {
+                         enabled: false
+                     }
+                 }
+             }
+         }
+     },
+     series: [{
+      color: 'rgba(223, 83, 83, .5)',
+		 	data: PLOTDATA
+   	 }]
+ });
+

@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block body %}
-
   <div class="">
     <div class="row">
       <div class="col-lg-12">
@@ -17,6 +16,8 @@
 				
 				<h2>Points</h2>
 				
+				<div id="plot" style="min-width: 310px; height: 400px; max-width: 800px; margin: 0 auto"></div>
+				
 				<table class="table">
 				{% for point in points %}
 					<tr>
@@ -30,4 +31,8 @@
       </div>
     </div>
   </div>
+	
+	<script>
+	PLOTDATA = {{ points_json }}
+	</script>
 {% endblock %}
