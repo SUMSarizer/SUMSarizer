@@ -17,7 +17,7 @@ class Datasets(db.Model):
   def from_file(cls, file):
     import sumsparser as parser
     parsed = parser.parse(file)
-    dataset = Datasets(file.name)
+    dataset = Datasets(file.filename)
     for note_text in parsed['notes']:
       note = Notes(note_text)
       dataset.notes.append(note)
