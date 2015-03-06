@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block body %}
+
+  <div class="">
+    <div class="row">
+      <div class="col-lg-12">
+        <h1>Data Set</h1>
+				
+				<h2>Notes</h2>
+				
+				{% for note in notes %}
+					<div>
+						{{ note.text }}
+					</div>
+				{% endfor %}
+				
+				<h2>Points</h2>
+				
+				<table class="table">
+				{% for point in points %}
+					<tr>
+						<td>{{point.timestamp}}</td>
+						<td>{{point.unit}}</td>
+						<td>{{point.value}}</td>
+					</tr>
+				{% endfor %}
+				</table>
+				
+      </div>
+    </div>
+  </div>
+{% endblock %}

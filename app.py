@@ -89,11 +89,9 @@ def login():
     return redirect(request.args.get('next') or url_for('dashboard'))
 
 
-@app.route('/dashboard', methods=['GET', 'POST'])
+@app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
-    """
-    """
     page = int(request.args.get('page', 0))
     
     datasets = Datasets.query\
@@ -103,6 +101,18 @@ def dashboard():
     return render_template('dashboard.html', 
       datasets=datasets.items,
       pagination=datasets)
+      
+@app.route('/dataset/<id>', methods=['GET'])
+@login_required
+def dataset(id):
+    
+    # TODO: only allowed to access my own data sets
+    dataset = Datasets.query.get(id)
+
+    return render_template('dataset.html', 
+      dataset=dataset,
+      notes=dataset.notes,
+      points=dataset.data_points)
 
 @app.route('/upload', methods=['POST'])
 @login_required
