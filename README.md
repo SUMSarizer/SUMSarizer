@@ -75,3 +75,15 @@ To see credentials:
 	heroku pg:credentials DATABASE
 
 
+Secrets
+---
+
+Secrets stored in the repository with Ansible Vault. Contact the repository maintainer for the password.
+
+Install [Ansible](http://www.ansible.com/home). 
+
+Edit files:
+
+	ansible-value edit secrets.txt
+
+More: http://docs.ansible.com/playbooks_vault.html#id6
