@@ -94,19 +94,16 @@ def login():
 def dashboard():
     """
     """
-    
     datasets = Datasets.query.limit(10).all()
 
-    # if request.method == 'POST':
-    #     if request.form.get('birthday'):
-    #         user.custom_data['birthday'] = request.form.get('birthday')
-    #
-    #     if request.form.get('color'):
-    #         user.custom_data['color'] = request.form.get('color')
-    #
-    #     user.save()
-
     return render_template('dashboard.html', datasets=datasets)
+
+@app.route('/upload', methods=['POST'])
+@login_required
+def upload():
+  file = request.files['file']
+  return jsonify({'success': True, 'contents': file.read()})
+
 
 @app.route('/api', methods=['GET'])
 @login_required
