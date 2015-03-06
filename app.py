@@ -101,8 +101,14 @@ def dashboard():
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload():
-  file = request.files['file']
-  return jsonify({'success': True, 'contents': file.read()})
+  file = request.files['file']  
+  dataset = Datasets.from_file(file)
+  db.session.add(dataset)
+  db.session.commit()
+    
+  return jsonify({
+    'success': True
+  })
 
 
 @app.route('/api', methods=['GET'])
