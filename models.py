@@ -9,6 +9,7 @@ class Datasets(db.Model):
   title = db.Column(db.Unicode)
   
   notes = db.relationship('Notes')
+  data_points = db.relationship('DataPoints')
 
   def __init__(self, title):
     self.title = title
@@ -16,11 +17,18 @@ class Datasets(db.Model):
   @classmethod
   def from_file(cls, file):
     import sumsparser as parser
+    from dateutil.parser import parse as date_parse
     parsed = parser.parse(file)
     dataset = Datasets(file.filename)
     for note_text in parsed['notes']:
       note = Notes(note_text)
       dataset.notes.append(note)
+    for data_point in parsed['data']:
+      data_point = DataPoints(date_parse(data_point[0]),
+                              data_point[1],
+                              float(data_point[2]))
+      dataset.data_points.append(data_point)
+      
     return dataset
     
   def __repr__(self):
@@ -46,6 +54,8 @@ class DataPoints(db.Model):
   timestamp = db.Column(db.Date)
   unit = db.Column(db.String(16))
   value = db.Column(db.Float)
+  
+  dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
   
   def __init__(self, timestamp, unit, value):
     self.timestamp = timestamp
