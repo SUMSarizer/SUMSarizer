@@ -9,13 +9,13 @@
 				<div class="pull-right">
 					<a href="" class="btn btn-success">Upload</a>
 					
-					<form id="myform">
+					<form id="myform" ng-submit="vm.submit()">
 						<input id="files" type="file" name="file" multiple>
 						<input type="submit" />
 					</form>
 				</div>
 				
-				<div>
+				<div ng-if="vm.uploadCount">
 					Uploads remaining: {[{ vm.uploadCount }]}
 				</div>
 				
