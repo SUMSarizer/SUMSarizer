@@ -1,13 +1,13 @@
-angular.module('myApp', [])
+angular.module('myApp', [
+	'ui.bootstrap'
+])
 
 .config(function($interpolateProvider){
  $interpolateProvider.startSymbol('{[{').endSymbol('}]}');
 })
 
-.controller('DashboardCtrl', function ($timeout) {
+.controller('ModalInstanceCtrl', function ($scope, $modalInstance, $timeout) {
 	var vm = this;
-	vm.uploadCount = 0;
-	
 	vm.submit = function () {
 		
 		var elInput = document.getElementById('files');
@@ -42,6 +42,29 @@ angular.module('myApp', [])
 		}
 	
 		nextJob();
+	};
+	
+  vm.cancel = function () {
+    $modalInstance.dismiss('cancel');
+  };
+})
+
+.controller('DashboardCtrl', function ($timeout, $modal) {
+	var vm = this;
+	vm.uploadCount = 0;
+	
+	vm.openModal = function () {
+		var modalInstance = $modal.open({
+			templateUrl: 'modal.html',
+			controller: 'ModalInstanceCtrl',
+			controllerAs: 'vm'
+		});
+
+		modalInstance.result.then(function () {
+
+		}, function () {
+			
+		});
 	};
 	
 });

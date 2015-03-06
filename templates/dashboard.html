@@ -1,22 +1,32 @@
 {% extends "base.html" %}
 
 {% block body %}
+
+	<script type="text/ng-template" id="modal.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Upload</h3>
+    </div>
+    <div class="modal-body">
+			<p>You can select multiple files at once.</p>
+			<input id="files" type="file" name="file" multiple>
+			
+			<div ng-if="vm.uploadCount">
+				Uploads remaining: {[{ vm.uploadCount }]}
+			</div>
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-success" ng-click="vm.submit()">Upload</button>
+        <button class="btn" ng-click="vm.cancel()">Cancel</button>
+    </div>
+  </script>
+
   <div class="" ng-controller="DashboardCtrl as vm">
     <div class="row">
       <div class="col-lg-12">
         <h1>Data Sets</h1>
 				
-				<div class="pull-right">
-					<a href="" class="btn btn-success">Upload</a>
-					
-					<form id="myform" ng-submit="vm.submit()">
-						<input id="files" type="file" name="file" multiple>
-						<input type="submit" />
-					</form>
-				</div>
-				
-				<div ng-if="vm.uploadCount">
-					Uploads remaining: {[{ vm.uploadCount }]}
+				<div class="pull-right">				
+					<a href="" class="btn btn-success" ng-click="vm.openModal()">Upload</a>
 				</div>
 				
 				<ul>
