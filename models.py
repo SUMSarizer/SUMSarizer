@@ -1,6 +1,16 @@
 import datetime
 from app import db
 
+class Studies(db.Model):
+  __tablename__ = 'studies'
+  
+  id = db.Column(db.Integer, primary_key=True)
+  created_at = db.Column(db.DateTime, default=datetime.datetime.now)
+  title = db.Column(db.Unicode)
+  owner = db.Column(db.Unicode)
+  
+  datasets = db.relationship('Datasets')
+
 class Datasets(db.Model):
   __tablename__ = 'datasets'
 
@@ -10,6 +20,8 @@ class Datasets(db.Model):
   
   notes = db.relationship('Notes')
   data_points = db.relationship('DataPoints')
+  
+  study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
 
   def __init__(self, title):
     self.title = title

@@ -100,7 +100,8 @@ def dashboard():
 
     return render_template('dashboard.html', 
       datasets=datasets.items,
-      pagination=datasets)
+      pagination=datasets,
+      user=user)
       
 @app.route('/dataset/<id>', methods=['GET'])
 @login_required
