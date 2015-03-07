@@ -14,7 +14,7 @@ class Studies(db.Model):
   @classmethod
   def for_user(cls, user):
     return Studies.query\
-      .filter(cls.owner==user.email)\
+      .filter(cls.owner==user.get_id())\
       .order_by(Studies.created_at.desc())\
       .limit(50)
     
