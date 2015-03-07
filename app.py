@@ -2,6 +2,7 @@
 """
 
 import os
+import json
 from flask import (
     Flask,
     redirect,
@@ -127,10 +128,18 @@ def study(id):
 @app.route('/dataset/<id>', methods=['GET'])
 @login_required
 def dataset(id):
-    import json
     import time
-    # TODO: only allowed to access my own data sets
+
     dataset = Datasets.query.get(id)
+    if dataset.study.owner != user.get_id():
+        abort(401)
+    
+    # Grab the list of datasets in this study
+    # What page is this dataset?
+    # has_next?
+    # has_prev?
+    prev_ds = dataset.prev()
+    next_ds = dataset.next()
     
     graph_points = [
       [time.mktime(x.timestamp.timetuple()), x.value] for x in dataset.data_points
@@ -140,7 +149,9 @@ def dataset(id):
       dataset=dataset,
       notes=dataset.notes,
       points=dataset.data_points,
-      points_json=json.dumps(graph_points))
+      points_json=json.dumps(graph_points),
+      next_ds=next_ds,
+      prev_ds=prev_ds)
 
 @app.route('/upload/<id>', methods=['POST'])
 @login_required

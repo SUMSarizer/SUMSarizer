@@ -9,7 +9,7 @@ class Studies(db.Model):
   title = db.Column(db.Unicode)
   owner = db.Column(db.Unicode)
   
-  datasets = db.relationship('Datasets', lazy="dynamic")
+  datasets = db.relationship('Datasets', lazy="dynamic", backref="study")
   
   def __init__(self, title, owner):
     self.title = title
@@ -56,8 +56,19 @@ class Datasets(db.Model):
       
     return dataset
     
-  def __repr__(self):
-    return '<id {}>'.format(self.id)
+  def next(self):
+    return Datasets.query\
+      .filter(Datasets.study_id==self.study_id)\
+      .filter(Datasets.created_at < self.created_at)\
+      .order_by(Datasets.created_at.desc())\
+      .first()
+        
+  def prev(self):
+    return Datasets.query\
+      .filter(Datasets.study_id==self.study_id)\
+      .filter(Datasets.created_at > self.created_at)\
+      .order_by(Datasets.created_at)\
+      .first()
 
 class Notes(db.Model):
   __tablename__ = 'notes'

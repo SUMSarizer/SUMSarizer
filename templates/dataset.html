@@ -4,6 +4,17 @@
   <div class="">
     <div class="row">
       <div class="col-lg-12">
+				
+				<div>
+					{% if prev_ds %}
+					<a href="{{ url_for('dataset', id=prev_ds.id) }}">&larr; Previous</a> 
+					{% endif %}
+					
+					{% if next_ds %}
+					<a href="{{ url_for('dataset', id=next_ds.id) }}">Next &rarr;</a>
+					{% endif %}
+				</div>
+				
         <h1>Data Set</h1>
 				
 				<h2>Notes</h2>
