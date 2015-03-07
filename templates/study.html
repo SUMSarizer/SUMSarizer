@@ -2,6 +2,7 @@
 
 {% block body %}
 
+
 	{% macro render_pagination(pagination, endpoint) %}
 	  <div class=pagination>
 	  {%- for page in pagination.iter_pages() %}
@@ -44,24 +45,6 @@
     <div class="row">
       <div class="col-lg-12">
 				
-				<h1>Studies</h1>
-				<div class="pull-right">				
-					<a href="" class="btn btn-success" ng-click="vm.openModal()">New Study</a>
-				</div>
-				
-				<ul>
-					<li>
-						<a>My first study</a>
-					</li>
-					<li>
-						<a>My second study</a>
-					</li>
-					<li>
-						<a>My third study</a>
-					</li>
-				</ul>
-				
-				
         <h1 class="clearfix">Data Sets</h1>
 				
 				<div class="pull-right">				
@@ -81,4 +64,5 @@
       </div>
     </div>
   </div>
+
 {% endblock %}

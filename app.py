@@ -104,6 +104,23 @@ def new_study():
     db.session.add(study)  
     db.session.commit()
     return redirect(url_for('dashboard'))
+    
+@app.route('/study/<id>', methods=['GET'])
+@login_required
+def study(id):
+    study = Studies.query.get(id)
+    # TODO: auth
+    
+    page = int(request.args.get('page') or 1)
+    
+    datasets = Datasets.query\
+      .order_by(Datasets.created_at.desc())\
+      .paginate(page, per_page=15)
+    
+    return render_template('study.html', 
+      study=study,
+      datasets=datasets.items,
+      pagination=datasets)
       
 @app.route('/dataset/<id>', methods=['GET'])
 @login_required
