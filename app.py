@@ -26,7 +26,7 @@ app.config.from_object(os.environ.get('APP_SETTINGS'))
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
-from models import Datasets
+from models import Datasets, Studies
 
 ##### Website
 @app.route('/')
@@ -93,15 +93,11 @@ def login():
 @login_required
 def dashboard():
     page = int(request.args.get('page') or 1)
-    
-    datasets = Datasets.query\
-      .order_by(Datasets.created_at.desc())\
-      .paginate(page, per_page=15)
-
+      
+    studies = Studies.for_user(user)
+            
     return render_template('dashboard.html', 
-      datasets=datasets.items,
-      pagination=datasets,
-      user=user)
+      studies=studies)
       
 @app.route('/dataset/<id>', methods=['GET'])
 @login_required

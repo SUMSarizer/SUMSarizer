@@ -10,6 +10,14 @@ class Studies(db.Model):
   owner = db.Column(db.Unicode)
   
   datasets = db.relationship('Datasets')
+  
+  @classmethod
+  def for_user(cls, user):
+    return Studies.query\
+      .filter(cls.owner==user.email)\
+      .order_by(Studies.created_at.desc())\
+      .limit(50)
+    
 
 class Datasets(db.Model):
   __tablename__ = 'datasets'

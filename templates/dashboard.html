@@ -27,15 +27,11 @@
 				</div>
 				
 				<ul>
+					{% for study in studies %}
 					<li>
-						<a>My first study</a>
+						<a>{{ study.title }}</a>
 					</li>
-					<li>
-						<a>My second study</a>
-					</li>
-					<li>
-						<a>My third study</a>
-					</li>
+					{% endfor %}
 				</ul>
 				
       </div>
