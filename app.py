@@ -8,7 +8,8 @@ from flask import (
     render_template,
     request,
     url_for,
-    jsonify
+    jsonify,
+    abort
 )
 from flask.ext.stormpath import (
     StormpathManager,
@@ -109,7 +110,9 @@ def new_study():
 @login_required
 def study(id):
     study = Studies.query.get(id)
-    # TODO: auth
+    
+    if study.owner != user.get_id():
+        abort(401)
     
     page = int(request.args.get('page') or 1)
     
