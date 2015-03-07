@@ -11,6 +11,10 @@ class Studies(db.Model):
   
   datasets = db.relationship('Datasets')
   
+  def __init__(self, title, owner):
+    self.title = title
+    self.owner = owner.get_id()
+  
   @classmethod
   def for_user(cls, user):
     return Studies.query\

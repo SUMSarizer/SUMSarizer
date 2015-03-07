@@ -80,9 +80,6 @@ angular.module('myApp', [
 
 .controller('NewStudyModalCtrl', function ($scope, $modalInstance, $timeout, $window) {
 	var vm = this;
-  vm.submit = function () {
-    $modalInstance.dismiss();
-  };
 	vm.cancel = function () {
     $modalInstance.dismiss();
   };
@@ -96,13 +93,7 @@ angular.module('myApp', [
 			controller: 'NewStudyModalCtrl',
 			controllerAs: 'vm'
 		});
-		modalInstance.result.then(function () {
-
-		}, function () {
-			
-		});
 	};
-	
 });
 
 if (window.PLOTDATA) {

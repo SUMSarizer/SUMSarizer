@@ -93,11 +93,17 @@ def login():
 @login_required
 def dashboard():
     page = int(request.args.get('page') or 1)
-      
     studies = Studies.for_user(user)
-            
     return render_template('dashboard.html', 
       studies=studies)
+      
+@app.route('/new_study', methods=['POST'])
+@login_required
+def new_study():
+    study = Studies(request.form['title'], user)
+    db.session.add(study)  
+    db.session.commit()
+    return redirect(url_for('dashboard'))
       
 @app.route('/dataset/<id>', methods=['GET'])
 @login_required

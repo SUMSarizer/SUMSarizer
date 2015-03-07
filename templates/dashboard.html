@@ -6,19 +6,18 @@
     <div class="modal-header">
         <h3 class="modal-title">Create New Study</h3>
     </div>
-    <div class="modal-body">
-			<form action="">
-				
-				<div class="form-group">
-					<label for="">Study Name</label>
-					<input class="form-control" type="text" />
-				</div>
-			</form>
-    </div>
-    <div class="modal-footer">
-        <button class="btn btn-success" ng-click="vm.submit()">Create</button>
-        <button class="btn" ng-click="vm.cancel()">Cancel</button>
-    </div>
+		<form action="{{ url_for('new_study') }}" method="post">
+	    <div class="modal-body">
+					<div class="form-group">
+						<label for="">Study Name</label>
+						<input class="form-control" type="text" name="title" />
+					</div>
+	    </div>
+	    <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Create</button>
+        <a class="btn" ng-click="vm.cancel()">Cancel</a>
+	    </div>
+		</form>
   </script>
 
   <div class="" ng-controller="StudyCtrl as vm">
