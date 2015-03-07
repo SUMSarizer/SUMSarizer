@@ -9,7 +9,7 @@ class Studies(db.Model):
   title = db.Column(db.Unicode)
   owner = db.Column(db.Unicode)
   
-  datasets = db.relationship('Datasets')
+  datasets = db.relationship('Datasets', lazy="dynamic")
   
   def __init__(self, title, owner):
     self.title = title

@@ -113,7 +113,7 @@ def study(id):
     
     page = int(request.args.get('page') or 1)
     
-    datasets = Datasets.query\
+    datasets = study.datasets\
       .order_by(Datasets.created_at.desc())\
       .paginate(page, per_page=15)
     
