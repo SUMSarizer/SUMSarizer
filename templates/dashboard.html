@@ -2,62 +2,41 @@
 
 {% block body %}
 
-	{% macro render_pagination(pagination, endpoint) %}
-	  <div class=pagination>
-	  {%- for page in pagination.iter_pages() %}
-	    {% if page %}
-	      {% if page != pagination.page %}
-	        <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
-	      {% else %}
-	        <strong>{{ page }}</strong>
-	      {% endif %}
-	    {% else %}
-	      <span class=ellipsis>…</span>
-	    {% endif %}
-	  {%- endfor %}
-	  </div>
-	{% endmacro %}
-
-
 	<script type="text/ng-template" id="modal.html">
     <div class="modal-header">
-        <h3 class="modal-title">Upload</h3>
+        <h3 class="modal-title">Create New Study</h3>
     </div>
     <div class="modal-body">
-			<p>You can select multiple files at once.</p>
-			<input id="files" type="file" name="file" multiple>
 			
-			<div ng-if="vm.uploadCount">
-				Uploads remaining: {[{ vm.uploadCount }]}
-			</div>
-			<div ng-if="vm.complete">
-				Upload complete
-			</div>
+			<label for="">Study Name</label>
+			<input type="text" />
     </div>
     <div class="modal-footer">
-        <button class="btn btn-success" ng-click="vm.submit()">Upload</button>
-        <button class="btn" ng-click="vm.cancel()">Close</button>
+        <button class="btn btn-success" ng-click="vm.submit()">Create</button>
+        <button class="btn" ng-click="vm.cancel()">Cancel</button>
     </div>
   </script>
 
-  <div class="" ng-controller="DashboardCtrl as vm">
+  <div class="" ng-controller="StudyCtrl as vm">
     <div class="row">
       <div class="col-lg-12">
-        <h1>Data Sets</h1>
 				
+				<h1>Studies</h1>
 				<div class="pull-right">				
-					<a href="" class="btn btn-success" ng-click="vm.openModal()">Upload</a>
+					<a href="" class="btn btn-success" ng-click="vm.openModal()">New Study</a>
 				</div>
-								
-				<ul>
-					{% for dataset in datasets %}
-					<li>
-						<p><a href="{{url_for('dataset', id=dataset.id)}}">{{ dataset.title }}</a></p>
-					</li>
-					{% endfor %}
-				</ul>
 				
-				{{ render_pagination(pagination, 'dashboard') }}
+				<ul>
+					<li>
+						<a>My first study</a>
+					</li>
+					<li>
+						<a>My second study</a>
+					</li>
+					<li>
+						<a>My third study</a>
+					</li>
+				</ul>
 				
       </div>
     </div>

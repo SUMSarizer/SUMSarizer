@@ -76,57 +76,84 @@ angular.module('myApp', [
 		});
 	};
 	
+})
+
+.controller('NewStudyModalCtrl', function ($scope, $modalInstance, $timeout, $window) {
+	var vm = this;
+  vm.submit = function () {
+    $modalInstance.dismiss();
+  };
+	vm.cancel = function () {
+    $modalInstance.dismiss();
+  };
+})
+
+.controller('StudyCtrl', function ($timeout, $modal) {
+	var vm = this;
+	vm.openModal = function () {
+		var modalInstance = $modal.open({
+			templateUrl: 'modal.html',
+			controller: 'NewStudyModalCtrl',
+			controllerAs: 'vm'
+		});
+		modalInstance.result.then(function () {
+
+		}, function () {
+			
+		});
+	};
+	
 });
 
+if (window.PLOTDATA) {
+	$('#plot').highcharts({
+	     chart: {
+	         type: 'scatter',
+	         zoomType: 'xy'
+	     },
+	     title: {
+	         text: 'Stove temperature by time'
+	     },
+	     xAxis: {
+	         title: {
+	             enabled: true,
+	             text: 'Time (s)'
+	         },
+	         startOnTick: true,
+	         endOnTick: true,
+	         showLastLabel: true
+	     },
+	     yAxis: {
+	         title: {
+	             text: 'Temp (C)'
+	         }
+	     },
+	     plotOptions: {
+	         scatter: {
+	             marker: {
+	                 radius: 5,
+	                 states: {
+	                     hover: {
+	                         enabled: true,
+	                         lineColor: 'rgb(100,100,100)'
+	                     }
+	                 }
+	             },
+	             states: {
+	                 hover: {
+	                     marker: {
+	                         enabled: false
+	                     }
+	                 }
+	             }
+	         }
+	     },
+	     series: [{
+	      color: 'rgba(223, 83, 83, .5)',
+			 	data: PLOTDATA
+	   	 }]
+	 });
 
-
-
-
-$('#plot').highcharts({
-     chart: {
-         type: 'scatter',
-         zoomType: 'xy'
-     },
-     title: {
-         text: 'Stove temperature by time'
-     },
-     xAxis: {
-         title: {
-             enabled: true,
-             text: 'Time (s)'
-         },
-         startOnTick: true,
-         endOnTick: true,
-         showLastLabel: true
-     },
-     yAxis: {
-         title: {
-             text: 'Temp (C)'
-         }
-     },
-     plotOptions: {
-         scatter: {
-             marker: {
-                 radius: 5,
-                 states: {
-                     hover: {
-                         enabled: true,
-                         lineColor: 'rgb(100,100,100)'
-                     }
-                 }
-             },
-             states: {
-                 hover: {
-                     marker: {
-                         enabled: false
-                     }
-                 }
-             }
-         }
-     },
-     series: [{
-      color: 'rgba(223, 83, 83, .5)',
-		 	data: PLOTDATA
-   	 }]
- });
+	
+}
 
