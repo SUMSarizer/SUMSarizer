@@ -13,6 +13,9 @@ angular.module('myApp', [
 		vm.uploading = true;
 		vm.complete = false;
 		
+		var elAction = document.getElementById('action');
+		var action = elAction.getAttribute('value');
+		
 		var elInput = document.getElementById('files');
 		var files = Array.prototype.slice.call(elInput.files);
 		var uploadJobs = files.map(function (file, index) {
@@ -20,7 +23,7 @@ angular.module('myApp', [
 				var formData = new FormData()
 				formData.append('file', file);
 				var request = new XMLHttpRequest();
-				request.open("POST", "/upload", true);
+				request.open("POST", action, true);
 				request.onload = function (e) {
 								
 					console.log('Uploaded');

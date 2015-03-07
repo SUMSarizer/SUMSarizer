@@ -110,7 +110,6 @@ def new_study():
 @login_required
 def study(id):
     study = Studies.query.get(id)
-    
     if study.owner != user.get_id():
         abort(401)
     
@@ -143,17 +142,21 @@ def dataset(id):
       points=dataset.data_points,
       points_json=json.dumps(graph_points))
 
-@app.route('/upload', methods=['POST'])
+@app.route('/upload/<id>', methods=['POST'])
 @login_required
-def upload():
-  file = request.files['file']  
-  dataset = Datasets.from_file(file)
-  db.session.add(dataset)
-  db.session.commit()
+def upload(id):
+    study = Studies.query.get(id)
+    if study.owner != user.get_id():
+        abort(401)
     
-  return jsonify({
+    file = request.files['file']
+    dataset = Datasets.from_file(file, study)
+    db.session.add(dataset)
+    db.session.commit()
+
+    return jsonify({
     'success': True
-  })
+    })
 
 
 @app.route('/api', methods=['GET'])

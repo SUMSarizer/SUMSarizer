@@ -35,15 +35,16 @@ class Datasets(db.Model):
   
   study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
 
-  def __init__(self, title):
+  def __init__(self, title, study):
     self.title = title
+    self.study_id = study.id
   
   @classmethod
-  def from_file(cls, file):
+  def from_file(cls, file, study):
     import sumsparser as parser
     from dateutil.parser import parse as date_parse
     parsed = parser.parse(file)
-    dataset = Datasets(file.filename)
+    dataset = Datasets(file.filename, study)
     for note_text in parsed['notes']:
       note = Notes(note_text)
       dataset.notes.append(note)
