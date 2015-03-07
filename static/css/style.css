@@ -3,6 +3,7 @@ h1 { font-size: 24px; border-bottom: 1px solid #4e5d6c; padding: 5px; margin-bot
 h2 { font-size: 20px; }
 label { font-size: 16px;}
 a { cursor: pointer; }
+.upload-container { margin: 20px 0;}
 
 #welcome {
   margin-top: 6em;
