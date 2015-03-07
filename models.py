@@ -31,7 +31,7 @@ class Datasets(db.Model):
   title = db.Column(db.Unicode)
   
   notes = db.relationship('Notes')
-  data_points = db.relationship('DataPoints')
+  data_points = db.relationship('DataPoints', backref="dataset")
   
   study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
 
@@ -90,6 +90,7 @@ class DataPoints(db.Model):
   timestamp = db.Column(db.DateTime)
   unit = db.Column(db.String(16))
   value = db.Column(db.Float)
+  selected = db.Column(db.Boolean)
   
   dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
   

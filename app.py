@@ -28,7 +28,7 @@ app.config.from_object(os.environ.get('APP_SETTINGS'))
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
-from models import Datasets, Studies
+from models import Datasets, Studies, DataPoints
 
 ##### Website
 @app.route('/')
@@ -141,10 +141,19 @@ def dataset(id):
     prev_ds = dataset.prev()
     next_ds = dataset.next()
     
+    def clean_selected(sel):
+        if not sel:
+            return 0
+        if sel:
+            return 1
+        return 0
+    
     graph_points = [{
+        "id": x.id,
         "selected": 0,
         "temp_c": x.value,
         "time": x.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+        "selected": clean_selected(x.selected)
     } for x in dataset.data_points]
 
     return render_template('dataset.html', 
@@ -154,6 +163,23 @@ def dataset(id):
       points_json=json.dumps(graph_points),
       next_ds=next_ds,
       prev_ds=prev_ds)
+
+@app.route('/point', methods=['POST'])
+@login_required
+def point():
+    json = request.get_json()
+    point = DataPoints.query.get(json['id'])
+    if point.dataset.study.owner != user.get_id():
+        abort(401)
+    
+    point.selected = json['selected'] == 1
+    db.session.add(point)
+    db.session.commit()
+    
+    return jsonify({
+        "success": True
+    })
+
 
 @app.route('/upload/<id>', methods=['POST'])
 @login_required
