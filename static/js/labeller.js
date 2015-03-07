@@ -84,12 +84,15 @@ function pad_extent(extent,padding){
 
 }
 
-d3.csv("sumsdata.csv", type, function(error, loaded_data) {
-  data=loaded_data;
+function init () {
+	
+	data=window.PLOTDATA;
+	data = data.map(type);
 
   //set scales based on loaded data
   main_xscale.domain(pad_extent(d3.extent(data.map(function(d) { return d.time; }))));
   main_yscale.domain(pad_extent(d3.extent(data.map(function(d) { return d.temp_c; }))));
+		
   context_xscale.domain(main_xscale.domain());
   context_yscale.domain(main_yscale.domain());
 
@@ -110,6 +113,10 @@ d3.csv("sumsdata.csv", type, function(error, loaded_data) {
   //run brushing functions to make sure everything highlighted right
   brushed_context();
   brushed_main();
+}
+
+$(function () {
+ init();
 });
 
 //inital plotting function

@@ -141,9 +141,11 @@ def dataset(id):
     prev_ds = dataset.prev()
     next_ds = dataset.next()
     
-    graph_points = [
-      [time.mktime(x.timestamp.timetuple()), x.value] for x in dataset.data_points
-    ]
+    graph_points = [{
+        "selected": 0,
+        "temp_c": x.value,
+        "time": x.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+    } for x in dataset.data_points]
 
     return render_template('dataset.html', 
       dataset=dataset,

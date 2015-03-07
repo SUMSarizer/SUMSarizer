@@ -33,3 +33,51 @@ a { cursor: pointer; }
   color: #DF691A;
   font-weight: bold;
 }
+
+
+
+
+svg {
+  font: 10px sans-serif;
+  display: block;
+  margin: auto;
+}
+
+.area {
+  fill: steelblue;
+  clip-path: url(#clip);
+}
+
+.line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+  clip-path: url(#clip);
+}
+
+.point {
+  fill: steelblue;
+  stroke: none;
+  clip-path: url(#clip);
+}
+
+.point.selected {
+  fill: red;
+  fill-opacity: 1;
+  stroke: brown;
+  clip-path: url(#clip);
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.main_brush .extent,
+.context_brush .extent {
+  stroke: #fff;
+  fill-opacity: .125;
+  shape-rendering: crispEdges;
+}

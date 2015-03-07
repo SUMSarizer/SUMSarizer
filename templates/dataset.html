@@ -47,7 +47,7 @@
   </div>
 	
 	<script>
-	PLOTDATA = {{ points_json }}
+	window.PLOTDATA = {{ points_json | safe}}
 	</script>
 	
 {% endblock %}
