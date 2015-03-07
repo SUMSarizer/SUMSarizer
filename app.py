@@ -173,6 +173,10 @@ def point():
         abort(401)
     
     point.selected = json['selected'] == 1
+    
+    print point
+    print point.timestamp
+    
     db.session.add(point)
     db.session.commit()
     
