@@ -19,7 +19,7 @@ class ProductionConfig(Config):
 class StagingConfig(Config):
   DEVELOPMENT = True
   DEBUG = True
-  SQLALCHEMY_DATABASE_URI = os.environ.get('HEROKU_POSTGRESQL_PINK_URL')
+  SQLALCHEMY_DATABASE_URI = os.environ.get('HEROKU_POSTGRESQL_MAROON_URL')
 
 class DevelopmentConfig(Config):
   DEVELOPMENT = True
