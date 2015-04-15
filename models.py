@@ -70,6 +70,11 @@ class Datasets(db.Model):
       .order_by(Datasets.created_at)\
       .first()
 
+  def study_name(self):
+    return Studies.query\
+      .filter(Studies.id==self.study_id)\
+      .first()
+
 class Notes(db.Model):
   __tablename__ = 'notes'
   

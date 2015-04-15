@@ -141,6 +141,8 @@ def dataset(id):
     prev_ds = dataset.prev()
     next_ds = dataset.next()
     
+    studyname_ds = dataset.study_name()
+
     def clean_selected(sel):
         if not sel:
             return 0
@@ -158,6 +160,9 @@ def dataset(id):
 
     return render_template('dataset.html', 
       dataset=dataset,
+      title=dataset.title,
+      study=studyname_ds.title,
+      studyid = dataset.study_id,
       notes=dataset.notes,
       points=dataset.data_points,
       points_json=json.dumps(graph_points),
