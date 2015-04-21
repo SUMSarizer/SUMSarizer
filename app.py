@@ -142,7 +142,7 @@ def dataset(id):
     next_ds = dataset.next()
     all_ds = dataset.items()
     
-    studyname_ds = dataset.study_name()
+    # studyname_ds = dataset.study_name()
 
     def clean_selected(sel):
         if not sel:
@@ -162,7 +162,7 @@ def dataset(id):
     return render_template('dataset.html', 
       dataset=dataset,
       title=dataset.title,
-      study=studyname_ds.title,
+      study=dataset.study.title,
       studyid = dataset.study_id,
       notes=dataset.notes,
       points=dataset.data_points,
