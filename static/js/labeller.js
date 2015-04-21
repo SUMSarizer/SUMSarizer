@@ -5,9 +5,10 @@ function labeller () {
 	// context -- smaller context plot for zooming, scrolling
 
 	//margins
-	var main_margin = {top: 10, right: 10, bottom: 100, left: 40},
-	context_margin = {top: 430, right: 10, bottom: 20, left: 40},
-	width = 960 - main_margin.left - main_margin.right,
+	var main_margin = {top: 10, right: 10, bottom: 100, left: 20},
+	context_margin = {top: 430, right: 10, bottom: 20, left: 20},
+	maindiv_width = $('#maindiv').width();
+	width = maindiv_width - main_margin.left - main_margin.right,
 	main_height = 500 - main_margin.top - main_margin.bottom,
 	context_height = 500 - context_margin.top - context_margin.bottom;
 
@@ -22,7 +23,6 @@ function labeller () {
 	var main_xaxis = d3.svg.axis().scale(main_xscale).orient("bottom"),
 	context_xaxis = d3.svg.axis().scale(context_xscale).orient("bottom"),
 	yaxis = d3.svg.axis().scale(main_yscale).orient("left");
-
 
 	//plotting areas
 	var svg = d3.select("#maindiv").append("svg")

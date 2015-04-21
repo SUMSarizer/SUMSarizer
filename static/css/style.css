@@ -20,6 +20,17 @@ a { cursor: pointer; color: steelblue;}
   font-size: 1.5em;
 }
 
+#fileList{
+  max-height: 200px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+#fileNotes{
+  font-size: 9pt;
+  padding-top:20px;
+}
+
 .register, .login, .dashboard {
   margin-top: 6em;
 }
@@ -49,7 +60,9 @@ svg {
   font: 10px sans-serif;
   display: block;
   margin: auto;
-}
+/*  max-width:90%;
+  overflow-x: scroll;
+*/}
 
 .area {
   fill: black;
@@ -89,3 +102,5 @@ svg {
   fill-opacity: .125;
   shape-rendering: crispEdges;
 }
+
+/*#maindiv{width:100%;}*/

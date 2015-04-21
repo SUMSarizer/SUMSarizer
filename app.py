@@ -140,6 +140,7 @@ def dataset(id):
     # has_prev?
     prev_ds = dataset.prev()
     next_ds = dataset.next()
+    all_ds = dataset.items()
     
     studyname_ds = dataset.study_name()
 
@@ -167,7 +168,8 @@ def dataset(id):
       points=dataset.data_points,
       points_json=json.dumps(graph_points),
       next_ds=next_ds,
-      prev_ds=prev_ds)
+      prev_ds=prev_ds,
+      all_ds=all_ds)
 
 @app.route('/point', methods=['POST'])
 @login_required

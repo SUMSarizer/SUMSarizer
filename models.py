@@ -52,8 +52,7 @@ class Datasets(db.Model):
       data_point = DataPoints(date_parse(data_point[0]),
                               data_point[1],
                               float(data_point[2]))
-      dataset.data_points.append(data_point)
-      
+      dataset.data_points.append(data_point)      
     return dataset
     
   def next(self):
@@ -69,6 +68,12 @@ class Datasets(db.Model):
       .filter(Datasets.created_at > self.created_at)\
       .order_by(Datasets.created_at)\
       .first()
+
+  def items(self):
+    return Datasets.query\
+      .filter(Datasets.study_id==self.study_id)\
+      .order_by(Datasets.created_at)\
+      .all()
 
   def study_name(self):
     return Studies.query\
@@ -96,6 +101,8 @@ class DataPoints(db.Model):
   unit = db.Column(db.String(16))
   value = db.Column(db.Float)
   selected = db.Column(db.Boolean)
+  # Add Boolean training set column
+  training = db.Column(db.Boolean)
   
   dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
   

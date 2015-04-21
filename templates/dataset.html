@@ -1,33 +1,30 @@
 {% extends "base.html" %}
 {% block body %}
-	<div class="row">				
-        <h1 class='nobottom'>Data Set</h1>
-        	<p class='tinyText'><strong>{{ title }}</strong> from study <strong><a href="{{ url_for('study', id=studyid) }}">{{study}}</a></strong></p>	
-			<div id="maindiv">
-		    	<div class="col-md-2 pull-left ">
-					<div>
-						{% if prev_ds %}
-						<a href="{{ url_for('dataset', id=prev_ds.id) }}" class='btn btn-default btn-xs pull-left'>&larr; Previous</a> 
-						{% endif %}
-					</div>
-				</div>	
-		    	<div class="col-md-2 pull-right">
-      				<div>
-					{% if next_ds %}
-					<a href="{{ url_for('dataset', id=next_ds.id) }}" class='btn btn-default btn-xs pull-right'>Next &rarr;</a>
-					{% endif %}
-					</div>
-				</div>
+	<div class="row">	
+		<div id='fileInfo' class='col-md-4 pull-left'>
+			<p style='margin-top:30px;'> Files from study         		
+    			<a href="{{ url_for('study', id=studyid) }}">{{study}}</a>
+    		</p>
+	    	<div id='fileList'>
+	    		<ul class="list-unstyled">
+		    		{% for all_d in all_ds %}
+						<li class="list-unstyled">
+							<a href="{{ url_for('dataset', id=all_d.id) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a> 
+						</li>
+					{% endfor %}
+				</ul>
 			</div>
-	
-		<h2>Notes</h2>
-			<div>
-			{% for note in notes %}
-				<div>
-					{{ note.text }}
-				</div>
-			{% endfor %}					
-	      </div>
+			<div id="fileNotes">
+	    		<p>Active File Notes</p>
+				{% for note in notes %}
+				<div>{{ note.text }}</div>
+				{% endfor %}					
+			</div>
+		</div>	
+		<div class="col-md-8">			
+	        <h1 class='nobottom'>Datapoints</h1>
+			<div id='maindiv'></div>
+        </div>
     </div>
 	
 	<script>
