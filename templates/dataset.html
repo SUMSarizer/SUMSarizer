@@ -5,15 +5,24 @@
 			<p style='margin-top:30px;'> Files from study         		
     			<a href="{{ url_for('study', id=studyid) }}">{{study}}</a>
     		</p>
+
 	    	<div id='fileList'>
-	    		<ul class="list-unstyled">
+	    		<table class="table table-condensed">
+				    <tbody>
 		    		{% for all_d in all_ds %}
-						<li class="list-unstyled">
-							<a href="{{ url_for('dataset', id=all_d.id) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a> 
-						</li>
+				        <tr>
+				        	<td colspan="1">
+				        		<a href="{{ url_for('dataset', id=all_d.id) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
+			        		</td>
+				        	<td colspan="1">
+				        		<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
+				        	</td>
+				        </tr>
 					{% endfor %}
-				</ul>
+				    </tbody>
+			    </table>
 			</div>
+
 			<div id="fileNotes">
 	    		<p>Active File Notes</p>
 				{% for note in notes %}
@@ -21,8 +30,13 @@
 				{% endfor %}					
 			</div>
 		</div>	
-		<div class="col-md-8">			
+		<div class="col-md-8">
 	        <h1 class='nobottom'>Datapoints</h1>
+			<div class='pull-right btn btn-xs btn-default' id='next'>
+				{% if next_ds %}
+					<a href="{{ url_for('dataset', id=next_ds.id) }}">Done? Next. &rarr;</a>
+				{% endif %}	
+			</div>
 			<div id='maindiv'></div>
         </div>
     </div>
@@ -32,3 +46,20 @@
 	</script>
 	
 {% endblock %}
+
+    		<table class="table table-condensed">
+			    <thead>
+					<tr>
+			        	<th>#</th>
+			        	<th>Filename</th>
+			        	<th>Status</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <tr>
+			        	<th scope="row">3</th>
+			        	<td colspan="2">Larry the Bird</td>
+			        	<td>@twitter</td>
+			        </tr>
+			    </tbody>
+		    </table>

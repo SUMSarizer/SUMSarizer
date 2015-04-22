@@ -29,6 +29,7 @@ class Datasets(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   created_at = db.Column(db.DateTime, default=datetime.datetime.now)
   title = db.Column(db.Unicode)
+  labelled = db.Column(db.Boolean)
   
   notes = db.relationship('Notes')
   data_points = db.relationship('DataPoints', order_by="DataPoints.timestamp", backref="dataset")
@@ -72,7 +73,7 @@ class Datasets(db.Model):
   def items(self):
     return Datasets.query\
       .filter(Datasets.study_id==self.study_id)\
-      .order_by(Datasets.created_at)\
+      .order_by(Datasets.created_at.desc())\
       .all()
 
 class Notes(db.Model):
