@@ -1,41 +1,55 @@
-.header { margin: 10px 0 20px 0;}
-h1 { font-size: 24px; border-bottom: 1px solid #4e5d6c; padding: 5px; margin-bottom: 30px; }
-h2 { font-size: 20px; }
-label { font-size: 16px;}
-a { cursor: pointer; }
+body {background-color:white; color: black;}
+
+.header { margin: 0; border-bottom: 1px solid lightgrey;}
+h1 { font-size: 24px; border-bottom: 1px dotted lightgrey; padding: 5px; margin-bottom: 30px; }
+.nobottom{margin-bottom:0px;}
+.nomargin{margin:0;}
+.tinyText{font-size:12px; font-weight:200;}
 .upload-container { margin: 20px 0;}
+.row{margin-left:10px; margin-right:10px;}
 
-#welcome {
-  margin-top: 6em;
+h2 { font-size: 20px; }
+
+label { font-size: 16px;}
+
+a { cursor: pointer; color: steelblue;}
+
+#welcome {margin-top: 6em;}
+
+#welcome li {font-size: 1.5em;}
+
+#next a{color:white;}
+
+#fileList{
+  max-height: 200px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
 
-#welcome li {
-  font-size: 1.5em;
+#fileNotes{
+  font-size: 9pt;
+  padding-top:20px;
 }
 
-.register, .login, .dashboard {
-  margin-top: 6em;
-}
+.register, .login, .dashboard {margin-top: 6em;}
 
-.register-fail, .login-fail {
-  margin-bottom: 1em;
-}
+.register-fail, .login-fail {margin-bottom: 1em;}
 
-.login .last-p {
-  margin-bottom: 2em;
-}
+.login .last-p {margin-bottom: 2em;}
 
-.dashboard h2 {
-  font-weight: bold;
-}
+.dashboard h2 {font-weight: bold;}
 
 .dashboard .data {
   color: #DF691A;
   font-weight: bold;
 }
 
+tr td a.btn.btn-xs{font-size:8pt;}
+tr td a.btn.btn-xs:hover{color:steelblue; text-decoration: underline;}
+tr td a.btn.btn-xs.btn-danger:hover{color:white; text-decoration: none;}
 
-
+.nav-pills>li>a{color:black; border-bottom: 3px solid white;}
+.nav-pills>li>a:hover{color:black; border-bottom: 3px solid steelblue; background-color:white;}
 
 svg {
   font: 10px sans-serif;
@@ -44,19 +58,19 @@ svg {
 }
 
 .area {
-  fill: steelblue;
+  fill: black;
   clip-path: url(#clip);
 }
 
 .line {
   fill: none;
-  stroke: steelblue;
+  stroke: black;
   stroke-width: 1.5px;
   clip-path: url(#clip);
 }
 
 .point {
-  fill: steelblue;
+  fill: black;
   stroke: none;
   clip-path: url(#clip);
 }
@@ -64,7 +78,7 @@ svg {
 .point.selected {
   fill: red;
   fill-opacity: 1;
-  stroke: brown;
+  stroke: red;
   clip-path: url(#clip);
 }
 
