@@ -1,39 +1,65 @@
 {% extends "base.html" %}
-
 {% block body %}
-  <div class="">
-    <div class="row">
-      <div class="col-lg-12">
-				
-				<div>
-					{% if prev_ds %}
-					<a href="{{ url_for('dataset', id=prev_ds.id) }}">&larr; Previous</a> 
-					{% endif %}
-					
-					{% if next_ds %}
-					<a href="{{ url_for('dataset', id=next_ds.id) }}">Next &rarr;</a>
-					{% endif %}
-				</div>
-				
-        <h1>Data Set</h1>
-				
-				<div id="maindiv"></div>
-				
-				
-				<h2>Notes</h2>
-				
+	<div class="row">	
+		<div id='fileInfo' class='col-md-4 pull-left'>
+			<p style='margin-top:30px;'> Files from study         		
+    			<a href="{{ url_for('study', id=studyid) }}">{{study}}</a>
+    		</p>
+
+	    	<div id='fileList'>
+	    		<table class="table table-condensed">
+				    <tbody>
+		    		{% for all_d in all_ds %}
+				        <tr>
+				        	<td colspan="1">
+				        		<a href="{{ url_for('dataset', id=all_d.id) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
+			        		</td>
+				        	<td colspan="1">
+				        		<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
+				        	</td>
+				        </tr>
+					{% endfor %}
+				    </tbody>
+			    </table>
+			</div>
+
+			<div id="fileNotes">
+	    		<p>Active File Notes</p>
 				{% for note in notes %}
-					<div>
-						{{ note.text }}
-					</div>
-				{% endfor %}
-								
-      </div>
+				<div>{{ note.text }}</div>
+				{% endfor %}					
+			</div>
+		</div>	
+		<div class="col-md-8">
+	        <h1 class='nobottom'>Datapoints</h1>
+			<div class='pull-right btn btn-xs btn-default' id='next'>
+				{% if next_ds %}
+					<a href="{{ url_for('dataset', id=next_ds.id) }}">Done? Next&rarr;</a>
+				{% endif %}	
+			</div>
+			<div id='maindiv'></div>
+        </div>
     </div>
-  </div>
 	
 	<script>
 	window.PLOTDATA = {{ points_json | safe}}
 	</script>
 	
 {% endblock %}
+
+    		<table class="table table-condensed">
+			    <thead>
+					<tr>
+			        	<th>#</th>
+			        	<th>Filename</th>
+			        	<th>Status</th>
+			        </tr>
+			    </thead>
+			    <tbody>
+			        <tr>
+			        	<th scope="row">3</th>
+			        	<td colspan="2">Larry the Bird</td>
+			        	<td>@twitter</td>
+			        </tr>
+			    </tbody>
+		    </table>
