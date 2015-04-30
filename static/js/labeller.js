@@ -110,7 +110,7 @@ function labeller () {
 	  makeplot(data);
 
 	  //set default extent for context
-	  var defaultExtent = [context_xscale.domain()[0],context_xscale.invert(context_xscale.range()[1]*(1/7))];
+	  var defaultExtent = [context_xscale.domain()[0],context_xscale.invert(context_xscale.range()[1]*(7/7))];
 	  svg.select(".context_brush").call(context_brush.extent(defaultExtent));
 
 	  //run brushing functions to make sure everything highlighted right
