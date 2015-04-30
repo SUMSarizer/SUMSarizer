@@ -140,10 +140,7 @@ def dataset(id):
     # has_prev?
     prev_ds = dataset.prev()
     next_ds = dataset.next()
-    all_ds = dataset.items()
     
-    # studyname_ds = dataset.study_name()
-
     def clean_selected(sel):
         if not sel:
             return 0
@@ -161,15 +158,11 @@ def dataset(id):
 
     return render_template('dataset.html', 
       dataset=dataset,
-      title=dataset.title,
-      study=dataset.study.title,
-      studyid = dataset.study_id,
       notes=dataset.notes,
       points=dataset.data_points,
       points_json=json.dumps(graph_points),
       next_ds=next_ds,
-      prev_ds=prev_ds,
-      all_ds=all_ds)
+      prev_ds=prev_ds)
 
 @app.route('/point', methods=['POST'])
 @login_required
