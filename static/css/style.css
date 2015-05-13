@@ -89,6 +89,7 @@ svg {
   shape-rendering: crispEdges;
 }
 
+
 .main_brush .extent,
 .context_brush .extent {
   stroke: #fff;
