@@ -1,6 +1,30 @@
 import datetime
 from app import db
 
+study_users = db.Table('study_users',
+    db.Column('study_id', db.Integer, db.ForeignKey('studies.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
+)
+
+
+class Users(db.Model):
+  __tablename__ = 'users'
+  
+  id = db.Column(db.Integer, primary_key=True)
+  user_id = db.Column(db.Unicode)
+  email = db.Column(db.Unicode)
+  studies = db.relationship('Studies', secondary=study_users,
+        backref=db.backref('users', lazy='dynamic'))
+  
+  def __init__(self, user):
+    self.user_id = user.get_id()
+    self.email = user.email
+    
+  @classmethod
+  def fromStormpath(cls,user):
+    print user.get_id()
+    return Users.query.filter_by(user_id=user.get_id()).first()
+
 class Studies(db.Model):
   __tablename__ = 'studies'
   
@@ -11,17 +35,15 @@ class Studies(db.Model):
   
   datasets = db.relationship('Datasets', lazy="dynamic", backref="study")
   
+  #users = db.relationship('Users', secondary=study_users,
+  #      backref=db.backref('studies', lazy='dynamic'))
+  
   def __init__(self, title, owner):
     self.title = title
     self.owner = owner.get_id()
-  
-  @classmethod
-  def for_user(cls, user):
-    return Studies.query\
-      .filter(cls.owner==user.get_id())\
-      .order_by(Studies.created_at.desc())\
-      .limit(50)
     
+  def authorizedUser(self,user):
+    return (self.users.filter_by(user_id=user.get_id()).count()>0)
 
 class Datasets(db.Model):
   __tablename__ = 'datasets'

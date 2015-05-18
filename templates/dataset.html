@@ -12,7 +12,7 @@
 		    		{% for all_d in all_ds %}
 				        <tr>
 				        	<td colspan="1">
-				        		<a href="{{ url_for('dataset', id=all_d.id)+'?trainingOnly=true' }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
+				        		<a href="{{ url_for('dataset', id=all_d.id, trainingOnly=true) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
 			        		</td>
 				        	<td colspan="1">
 				        		<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
@@ -34,7 +34,7 @@
 	        <h1 class='nobottom'>Datapoints</h1>
 			<div class='pull-right btn btn-xs btn-default' id='next'>
 				{% if next_ds %}
-					<a href="{{ url_for('dataset', id=next_ds.id) }}">Done? Next&rarr;</a>
+					<a href="{{ url_for('dataset', id=next_ds.id, trainingOnly=true) }}">Done? Next&rarr;</a>
 				{% endif %}	
 			</div>
 			<div id='maindiv'></div>

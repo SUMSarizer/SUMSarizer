@@ -30,7 +30,7 @@ app.config.from_object(os.environ.get('APP_SETTINGS'))
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
-from models import Datasets, Studies, DataPoints
+from models import Datasets, Studies, DataPoints, Users
 
 SUBSET_SIZE=datetime.timedelta(7)
 ##### Website
@@ -63,8 +63,14 @@ def register():
     except StormpathError, err:
         # If something fails, we'll display a user-friendly error message.
         return render_template('register.html', error=err.message)
-
+    
     login_user(_user, remember=True)
+    
+    # add user to internal DB
+    db_user = Users(user)
+    db.session.add(db_user)
+    db.session.commit()
+
     return redirect(url_for('dashboard'))
 
 
@@ -98,7 +104,7 @@ def login():
 @login_required
 def dashboard():
     page = int(request.args.get('page') or 1)
-    studies = Studies.for_user(user)
+    studies = Users.fromStormpath(user).studies
     return render_template('dashboard.html', 
       studies=studies)
       
@@ -106,7 +112,8 @@ def dashboard():
 @login_required
 def new_study():
     study = Studies(request.form['title'], user)
-    db.session.add(study)  
+    db.session.add(study)
+    study.users.append(Users.fromStormpath(user))
     db.session.commit()
     return redirect(url_for('dashboard'))
     
@@ -114,7 +121,7 @@ def new_study():
 @login_required
 def study(id):
     study = Studies.query.get(id)
-    if study.owner != user.get_id():
+    if not study.authorizedUser(user):
         abort(401)
     
     page = int(request.args.get('page') or 1)
@@ -126,7 +133,8 @@ def study(id):
     return render_template('study.html', 
       study=study,
       datasets=datasets.items,
-      pagination=datasets)
+      pagination=datasets,
+      users=study.users.all())
       
 @app.route('/dataset/<id>', methods=['GET'])
 @login_required
@@ -134,7 +142,7 @@ def dataset(id):
     import time
 
     dataset = Datasets.query.get(id)
-    if dataset.study.owner != user.get_id():
+    if not dataset.study.authorizedUser(user):
         abort(401)
     
     # Grab the list of datasets in this study
@@ -180,7 +188,7 @@ def dataset(id):
 
 def point(json):
     point = DataPoints.query.get(json['id'])
-    if point.dataset.study.owner != user.get_id():
+    if not point.dataset.study.authorizedUser(user):
         abort(401)
     
     point.selected = json['selected'] == 1
