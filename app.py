@@ -3,6 +3,8 @@
 
 import os
 import json
+import datetime
+import random
 from flask import (
     Flask,
     redirect,
@@ -30,6 +32,7 @@ stormpath_manager = StormpathManager(app)
 
 from models import Datasets, Studies, DataPoints
 
+SUBSET_SIZE=datetime.timedelta(7)
 ##### Website
 @app.route('/')
 def index():
@@ -150,6 +153,10 @@ def dataset(id):
         if sel:
             return 1
         return 0
+
+    data_points=dataset.data_points
+    if request.args.get('trainingOnly',''):
+        data_points = data_points.filter_by(training=True).all()
     
     graph_points = [{
         "id": x.id,
@@ -157,7 +164,7 @@ def dataset(id):
         "temp_c": x.value,
         "time": x.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
         "selected": clean_selected(x.selected)
-    } for x in dataset.data_points]
+    } for x in data_points]
 
     return render_template('dataset.html', 
       dataset=dataset,
@@ -171,10 +178,7 @@ def dataset(id):
       prev_ds=prev_ds,
       all_ds=all_ds)
 
-@app.route('/point', methods=['POST'])
-@login_required
-def point():
-    json = request.get_json()
+def point(json):
     point = DataPoints.query.get(json['id'])
     if point.dataset.study.owner != user.get_id():
         abort(401)
@@ -186,11 +190,31 @@ def point():
     
     db.session.add(point)
     db.session.commit()
+
+@app.route('/points', methods=['POST'])
+@login_required
+def points():
+    json = request.get_json()
     
+    for point_json in json:
+        point(point_json)
+        
     return jsonify({
         "success": True
     })
+    
 
+def select_subset(dataset):
+    first_time=dataset.data_points[1].timestamp  
+    last_time=dataset.data_points[-1].timestamp
+    time_length=last_time-first_time-SUBSET_SIZE
+    subset_start=first_time+datetime.timedelta(seconds=random.random()* time_length.total_seconds())
+    subset_end=subset_start+SUBSET_SIZE
+    
+    for data_point in dataset.data_points:
+        if((subset_start<=data_point.timestamp)&(data_point.timestamp<=subset_end)):
+            data_point.training=True
+    
 
 @app.route('/upload/<id>', methods=['POST'])
 @login_required
@@ -201,6 +225,7 @@ def upload(id):
     
     file = request.files['file']
     dataset = Datasets.from_file(file, study)
+    select_subset(dataset)
     db.session.add(dataset)
     db.session.commit()
 

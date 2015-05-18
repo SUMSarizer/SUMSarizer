@@ -32,7 +32,7 @@ class Datasets(db.Model):
   labelled = db.Column(db.Boolean)
   
   notes = db.relationship('Notes')
-  data_points = db.relationship('DataPoints', order_by="DataPoints.timestamp", backref="dataset")
+  data_points = db.relationship('DataPoints', order_by="DataPoints.timestamp", backref="dataset",lazy="dynamic")
   
   study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
 

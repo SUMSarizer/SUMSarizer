@@ -252,18 +252,20 @@ function labeller () {
 
 	// Find the nodes within the specified rectangle.
 	function search(quadtree, brush_xmin, brush_ymin, brush_xmax, brush_ymax) {
+	  var brushed_points = [];
 	  quadtree.visit(function(node, rect_xmin, rect_ymin, rect_xmax, rect_ymax) {
 	    var p = node.point;
 	    if (p){
 	      //select based on xor (so brushing toggles all points under brush)
 	      p.selected = p.selected ^ ((p.x >= brush_xmin) && (p.x <= brush_xmax) && (p.y >= brush_ymin) && (p.y <= brush_ymax));
-
-				post(p);
+	      		brushed_points.push(p);
+				//post(p);
 	    }
 	    //true if brush and quadtree rectangle don't over lap -- we didn't brush anything in here.
 	    //therefore, don't look at children of this node
 	    return rect_xmin > brush_xmax || rect_ymin > brush_ymax || rect_xmax < brush_xmin || rect_ymax < brush_ymin;
 	  });
+	  post(brushed_points);
 	}
 
 	function brushed_main(){
@@ -281,7 +283,7 @@ function labeller () {
 	function post (p) {
 		$.ajax({
 			type: "POST",
-			url: "/point",
+			url: "/points",
 			data: JSON.stringify(p),
 			dataType: 'json',
 			contentType: 'application/json'
