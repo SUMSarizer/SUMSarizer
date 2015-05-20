@@ -26,8 +26,11 @@ function labeller () {
 
 	//plotting areas
 	var svg = d3.select("#maindiv").append("svg")
+	.attr("id", "mainChart")
 	.attr("width", width + main_margin.left + main_margin.right)
-	.attr("height", main_height + main_margin.top + main_margin.bottom);
+	.attr("height", main_height + main_margin.top + main_margin.bottom)
+	.attr("viewBox", "0 0 " + (width + main_margin.left + main_margin.right) + " " + (main_height + main_margin.top + main_margin.bottom))
+	.attr("perserveAspectRatio", "xMinYMid");
 
 	//something about clipping, not sure what this is doing yet
 	svg.append("defs").append("clipPath")
