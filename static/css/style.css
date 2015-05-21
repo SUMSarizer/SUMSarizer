@@ -4,6 +4,7 @@ body {background-color:white; color: black;}
 h1 { font-size: 24px; border-bottom: 1px dotted lightgrey; padding: 5px; margin-bottom: 30px; }
 .nobottom{margin-bottom:0px;}
 .nomargin{margin:0;}
+.studyTextButton{margin-right:20px; margin-top:12px}
 .tinyText{font-size:12px; font-weight:200;}
 .upload-container { margin: 20px 0;}
 .row{margin-left:10px; margin-right:10px;}
@@ -89,10 +90,14 @@ svg {
   shape-rendering: crispEdges;
 }
 
-
 .main_brush .extent,
 .context_brush .extent {
   stroke: #fff;
   fill-opacity: .125;
   shape-rendering: crispEdges;
 }
+
+.modal-body input.form-control{border:1px solid lightgray;}
+.modal-content{background-color:white!important;}
+.modal-footer{background-color:white!important;}
+.modal-header{background-color:white!important;}

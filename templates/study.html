@@ -57,10 +57,10 @@
     <div class="row">
       <div class="col-lg-12">
 				
-		<h1>{{study.title}}</h1> 
-		<a href="" class="btn btn-success" ng-click="vm.deleteModal()">Delete Study</a> 
-		<a href="" class="btn btn-success" ng-click="vm.openModal()">Upload Sensor Data</a>
-
+		<h1>{{study.title}} 
+			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.deleteModal()">Delete Study</a> 
+			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.openModal()">Upload Sensor Data</a>
+		</h1>
 		<div class="upload-container">				
 			
 			{% for upload in uploads %}
