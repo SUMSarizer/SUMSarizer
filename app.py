@@ -5,6 +5,9 @@ import os
 import json
 import datetime
 import random
+import zipfile
+import re
+#from werkzeug.contrib.profiler import ProfilerMiddleware
 from flask import (
     Flask,
     redirect,
@@ -27,6 +30,8 @@ from stormpath.error import Error as StormpathError
 
 app = Flask(__name__)
 app.config.from_object(os.environ.get('APP_SETTINGS'))
+#app.config['PROFILE'] = True
+#app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
@@ -231,11 +236,17 @@ def upload(id):
     if study.owner != user.get_id():
         abort(401)
     
-    file = request.files['file']
-    dataset = Datasets.from_file(file, study)
-    select_subset(dataset)
-    db.session.add(dataset)
-    db.session.commit()
+    zfile = request.files['file']
+    zpf=zipfile.ZipFile(zfile)
+    valCSV=re.compile("[^\.\_.*\.csv]")
+    for file in zpf.namelist():
+        if(valCSV.match(file) is None):
+            continue
+        print file
+        dataset = Datasets.from_file(zpf.open(file),file, study)
+        select_subset(dataset)
+        db.session.add(dataset)
+        db.session.commit()
 
     return jsonify({
     'success': True

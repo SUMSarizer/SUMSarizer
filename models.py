@@ -1,6 +1,8 @@
 import datetime
 from app import db
-
+import sumsparser as parser
+from dateutil.parser import parse as date_parse
+    
 study_users = db.Table('study_users',
     db.Column('study_id', db.Integer, db.ForeignKey('studies.id')),
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
@@ -58,24 +60,19 @@ class Datasets(db.Model):
   
   study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
 
-  def __init__(self, title, study):
+  def __init__(self, title, study, notes = [], data_points = []):
     self.title = title
     self.study_id = study.id
+    self.notes = notes
+    self.data_points = data_points
   
   @classmethod
-  def from_file(cls, file, study):
-    import sumsparser as parser
-    from dateutil.parser import parse as date_parse
+  def from_file(cls, file, filename, study):
     parsed = parser.parse(file)
-    dataset = Datasets(file.filename, study)
-    for note_text in parsed['notes']:
-      note = Notes(note_text)
-      dataset.notes.append(note)
-    for data_point in parsed['data']:
-      data_point = DataPoints(date_parse(data_point[0]),
-                              data_point[1],
-                              float(data_point[2]))
-      dataset.data_points.append(data_point)      
+    
+    notes = [Notes(note_text) for note_text in parsed['notes']]
+    data_points=[DataPoints.from_parsed(parsed_point) for parsed_point in parsed['data']]
+    dataset = Datasets(filename, study, notes, data_points)
     return dataset
     
   def next(self):
@@ -128,3 +125,9 @@ class DataPoints(db.Model):
     self.timestamp = timestamp
     self.unit = unit
     self.value = value
+    
+  @classmethod
+  def from_parsed(cls, parsed_point):
+    return DataPoints(date_parse(parsed_point[0]),
+                              parsed_point[1],
+                              float(parsed_point[2]))
