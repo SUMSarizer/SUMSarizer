@@ -62,6 +62,24 @@ angular.module('myApp', [
   };
 })
 
+.controller('DeleteModalInstanceCtrl', function ($scope, $modalInstance, $timeout, $window) {
+	var vm = this;
+	
+	vm.submit = function () {
+		
+		vm.uploading = true;
+		vm.complete = false;
+		
+		var elAction = document.getElementById('action');
+		var action = elAction.getAttribute('value');
+		$window.location.href = action
+	};
+	
+    vm.cancel = function () {
+	    $modalInstance.dismiss('cancel');
+  };
+})
+
 .controller('DashboardCtrl', function ($timeout, $modal) {
 	var vm = this;
 	vm.uploadCount = 0;
@@ -79,6 +97,17 @@ angular.module('myApp', [
 			
 		});
 	};
+	
+	
+	vm.deleteModal = function () {
+		var modalInstance = $modal.open({
+			templateUrl: 'modal_delete.html',
+			controller: 'DeleteModalInstanceCtrl',
+			controllerAs: 'vm'
+		});
+	};
+
+
 	
 })
 

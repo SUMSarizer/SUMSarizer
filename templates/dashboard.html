@@ -32,7 +32,7 @@
 				<ul>
 					{% for study in studies %}
 					<li>
-						<a href="{{ url_for('study', id=study.id) }}">{{ study.title }}</a>
+						<a href="{{ url_for('study', study_id=study.id) }}">{{ study.title }}</a>
 					</li>
 					{% endfor %}
 				</ul>

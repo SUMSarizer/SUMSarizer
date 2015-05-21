@@ -127,13 +127,13 @@ def new_study():
     db.session.add(study)
     study.users.append(Users.fromStormpath(user))
     db.session.commit()
-    return redirect(url_for('dashboard'))
+    return redirect(url_for('study', study_id=study.id))
 
 
-@app.route('/study/<id>', methods=['GET'])
+@app.route('/study/<study_id>', methods=['GET'])
 @login_required
-def study(id):
-    study = Studies.query.get(id)
+def study(study_id):
+    study = Studies.query.get(study_id)
     if not study.authorizedUser(user):
         abort(401)
 
@@ -149,6 +149,19 @@ def study(id):
                            pagination=datasets,
                            users=study.users.all(),
                            uploads=study.uploads)
+
+
+@app.route('/delete_study/<study_id>', methods=['GET'])
+@login_required
+def delete_study(study_id):
+    study = Studies.query.get(study_id)
+    if study.owner != user.get_id():
+        abort(401)
+
+    db.session.delete(study)
+    db.session.commit()
+
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/dataset/<id>', methods=['GET'])
@@ -246,9 +259,9 @@ def generate_selector(data):
     return selector
 
 
-def zip_ingress(zfilename, study_id):
+def zip_ingress(data, study_id):
     conn = db.engine.connect()
-    zpf = zipfile.ZipFile(zfilename)
+    zpf = zipfile.ZipFile(data)
 
     valCSV = re.compile("[^\.\_.*\.csv]")
     for file in zpf.namelist():
@@ -285,10 +298,10 @@ def upload(study_id):
         abort(401)
 
     zfile = request.files['file']
-    zfilename = secure_filename(zfile.filename)
-    zpath = os.path.join(app.config['UPLOAD_FOLDER'], zfilename)
-    zfile.save(zpath)
-    db.session.add(StudyUploads(zfilename, study_id))
+    #zfilename = secure_filename(zfile.filename)
+    #zpath = os.path.join(app.config['UPLOAD_FOLDER'], zfilename)
+    # zfile.save(zpath)
+    db.session.add(StudyUploads(zfile.filename, zfile.read(), study_id))
     db.session.commit()
 
     return jsonify({

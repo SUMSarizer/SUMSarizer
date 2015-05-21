@@ -33,12 +33,14 @@ class StudyUploads(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     filename = db.Column(db.Unicode)
+    data = db.Column(db.LargeBinary)
     study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
     # users = db.relationship('Users', secondary=study_users,
     #      backref=db.backref('studies', lazy='dynamic'))
 
-    def __init__(self, filename, study_id):
+    def __init__(self, filename, data, study_id):
         self.filename = filename
+        self.data = data
         self.study_id = study_id
 
 
@@ -50,8 +52,8 @@ class Studies(db.Model):
     title = db.Column(db.Unicode)
     owner = db.Column(db.Unicode)
 
-    datasets = db.relationship('Datasets', lazy="dynamic", backref="study")
-    uploads = db.relationship('StudyUploads', lazy="dynamic", backref="study")
+    datasets = db.relationship('Datasets', lazy="dynamic", cascade="all, delete-orphan", backref="study")
+    uploads = db.relationship('StudyUploads', lazy="dynamic", cascade="all, delete-orphan", backref="study")
     # users = db.relationship('Users', secondary=study_users,
     #      backref=db.backref('studies', lazy='dynamic'))
 
@@ -71,8 +73,8 @@ class Datasets(db.Model):
     title = db.Column(db.Unicode)
     labelled = db.Column(db.Boolean)
 
-    notes = db.relationship('Notes')
-    data_points = db.relationship('DataPoints', order_by="DataPoints.timestamp", backref="dataset", lazy="dynamic")
+    notes = db.relationship('Notes', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
+    data_points = db.relationship('DataPoints', order_by="DataPoints.timestamp", cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
 
     study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
 
