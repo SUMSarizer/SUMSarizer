@@ -85,7 +85,7 @@
 				
 				</ul>
 								
-        <h2>Users</h2>
+        <h2>Current Users</h2>
 				
 				<ul>
 					{% for user in users %}
@@ -95,7 +95,15 @@
 					{% endfor %}
 				</ul>
 
-
+        <h2>Add Other Users</h2>
+				
+				<ul>
+					{% for user in notusers %}
+					<li>
+						<p><a href="{{url_for('add_study_user', study_id=study.id,user_id=user.id)}}">{{user.email}}</a></p>
+					</li>
+					{% endfor %}
+				</ul>
       </div>
     </div>
   </div>

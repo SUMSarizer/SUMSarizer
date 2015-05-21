@@ -143,11 +143,14 @@ def study(study_id):
         .order_by(Datasets.created_at.desc())\
         .paginate(page, per_page=15)
 
+    users = study.users.all()
+    notusers = Users.query.except_(study.users).all()
     return render_template('study.html',
                            study=study,
                            datasets=datasets.items,
                            pagination=datasets,
                            users=study.users.all(),
+                           notusers=notusers,
                            uploads=study.uploads)
 
 
@@ -162,6 +165,21 @@ def delete_study(study_id):
     db.session.commit()
 
     return redirect(url_for('dashboard'))
+
+
+@app.route('/add_study_user/<study_id>', methods=['GET'])
+@login_required
+def add_study_user(study_id):
+    user_id = request.args.get('user_id')
+
+    if not user_id:
+        abort(400)
+
+    study = Studies.query.get(study_id)
+    user = Users.query.get(user_id)
+    study.users.append(user)
+    db.session.commit()
+    return redirect(url_for('study', study_id=study.id))
 
 
 @app.route('/dataset/<id>', methods=['GET'])
@@ -196,7 +214,6 @@ def dataset(id):
 
     graph_points = [{
         "id": x.id,
-        "selected": 0,
         "temp_c": x.value,
         "time": x.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
         "selected": clean_selected(x.selected)
@@ -298,8 +315,8 @@ def upload(study_id):
         abort(401)
 
     zfile = request.files['file']
-    #zfilename = secure_filename(zfile.filename)
-    #zpath = os.path.join(app.config['UPLOAD_FOLDER'], zfilename)
+    # zfilename = secure_filename(zfile.filename)
+    # zpath = os.path.join(app.config['UPLOAD_FOLDER'], zfilename)
     # zfile.save(zpath)
     db.session.add(StudyUploads(zfile.filename, zfile.read(), study_id))
     db.session.commit()
