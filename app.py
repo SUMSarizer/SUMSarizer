@@ -10,7 +10,7 @@ import re
 import sumsparser as parser
 from dateutil.parser import parse as date_parse
 
-# from werkzeug.contrib.profiler import ProfilerMiddleware
+#from werkzeug.contrib.profiler import ProfilerMiddleware
 from flask import (
     Flask,
     redirect,
@@ -34,12 +34,12 @@ from werkzeug import secure_filename
 
 app = Flask(__name__)
 app.config.from_object(os.environ.get('APP_SETTINGS'))
-# app.config['PROFILE'] = True
-# app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
+#app.config['PROFILE'] = True
+#app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
-from models import Datasets, Studies, StudyUploads, DataPoints, Notes, Users
+from models import Datasets, Studies, StudyUploads, DataPoints, Notes, Users, UserLabels
 
 SUBSET_SIZE = datetime.timedelta(7)
 # Website
@@ -182,12 +182,12 @@ def add_study_user(study_id):
     return redirect(url_for('study', study_id=study.id))
 
 
-@app.route('/dataset/<id>', methods=['GET'])
+@app.route('/label_dataset/<dataset_id>', methods=['GET'])
 @login_required
-def dataset(id):
+def label_dataset(dataset_id):
     import time
 
-    dataset = Datasets.query.get(id)
+    dataset = Datasets.query.get(dataset_id)
     if not dataset.study.authorizedUser(user):
         abort(401)
 
@@ -199,7 +199,19 @@ def dataset(id):
     next_ds = dataset.next()
     all_ds = dataset.items()
 
-    # studyname_ds = dataset.study_name()
+    user_row = Users.query.filter_by(stormpath_id=user.get_id()).first()
+
+    # join labels for this user with datapoints for this dataset
+    data_labels = dataset.user_labels(user_row.id)
+
+    # populate labels if they're currently empty
+    if data_labels.count() == 0:
+        conn = db.engine.connect()
+        dicts = UserLabels.dicts_from_datapoints(data_points, user_row.id)
+        conn.execute(UserLabels.__table__.insert(), dicts)
+        db.session.commit()
+
+    # json data for d3
 
     def clean_selected(sel):
         if not sel:
@@ -208,18 +220,14 @@ def dataset(id):
             return 1
         return 0
 
-    data_points = dataset.data_points
-    if request.args.get('trainingOnly', ''):
-        data_points = data_points.filter_by(training=True).all()
-
     graph_points = [{
-        "id": x.id,
-        "temp_c": x.value,
-        "time": x.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-        "selected": clean_selected(x.selected)
-    } for x in data_points]
+        "id": x.UserLabels.id,
+        "temp_c": x.DataPoints.value,
+        "time": x.DataPoints.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+        "selected": clean_selected(x.UserLabels.label)
+    } for x in data_labels]
 
-    return render_template('dataset.html',
+    return render_template('label_dataset.html',
                            dataset=dataset,
                            title=dataset.title,
                            study=dataset.study.title,
@@ -232,27 +240,34 @@ def dataset(id):
                            all_ds=all_ds)
 
 
-def point(json):
-    point = DataPoints.query.get(json['id'])
-    if not point.dataset.study.authorizedUser(user):
+@app.route('/reset_labels/<dataset_id>', methods=['GET'])
+@login_required
+def reset_labels(dataset_id):
+    import time
+
+    dataset = Datasets.query.get(dataset_id)
+    if not dataset.study.authorizedUser(user):
         abort(401)
 
-    point.selected = json['selected'] == 1
+    user_row = Users.query.filter_by(stormpath_id=user.get_id()).first()
+    data_labels = dataset.user_labels(user_row.id)
 
-    print point
-    print point.timestamp
-
-    db.session.add(point)
+    dicts = [dict(id=data_label.UserLabels.id, label=False) for data_label in data_labels]
+    db.session.bulk_update_mappings(UserLabels, dicts)
     db.session.commit()
 
+    return jsonify({
+        "success": True
+    })
 
-@app.route('/points', methods=['POST'])
+
+@app.route('/labels', methods=['POST'])
 @login_required
-def points():
+def labels():
     json = request.get_json()
-
-    for point_json in json:
-        point(point_json)
+    dicts = [dict(id=graph_point['id'], label=graph_point['selected'] == 1) for graph_point in json]
+    db.session.bulk_update_mappings(UserLabels, dicts)
+    db.session.commit()
 
     return jsonify({
         "success": True
@@ -263,7 +278,7 @@ def generate_selector(data):
     first_time = date_parse(data[1][0])
     last_time = date_parse(data[-1][0])
     time_length = last_time-first_time-SUBSET_SIZE
-    subset_start = first_time + \
+    subset_start = first_time +\
         datetime.timedelta(
             seconds=random.random() * time_length.total_seconds())
     if subset_start < first_time:

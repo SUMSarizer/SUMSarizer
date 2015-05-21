@@ -12,19 +12,22 @@ class Users(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Unicode)
+    stormpath_id = db.Column(db.Unicode)
     email = db.Column(db.Unicode)
     studies = db.relationship('Studies', secondary=study_users,
                               backref=db.backref('users', lazy='dynamic'))
 
+    labels = db.relationship('UserLabels',
+                             backref='users', lazy='dynamic')
+
     def __init__(self, user):
-        self.user_id = user.get_id()
+        self.stormpath_id = user.get_id()
         self.email = user.email
 
     @classmethod
     def fromStormpath(cls, user):
         print user.get_id()
-        return Users.query.filter_by(user_id=user.get_id()).first()
+        return Users.query.filter_by(stormpath_id=user.get_id()).first()
 
 
 class StudyUploads(db.Model):
@@ -62,7 +65,7 @@ class Studies(db.Model):
         self.owner = owner.get_id()
 
     def authorizedUser(self, user):
-        return (self.users.filter_by(user_id=user.get_id()).count() > 0)
+        return (self.users.filter_by(stormpath_id=user.get_id()).count() > 0)
 
 
 class Datasets(db.Model):
@@ -104,6 +107,12 @@ class Datasets(db.Model):
             .order_by(Datasets.created_at.desc())\
             .all()
 
+    def user_labels(self, user_id):
+        return db.session.query(DataPoints, UserLabels).\
+            filter_by(dataset_id=self.id).\
+            join(UserLabels).filter_by(user_id=user_id).\
+            order_by(DataPoints.timestamp)
+
 
 class Notes(db.Model):
     __tablename__ = 'notes'
@@ -134,11 +143,11 @@ class DataPoints(db.Model):
     timestamp = db.Column(db.DateTime)
     unit = db.Column(db.String(16))
     value = db.Column(db.Float)
-    selected = db.Column(db.Boolean)
     # Add Boolean training set column
     training = db.Column(db.Boolean)
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
+    user_labels = db.relationship('UserLabels', cascade="all, delete-orphan", backref="datapoint", lazy="dynamic")
 
     def __init__(self, timestamp, unit, value):
         self.timestamp = timestamp
@@ -146,7 +155,7 @@ class DataPoints(db.Model):
         self.value = value
 
     @classmethod
-    def dict_from_parsed(cls, parsed_point, dataset_id, selector):
+    def dict_from_parsed(cls, parsed_point, dataset_id, training_selector):
         timestamp = date_parse(parsed_point[0])
         return dict(
             created_at=datetime.datetime.now(),
@@ -154,6 +163,26 @@ class DataPoints(db.Model):
             unit=parsed_point[1],
             value=float(parsed_point[2]),
             dataset_id=dataset_id,
-            selected=False,
-            training=selector(timestamp)
+            training=training_selector(timestamp)
         )
+
+
+class UserLabels(db.Model):
+    __tablename__ = 'user_labels'
+
+    id = db.Column(db.Integer, primary_key=True)
+    datapoint_id = db.Column(db.Integer, db.ForeignKey('datapoints.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    label = db.Column(db.Boolean)
+
+    def __init__(self, datapoint_id, user_id, label=False):
+        self.datapoint_id = datapoint_id
+        self.user_id = user_id
+        self.label = False
+
+    @classmethod
+    def dicts_from_datapoints(cls, data_points, user_id):
+        dicts = [dict(datapoint_id=data_point.id,
+                      user_id=user_id,
+                      label=False) for data_point in data_points]
+        return dicts

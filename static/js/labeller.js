@@ -286,7 +286,7 @@ function labeller () {
 	function post (p) {
 		$.ajax({
 			type: "POST",
-			url: "/points",
+			url: "/labels",
 			data: JSON.stringify(p),
 			dataType: 'json',
 			contentType: 'application/json'

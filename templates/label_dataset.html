@@ -1,5 +1,23 @@
 {% extends "base.html" %}
 {% block body %}
+
+	<script type="text/ng-template" id="modal_reset.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Clear Points</h3>
+    </div>
+    
+	<div class="modal-body">
+			
+		<p>Are you sure you want to clear all the labels?</p>
+			
+	</div>
+	<div class="modal-footer">
+		<input id="action" type="hidden" name="action" value="{{ url_for('reset_labels', dataset_id=dataset.id) }}" />
+		<button class="btn btn-success" ng-click="vm.submit()">Yes</button>
+	    <a class="btn" ng-click="vm.cancel()">Cancel</a>
+	</div>
+  	</script>
+
 	<div class="row">	
 		<div id='fileInfo' class='col-md-4 pull-left'>
 			<p style='margin-top:30px;'> Files from study         		
@@ -12,7 +30,7 @@
 		    		{% for all_d in all_ds %}
 				        <tr>
 				        	<td colspan="1">
-				        		<a href="{{ url_for('dataset', id=all_d.id, trainingOnly=true) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
+				        		<a href="{{ url_for('label_dataset', dataset_id=all_d.id) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
 			        		</td>
 				        	<td colspan="1">
 				        		<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
@@ -31,14 +49,24 @@
 			</div>
 		</div>	
 		<div class="col-md-8">
-	        <h1 class='nobottom'>Datapoints</h1>
+	        <h1 class='nobottom'>Datapoints for {{title}}</h1>
 			<div class='pull-right btn btn-xs btn-default' id='next'>
 				{% if next_ds %}
-					<a href="{{ url_for('dataset', id=next_ds.id, trainingOnly=true) }}">Done? Next&rarr;</a>
+					<a href="{{ url_for('label_dataset', dataset_id=next_ds.id) }}">Done? Next&rarr;</a>
 				{% endif %}	
 			</div>
+		
+        	<div class="" ng-controller="DatasetCtrl as vm">
+		       	<div class='pull-right btn btn-xs btn-default' id='clear'>
+					{% if next_ds %}
+						<a href="" ng-click="vm.resetModal()">Clear Labels</a>
+					{% endif %}	
+				</div>
+			</div>
 			<div id='maindiv'></div>
-        </div>
+        
+		</div>
+
     </div>
 	
 	<script>

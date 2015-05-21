@@ -57,7 +57,6 @@ angular.module('myApp', [
 	};
 	
   vm.cancel = function () {
-		$window.location.reload();
     $modalInstance.dismiss('cancel');
   };
 })
@@ -73,6 +72,27 @@ angular.module('myApp', [
 		var elAction = document.getElementById('action');
 		var action = elAction.getAttribute('value');
 		$window.location.href = action
+	};
+	
+    vm.cancel = function () {
+	    $modalInstance.dismiss('cancel');
+  };
+})
+
+.controller('ResetModalInstanceCtrl', function ($scope, $modalInstance, $timeout, $window) {
+	var vm = this;
+	
+	vm.submit = function () {
+		
+		vm.uploading = true;
+		vm.complete = false;
+		
+		var elAction = document.getElementById('action');
+		var action = elAction.getAttribute('value');
+		var request = new XMLHttpRequest();
+		request.open("GET", action, true);
+		request.send();
+    	$window.location.reload()
 	};
 	
     vm.cancel = function () {
@@ -127,5 +147,26 @@ angular.module('myApp', [
 			controllerAs: 'vm'
 		});
 	};
-});
+})
 
+
+.controller('DatasetCtrl', function ($timeout, $modal) {
+	var vm = this;
+	vm.uploadCount = 0;
+	
+	vm.resetModal = function () {
+		var modalInstance = $modal.open({
+			templateUrl: 'modal_reset.html',
+			controller: 'ResetModalInstanceCtrl',
+			controllerAs: 'vm'
+		});
+
+		modalInstance.result.then(function () {
+
+		}, function () {
+			
+		});
+	};
+	
+	
+});
