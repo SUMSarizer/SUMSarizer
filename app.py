@@ -10,7 +10,7 @@ import re
 import sumsparser as parser
 from dateutil.parser import parse as date_parse
 
-#from werkzeug.contrib.profiler import ProfilerMiddleware
+from werkzeug.contrib.profiler import ProfilerMiddleware
 from flask import (
     Flask,
     redirect,
@@ -33,8 +33,8 @@ from stormpath.error import Error as StormpathError
 
 app = Flask(__name__)
 app.config.from_object(os.environ.get('APP_SETTINGS'))
-#app.config['PROFILE'] = True
-#app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
+app.config['PROFILE'] = True
+app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
