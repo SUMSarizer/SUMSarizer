@@ -8,7 +8,7 @@
 	  {%- for page in pagination.iter_pages() %}
 	    {% if page %}
 	      {% if page != pagination.page %}
-	        <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+	        <a href="{{ url_for(endpoint, id=study.id, page=page) }}">{{ page }}</a>
 	      {% else %}
 	        <strong>{{ page }}</strong>
 	      {% endif %}
@@ -27,13 +27,10 @@
     <div class="modal-body">
 			<p>Please upload a zip file containing all reading files for your study.</p>
 			<input id="files" type="file" name="file" multiple>
-			<input id="action" type="hidden" name="action" value="{{ url_for('upload', id=study.id) }}" />
+			<input id="action" type="hidden" name="action" value="{{ url_for('upload', study_id=study.id) }}" />
 			
 			<div ng-if="vm.uploadCount">
 				Uploads remaining: {[{ vm.uploadCount }]}
-			</div>
-			<div ng-if="vm.complete">
-				Upload complete
 			</div>
     </div>
     <div class="modal-footer">
@@ -48,22 +45,28 @@
 				
 		<h1>{{study.title}}</h1>
 				
+				
         <h2>Data Sets</h2>
 				
 				<div class="upload-container">				
 					<a href="" class="btn btn-success" ng-click="vm.openModal()">Upload</a>
+					{% for upload in uploads %}
+						<p><b>Pending upload: {{upload.filename}}</b> </p>
+					{% endfor %}
 				</div>
 								
+				
 				<ul>
 					{% for dataset in datasets %}
 					<li>
 						<p><a href="{{url_for('dataset', id=dataset.id,trainingOnly=true)}}">{{ dataset.title }}</a></p>
 					</li>
 					{% endfor %}
+					
+					{{ render_pagination(pagination, 'study') }}
+				
 				</ul>
-				
-				{{ render_pagination(pagination, 'dashboard') }}
-				
+								
         <h2>Users</h2>
 				
 				<ul>

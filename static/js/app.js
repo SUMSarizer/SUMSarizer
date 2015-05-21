@@ -49,6 +49,7 @@ angular.module('myApp', [
 			} else {
 				vm.complete = true;
 				vm.uploading = false;
+				vm.cancel();
 			}
 		}
 	

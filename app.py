@@ -10,7 +10,7 @@ import re
 import sumsparser as parser
 from dateutil.parser import parse as date_parse
 
-from werkzeug.contrib.profiler import ProfilerMiddleware
+# from werkzeug.contrib.profiler import ProfilerMiddleware
 from flask import (
     Flask,
     redirect,
@@ -30,15 +30,16 @@ from flask.ext.stormpath import (
 )
 from flask.ext.sqlalchemy import SQLAlchemy
 from stormpath.error import Error as StormpathError
+from werkzeug import secure_filename
 
 app = Flask(__name__)
 app.config.from_object(os.environ.get('APP_SETTINGS'))
-app.config['PROFILE'] = True
-app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
+# app.config['PROFILE'] = True
+# app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
-from models import Datasets, Studies, DataPoints, Notes, Users
+from models import Datasets, Studies, StudyUploads, DataPoints, Notes, Users
 
 SUBSET_SIZE = datetime.timedelta(7)
 # Website
@@ -146,7 +147,8 @@ def study(id):
                            study=study,
                            datasets=datasets.items,
                            pagination=datasets,
-                           users=study.users.all())
+                           users=study.users.all(),
+                           uploads=study.uploads)
 
 
 @app.route('/dataset/<id>', methods=['GET'])
@@ -244,25 +246,19 @@ def generate_selector(data):
     return selector
 
 
-@app.route('/upload/<id>', methods=['POST'])
-@login_required
-def upload(id):
+def zip_ingress(zfilename, study_id):
     conn = db.engine.connect()
-    study = Studies.query.get(id)
-    if study.owner != user.get_id():
-        abort(401)
+    zpf = zipfile.ZipFile(zfilename)
 
-    zfile = request.files['file']
-    zpf = zipfile.ZipFile(zfile)
     valCSV = re.compile("[^\.\_.*\.csv]")
     for file in zpf.namelist():
         # make sure we have a real csv and not a folder or some other file type
-        if(valCSV.match(file) is None):
+        if valCSV.match(file) is None:
             continue
         print file
 
         # first add empty dataset to get key
-        dataset = Datasets(file, study)
+        dataset = Datasets(file, study_id)
         db.session.add(dataset)
         db.session.commit()
         dataset_id = dataset.id
@@ -278,7 +274,22 @@ def upload(id):
         conn.execute(DataPoints.__table__.insert(), data_points)
         # db.session.bulk_insert_mappings(Notes, notes)
         conn.execute(Notes.__table__.insert(), notes)
-        db.session.commit()
+    db.session.commit()
+
+
+@app.route('/upload/<study_id>', methods=['POST'])
+@login_required
+def upload(study_id):
+    study = Studies.query.get(study_id)
+    if study.owner != user.get_id():
+        abort(401)
+
+    zfile = request.files['file']
+    zfilename = secure_filename(zfile.filename)
+    zpath = os.path.join(app.config['UPLOAD_FOLDER'], zfilename)
+    zfile.save(zpath)
+    db.session.add(StudyUploads(zfilename, study_id))
+    db.session.commit()
 
     return jsonify({
         'success': True

@@ -27,6 +27,21 @@ class Users(db.Model):
         return Users.query.filter_by(user_id=user.get_id()).first()
 
 
+class StudyUploads(db.Model):
+    __tablename__ = 'study_uploads'
+
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now)
+    filename = db.Column(db.Unicode)
+    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
+    # users = db.relationship('Users', secondary=study_users,
+    #      backref=db.backref('studies', lazy='dynamic'))
+
+    def __init__(self, filename, study_id):
+        self.filename = filename
+        self.study_id = study_id
+
+
 class Studies(db.Model):
     __tablename__ = 'studies'
 
@@ -36,7 +51,7 @@ class Studies(db.Model):
     owner = db.Column(db.Unicode)
 
     datasets = db.relationship('Datasets', lazy="dynamic", backref="study")
-
+    uploads = db.relationship('StudyUploads', lazy="dynamic", backref="study")
     # users = db.relationship('Users', secondary=study_users,
     #      backref=db.backref('studies', lazy='dynamic'))
 
@@ -61,9 +76,9 @@ class Datasets(db.Model):
 
     study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
 
-    def __init__(self, title, study, notes=[], data_points=[]):
+    def __init__(self, title, study_id, notes=[], data_points=[]):
         self.title = title
-        self.study_id = study.id
+        self.study_id = study_id
         self.notes = notes
         self.data_points = data_points
 
