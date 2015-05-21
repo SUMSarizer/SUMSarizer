@@ -207,7 +207,7 @@ def label_dataset(dataset_id):
     # populate labels if they're currently empty
     if data_labels.count() == 0:
         conn = db.engine.connect()
-        dicts = UserLabels.dicts_from_datapoints(dataset.data_points, user_row.id)
+        dicts = UserLabels.dicts_from_datapoints(dataset.data_points.filter_by(training=True), user_row.id)
         conn.execute(UserLabels.__table__.insert(), dicts)
         db.session.commit()
 
