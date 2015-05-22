@@ -77,27 +77,32 @@
 				{% endfor %}
 				
 				{{ render_pagination(pagination, 'study') }}
-			
 			</ul>
-		<div id='userPanel1' class='col-md-6'>						
-	        <h6><strong>Current Users</strong></h6>				
-				<ul id='currentUsers'>
-					{% for user in users %}
-					<li>
-						<p>{{user.email}}</p>
-					</li>
-					{% endfor %}
-				</ul>
+		<div id="usersContainer" class='col-md-12'>
+			<div class='col-md-5'></div>
+			<div id='userPanel1' class='col-md-3'>						
+		        <h6>Current Users</h6>				
+					<ul id='currentUsers'>
+						{% for user in users %}
+						<li>
+							<p>{{user.email}}</p>
+						</li>
+						{% endfor %}
+					</ul>
+				</div>
+			<div id='userPanel2' class='col-md-3'>
+		        <h6>
+		        	Add Other Users
+		        	<input type="text" id="searchDingus" placeholder="Filter Users..." name="search" class='pull-right'>
+		        </h6>
+					<ul id='otherUsers'>
+						{% for user in notusers %}
+						<li>
+							<p><a href="{{url_for('add_study_user', study_id=study.id,user_id=user.id)}}">{{user.email}}</a></p>
+						</li>
+						{% endfor %}
+					</ul>
 			</div>
-		<div id='userPanel2' class='col-md-6'>
-	        <h6><strong>Add Other Users</strong></h6>
-				<ul id='otherUsers'>
-					{% for user in notusers %}
-					<li>
-						<p><a href="{{url_for('add_study_user', study_id=study.id,user_id=user.id)}}">{{user.email}}</a></p>
-					</li>
-					{% endfor %}
-				</ul>
 		</div>
       </div>
     </div>
