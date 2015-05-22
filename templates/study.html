@@ -54,21 +54,25 @@
   </script>
 
   <div class="" ng-controller="DashboardCtrl as vm">
-    <div class="row">
+	<div class="row">
       <div class="col-lg-12">
-				
+
 		<h1>{{study.title}} 
 			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.deleteModal()"><span class="glyphicon glyphicon-remove" aria-hidden="true"> </span> Delete Study</a> 
 			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.openModal()"><span class="glyphicon glyphicon-upload" aria-hidden="true"> </span>
  Upload Sensor Data</a>
 		</h1>
-		<div class="upload-container">				
+
+  		<div class="upload-container">				
 			
 			{% for upload in uploads %}
-				<p><b>Pending upload: {{upload.filename}}</b> </p>
+				<div class="alert alert-info" role="alert">
+					<span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+					<b>Pending upload: {{upload.filename}}</b>
+				</div>
 			{% endfor %}
 		</div>
-				
+					
         <h2>Data Sets</h2>
 			<ul>
 				{% for dataset in datasets %}
@@ -99,7 +103,7 @@
 					<ul id='otherUsers'>
 						{% for user in notusers %}
 						<li>
-							<p><a href="{{url_for('add_study_user', study_id=study.id,user_id=user.id)}}">{{user.email}}</a></p>
+							<p> <a href="{{url_for('add_study_user', study_id=study.id,user_id=user.id)}}"> <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"> </span>{{user.email}}</a></p>
 						</li>
 						{% endfor %}
 					</ul>

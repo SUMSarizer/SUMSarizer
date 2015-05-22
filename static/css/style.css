@@ -103,7 +103,10 @@ svg {
 .modal-header{background-color:white!important;}
 
 #currentUsers{font-size:12px; list-style: none;}
-#otherUsers{font-size:12px; list-style: none;}
+#currentUsers{font-size:12px; list-style: none; padding-left:5px;}
+
+#otherUsers{font-size:12px; list-style: none; padding-left:5px;}
+#otherUsers li p a span.glyphicon{margin-right:10px;}
 
 #searchDingus{
 position: relative;
@@ -116,4 +119,8 @@ font-weight: 400;
 letter-spacing: 1px;
 }
 
+.glyphicon{margin-right:3px;}
+
 #usersContainer{border-top: 1px dotted lightgrey;}
+
+.upload-container{margin-top:-30px;}
