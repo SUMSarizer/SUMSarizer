@@ -5,9 +5,10 @@
 
 	{% macro render_pagination(pagination, endpoint) %}
 	  <div class=pagination>
+	  Page &nbsp;
 	  {%- for page in pagination.iter_pages() %}
-	    {% if page %}
-	      {% if page != pagination.page %}
+	    {% if page %} 
+	      {% if page != pagination.page %} 
 	        <a href="{{ url_for(endpoint, study_id=study.id, page=page) }}">{{ page }}</a>
 	      {% else %}
 	        <strong>{{ page }}</strong>
@@ -33,7 +34,7 @@
         <button class="btn btn-success" ng-click="vm.submit()">Upload</button>
         <button class="btn" ng-click="vm.cancel()">Close</button>
     </div>
-  </script>
+	</script>
 
 
 	<script type="text/ng-template" id="modal_delete.html">
@@ -51,7 +52,7 @@
 		    <a class="btn" ng-click="vm.cancel()">Cancel</a>
 		</div>
     </form>
-  </script>
+	</script>
 
   <div class="" ng-controller="DashboardCtrl as vm">
 	<div class="row">
@@ -60,42 +61,48 @@
 		<h1>{{study.title}} 
 			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.deleteModal()"><span class="glyphicon glyphicon-remove" aria-hidden="true"> </span> Delete Study</a> 
 			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.openModal()"><span class="glyphicon glyphicon-upload" aria-hidden="true"> </span>
- Upload Sensor Data</a>
+ 			Upload Sensor Data</a>
 		</h1>
 
   		<div class="upload-container">				
-			
 			{% for upload in uploads %}
-				<div class="alert alert-info" role="alert">
-					<span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
-					<b>Pending upload: {{upload.filename}}</b>
-				</div>
+			<div class="alert alert-info" role="alert">
+				<span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+				<b>Pending upload: {{upload.filename}}</b>
+			</div>
 			{% endfor %}
 		</div>
+
+		<br>
 					
         <h2>Data Sets</h2>
-			<ul>
+			<ul id='datasets' class='list-group row'>
 				{% for dataset in datasets %}
-				<li>
-					<p><a href="{{url_for('label_dataset', dataset_id=dataset.id)}}">{{ dataset.title }}</a></p>
+				<li class='list-group-item col-xs-4'>
+					<p>
+						<a href="{{url_for('label_dataset', dataset_id=dataset.id)}}">
+							<span class="glyphicon glyphicon-file" aria-hidden="true"> </span> 
+							{{ dataset.title }}</a></p>
 				</li>
-				{% endfor %}
-				
-				{{ render_pagination(pagination, 'study') }}
+				{% endfor %}				
 			</ul>
-		<div id="usersContainer" class='col-md-12'>
-			<div class='col-md-5'></div>
-			<div id='userPanel1' class='col-md-3'>						
+
+		{{ render_pagination(pagination, 'study') }}
+
+		<div id="usersContainer" class='col-xs-12'>
+			<div id='userPanel1' class='col-xs-6'>						
 		        <h6>Current Users</h6>				
 					<ul id='currentUsers'>
 						{% for user in users %}
 						<li>
-							<p>{{user.email}}</p>
+							<p>
+								<span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
+								{{user.email}}</p>
 						</li>
 						{% endfor %}
 					</ul>
 				</div>
-			<div id='userPanel2' class='col-md-3'>
+			<div id='userPanel2' class='col-xs-6'>
 		        <h6>
 		        	Add Other Users
 		        	<input type="text" id="searchDingus" placeholder="Filter Users..." name="search" class='pull-right'>
@@ -103,7 +110,12 @@
 					<ul id='otherUsers'>
 						{% for user in notusers %}
 						<li>
-							<p> <a href="{{url_for('add_study_user', study_id=study.id,user_id=user.id)}}"> <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"> </span>{{user.email}}</a></p>
+							<p> 
+								<a href="{{url_for('add_study_user', study_id=study.id,user_id=user.id)}}"> 
+									<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"> </span>
+								{{user.email}}
+								</a>
+							</p>
 						</li>
 						{% endfor %}
 					</ul>
