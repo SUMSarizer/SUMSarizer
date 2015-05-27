@@ -2,11 +2,6 @@ import datetime
 from app import db
 from dateutil.parser import parse as date_parse
 
-# study_users = db.Table('study_users',
-#                        db.Column('study_id', db.Integer, db.ForeignKey('studies.id'), index=True),
-#                        db.Column('user_id', db.Integer, db.ForeignKey('users.id'), index=True)
-#                        )
-
 
 class StudyUsers(db.Model):
     __tablename__ = 'study_users'
@@ -113,13 +108,12 @@ class Datasets(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     title = db.Column(db.Unicode)
-    labelled = db.Column(db.Boolean)
+    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'), index=True)
 
     notes = db.relationship('Notes', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
     user_labels = db.relationship('UserLabels', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
     data_points = db.relationship('DataPoints', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
-
-    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'), index=True)
+    labelled = db.relationship('LabelledDatasets', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
 
     def __init__(self, title, study_id, notes=[], data_points=[]):
         self.title = title
@@ -160,6 +154,21 @@ class Datasets(db.Model):
         self.data_points.delete()
         db.session.delete(self)
         db.session.commit()
+
+    def user_has_labelled(self, user):
+        return self.labelled.filter_by(user_id=user.id).count() > 0
+
+
+class LabelledDatasets(db.Model):
+    __tablename__ = 'labelled_datasets'
+
+    id = db.Column(db.Integer, primary_key=True)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
+
+    def __init__(self, dataset_id, user_id):
+        self.dataset_id = dataset_id
+        self.user_id = user_id
 
 
 class Notes(db.Model):

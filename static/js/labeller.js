@@ -91,7 +91,7 @@ function labeller () {
 	}
 
 	function init () {
-	
+		
 		data=window.PLOTDATA;
 		data = data.map(type);
 
@@ -113,13 +113,30 @@ function labeller () {
 	  makeplot(data);
 
 	  //set default extent for context
-	  var defaultExtent = [context_xscale.domain()[0],context_xscale.invert(context_xscale.range()[1]*(7/7))];
+	  Date.prototype.addDays = function(days)
+	  {
+    	var dat = new Date(this.valueOf());
+    	dat.setDate(dat.getDate() + days);
+    	return dat;
+	  }
+
+	  var start_date = context_xscale.domain()[0]
+	  if(window.view_or_label=="label"){
+	  	var end_date = new Date(start_date).addDays(1)
+	  } else {
+	  	var end_date = new Date(start_date).addDays(7)
+	  }
+	  
+
+	  var defaultExtent = [start_date,end_date]
+
 	  svg.select(".context_brush").call(context_brush.extent(defaultExtent));
 
 	  //run brushing functions to make sure everything highlighted right
 	  if(window.view_or_label=="label"){
 	  	brushed_context();
 	  	update_selection();
+	  	document.getElementById("next").style.display = 'none';
 	  } else {
 	  	main.selectAll(".point").classed("training", function(d) { return d.training; });
 		context.selectAll(".point").classed("training", function(d) { return d.training; });
@@ -211,7 +228,14 @@ function labeller () {
 	  .attr("cx", function(d) { return main_xscale(d.time); });
 
 	  main.select(".x.axis").call(main_xaxis);
+	  var limits=context_xscale.domain();
+	  if(context_brush.extent()[1]>=1*context_xscale.domain()[1]){
+	  	console.log("far right")
+	  	if(window.view_or_label=="label"){
+	  		document.getElementById("next").style.display = 'block';
+	  	}
 	  }
+	}
 
 
 

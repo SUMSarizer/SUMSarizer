@@ -39,7 +39,7 @@ app.config.from_object(os.environ.get('APP_SETTINGS'))
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
-from models import Datasets, Studies, StudyUploads, DataPoints, Notes, Users, StudyUsers, UserLabels
+from models import Datasets, Studies, StudyUploads, DataPoints, Notes, Users, StudyUsers, UserLabels, LabelledDatasets
 
 SUBSET_SIZE = datetime.timedelta(7)
 # Website
@@ -296,7 +296,28 @@ def dataset(dataset_id):
                            next_ds=next_ds,
                            prev_ds=prev_ds,
                            all_ds=all_ds,
-                           is_owner=is_owner)
+                           is_owner=is_owner,
+                           current_user=user)
+
+
+@app.route('/labelled_dataset/<dataset_id>', methods=['GET'])
+@login_required
+def labelled_dataset(dataset_id):
+
+    user = Users.from_stormpath(stormpath_user)
+    dataset = Datasets.query.get(dataset_id)
+    if not dataset.study.is_labeller(user):
+        abort(401)
+
+    labelled = LabelledDatasets(dataset.id, user.id)
+    db.session.add(labelled)
+    db.session.commit()
+
+    next_ds = dataset.next()
+    if(next_ds):
+        return redirect(url_for('dataset', dataset_id=next_ds.id, mode="label"))
+    else:
+        return redirect(url_for('dataset', dataset_id=dataset.id, mode="label"))
 
 
 @app.route('/reset_labels/<dataset_id>', methods=['GET'])

@@ -53,15 +53,20 @@
 	    	<div id='fileList'>
 	    		<table class="table table-condensed">
 				    <tbody>
-		    		{% for all_d in all_ds %}
+		    		{% for ds in all_ds %}
 				        <tr>
 				        	<td colspan="1">
-				        		<a href="{{ url_for('dataset', dataset_id=all_d.id, mode=mode) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
+				        		<a href="{{ url_for('dataset', dataset_id=ds.id, mode=mode) }}" class='btn btn-link btn-xs pull-left'>{{ds.title}}</a>
 			        		</td>
-				        	<td colspan="1">
-				        		<a href="{{ url_for('dataset', dataset_id=all_d.id, mode='label') }}"  title="Switch to labeling">
+			        		<td>
+			        			{% if ds.user_has_labelled(current_user) %}
+			        			<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
+			        			{% endif %}
+			        		</td>
+<!--				        	<td colspan="1">
+				        		<a href="{{ url_for('dataset', dataset_id=ds.id, mode='label') }}"  title="Switch to labeling">
 				        		<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
-				        	</td>
+				        	</td> -->
 				        </tr>
 					{% endfor %}
 				    </tbody>
@@ -79,9 +84,12 @@
 	        <h1 class='nobottom'>Datapoints for {{title}}</h1>
 	        {% if mode == "label" %}
 				<div class='pull-right btn btn-xs btn-default' id='next'>
-					{% if next_ds %}
-						<a href="{{ url_for('dataset', dataset_id=next_ds.id, mode=mode) }}">Done? Next&rarr;</a>
-					{% endif %}	
+					
+						<a href="{{ url_for('labelled_dataset', dataset_id=dataset.id, mode=mode) }}">
+						Done?
+						{% if next_ds %}
+							Next&rarr;</a>
+						{% endif %}	
 				</div>
 			
 	        	<div class="" ng-controller="DatasetCtrl as vm">
