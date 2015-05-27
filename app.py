@@ -34,8 +34,8 @@ from werkzeug import secure_filename
 
 app = Flask(__name__)
 app.config.from_object(os.environ.get('APP_SETTINGS'))
-app.config['PROFILE'] = True
-app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
+#app.config['PROFILE'] = True
+#app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 

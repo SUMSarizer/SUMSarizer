@@ -29,6 +29,10 @@
 			<p>Please upload a zip file containing all reading files for your study.</p>
 			<input id="files" type="file" name="file">
 			<input id="action" type="hidden" name="action" value="{{ url_for('upload', study_id=study.id) }}" />
+
+			<div ng-if="vm.uploading">
+				Uploading...
+		</div>	
     </div>
     <div class="modal-footer">
         <button class="btn btn-success" ng-click="vm.submit()">Upload</button>
@@ -45,6 +49,11 @@
 		<div class="modal-body">
 				
 			<p>Deleting the study will remove all associated datasets and labels. Are you sure you want to do this?</p>
+
+			<div ng-if="vm.deleting">
+				Deleting...
+			</div>	
+
 				
 		</div>
 		<div class="modal-footer">
