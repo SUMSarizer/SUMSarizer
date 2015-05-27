@@ -3,8 +3,8 @@ from app import db
 from dateutil.parser import parse as date_parse
 
 study_users = db.Table('study_users',
-                       db.Column('study_id', db.Integer, db.ForeignKey('studies.id')),
-                       db.Column('user_id', db.Integer, db.ForeignKey('users.id'))
+                       db.Column('study_id', db.Integer, db.ForeignKey('studies.id'),index=True),
+                       db.Column('user_id', db.Integer, db.ForeignKey('users.id'),index=True)
                        )
 
 
@@ -37,7 +37,7 @@ class StudyUploads(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     filename = db.Column(db.Unicode)
     data = db.Column(db.LargeBinary)
-    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
+    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'),index=True)
     # users = db.relationship('Users', secondary=study_users,
     #      backref=db.backref('studies', lazy='dynamic'))
 
@@ -67,6 +67,13 @@ class Studies(db.Model):
     def authorizedUser(self, user):
         return (self.users.filter_by(stormpath_id=user.get_id()).count() > 0)
 
+    def delete(self):
+        for dataset in self.datasets:
+            dataset.delete()
+        self.uploads.delete()
+        db.session.delete(self)
+        db.session.commit()
+
 
 class Datasets(db.Model):
     __tablename__ = 'datasets'
@@ -77,9 +84,10 @@ class Datasets(db.Model):
     labelled = db.Column(db.Boolean)
 
     notes = db.relationship('Notes', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
-    data_points = db.relationship('DataPoints', order_by="DataPoints.timestamp", cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
+    user_labels = db.relationship('UserLabels', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
+    data_points = db.relationship('DataPoints', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
 
-    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'))
+    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'),index=True)
 
     def __init__(self, title, study_id, notes=[], data_points=[]):
         self.title = title
@@ -107,12 +115,18 @@ class Datasets(db.Model):
             .order_by(Datasets.created_at.desc())\
             .all()
 
-    def user_labels(self, user_id):
-        return db.session.query(DataPoints, UserLabels).\
-            filter_by(dataset_id=self.id).\
+    def labels_for_id(self, user_id):
+        return db.session.query(Datasets,DataPoints, UserLabels).\
+            filter_by(id=self.id).\
             join(UserLabels).filter_by(user_id=user_id).\
+            join(DataPoints).\
             order_by(DataPoints.timestamp)
-
+    def delete(self):
+        self.user_labels.delete()
+        self.notes.delete()
+        self.data_points.delete()
+        db.session.delete(self)
+        db.session.commit()
 
 class Notes(db.Model):
     __tablename__ = 'notes'
@@ -121,7 +135,7 @@ class Notes(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     text = db.Column(db.Unicode)
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
+    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'),index=True)
 
     def __init__(self, text):
         self.text = text
@@ -140,14 +154,14 @@ class DataPoints(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
-    timestamp = db.Column(db.DateTime)
+    timestamp = db.Column(db.DateTime, index=True)
     unit = db.Column(db.String(16))
     value = db.Column(db.Float)
     # Add Boolean training set column
     training = db.Column(db.Boolean)
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'))
-    user_labels = db.relationship('UserLabels', cascade="all, delete-orphan", backref="datapoint", lazy="dynamic")
+    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'),index=True)
+    user_labels = db.relationship('UserLabels', backref="datapoint", lazy="dynamic", passive_deletes=True)
 
     def __init__(self, timestamp, unit, value):
         self.timestamp = timestamp
@@ -171,18 +185,21 @@ class UserLabels(db.Model):
     __tablename__ = 'user_labels'
 
     id = db.Column(db.Integer, primary_key=True)
-    datapoint_id = db.Column(db.Integer, db.ForeignKey('datapoints.id'))
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    datapoint_id = db.Column(db.Integer, db.ForeignKey('datapoints.id'),index=True)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'),index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),index=True)
     label = db.Column(db.Boolean)
 
-    def __init__(self, datapoint_id, user_id, label=False):
+    def __init__(self, datapoint_id, dataset_id, user_id, label=False):
         self.datapoint_id = datapoint_id
+        self.dataset_id = dataset_id
         self.user_id = user_id
         self.label = False
 
     @classmethod
-    def dicts_from_datapoints(cls, data_points, user_id):
+    def dicts_from_datapoints(cls, data_points, dataset_id, user_id):
         dicts = [dict(datapoint_id=data_point.id,
+                      dataset_id=dataset_id,
                       user_id=user_id,
                       label=False) for data_point in data_points]
         return dicts

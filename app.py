@@ -10,7 +10,7 @@ import re
 import sumsparser as parser
 from dateutil.parser import parse as date_parse
 
-#from werkzeug.contrib.profiler import ProfilerMiddleware
+from werkzeug.contrib.profiler import ProfilerMiddleware
 from flask import (
     Flask,
     redirect,
@@ -34,8 +34,8 @@ from werkzeug import secure_filename
 
 app = Flask(__name__)
 app.config.from_object(os.environ.get('APP_SETTINGS'))
-#app.config['PROFILE'] = True
-#app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
+app.config['PROFILE'] = True
+app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
@@ -161,10 +161,22 @@ def delete_study(study_id):
     if study.owner != user.get_id():
         abort(401)
 
-    db.session.delete(study)
-    db.session.commit()
+    study.delete()
 
     return redirect(url_for('dashboard'))
+
+@app.route('/delete_dataset/<dataset_id>', methods=['GET'])
+@login_required
+def delete_dataset(dataset_id):
+    dataset = Datasets.query.get(dataset_id)
+    study=dataset.study
+    if study.owner != user.get_id():
+        abort(401)
+
+    #db.session.delete(dataset)
+    #db.session.commit()
+    dataset.delete()
+    return redirect(url_for('study',study_id=study.id))
 
 
 @app.route('/add_study_user/<study_id>', methods=['GET'])
@@ -202,12 +214,12 @@ def label_dataset(dataset_id):
     user_row = Users.query.filter_by(stormpath_id=user.get_id()).first()
 
     # join labels for this user with datapoints for this dataset
-    data_labels = dataset.user_labels(user_row.id)
+    data_labels = dataset.labels_for_id(user_row.id)
 
     # populate labels if they're currently empty
     if data_labels.count() == 0:
         conn = db.engine.connect()
-        dicts = UserLabels.dicts_from_datapoints(dataset.data_points.filter_by(training=True), user_row.id)
+        dicts = UserLabels.dicts_from_datapoints(dataset.data_points.filter_by(training=True), dataset.id, user_row.id)
         conn.execute(UserLabels.__table__.insert(), dicts)
         db.session.commit()
 
@@ -233,7 +245,6 @@ def label_dataset(dataset_id):
                            study=dataset.study.title,
                            studyid=dataset.study_id,
                            notes=dataset.notes,
-                           points=dataset.data_points,
                            points_json=json.dumps(graph_points),
                            next_ds=next_ds,
                            prev_ds=prev_ds,
@@ -250,7 +261,7 @@ def reset_labels(dataset_id):
         abort(401)
 
     user_row = Users.query.filter_by(stormpath_id=user.get_id()).first()
-    data_labels = dataset.user_labels(user_row.id)
+    data_labels = dataset.labels_for_id(user_row.id)
 
     dicts = [dict(id=data_label.UserLabels.id, label=False) for data_label in data_labels]
     db.session.bulk_update_mappings(UserLabels, dicts)
