@@ -118,7 +118,7 @@ function labeller () {
 
 	  //run brushing functions to make sure everything highlighted right
 	  brushed_context();
-	  brushed_main();
+	  update_selection();
 	}
 
 	$(function () {
@@ -133,13 +133,24 @@ function labeller () {
 	  .attr("class", "line")
 	  .attr("d", main_line);
 
+	  main.append("g")
+	  .attr("class", "main_brush")
+	  .call(main_brush);
+	  //.call(main_brush.event);
+
 	  main.selectAll(".point")
 	  .data(data)
 	  .enter().append("circle")
 	  .attr("class", "point")
 	  .attr("cx", function(d) { return main_xscale(d.time); })
 	  .attr("cy", function(d) { return main_yscale(d.temp_c); })
-	  .attr("r", 4);
+	  .attr("r", 4)
+	  .on("click", function(point){
+	  		//allow clicking on single points
+            point.selected=1-point.selected;
+            post([point])
+            update_selection();
+        });
 
 	  main.append("g")
 	  .attr("class", "x axis")
@@ -149,11 +160,6 @@ function labeller () {
 	  main.append("g")
 	  .attr("class", "y axis")
 	  .call(yaxis);
-
-	  main.append("g")
-	  .attr("class", "main_brush")
-	  .call(main_brush)
-	  .call(main_brush.event);
 
 	  //context plot
 	  context.append("path")
@@ -271,15 +277,20 @@ function labeller () {
 	  post(brushed_points);
 	}
 
+	function update_selection(){
+	  main.selectAll(".point").classed("selected", function(d) { return d.selected; });
+	  context.selectAll(".point").classed("selected", function(d) { return d.selected; });
+	}
+
 	function brushed_main(){
 	  var extent = main_brush.extent();
+	  console.log(extent)
 	  //point.each(function(d) { d.selected = false; });
 	  //convert based on context_xscale because this is what quadtree is defined on
 	  // search(quadtree, context_xscale(extent[0][0]), main_yscale(extent[0][1]), context_xscale(extent[1][0]), main_yscale(extent[1][1]));
 	  search(quadtree, context_xscale(extent[0][0]), main_yscale(extent[1][1]), context_xscale(extent[1][0]), main_yscale(extent[0][1]));
 
-	  main.selectAll(".point").classed("selected", function(d) { return d.selected; });
-	  context.selectAll(".point").classed("selected", function(d) { return d.selected; });
+	  update_selection();
 	  d3.selectAll(".main_brush").call(main_brush.clear());
 	}
 
