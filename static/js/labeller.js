@@ -117,8 +117,14 @@ function labeller () {
 	  svg.select(".context_brush").call(context_brush.extent(defaultExtent));
 
 	  //run brushing functions to make sure everything highlighted right
-	  brushed_context();
-	  update_selection();
+	  if(window.view_or_label=="label"){
+	  	brushed_context();
+	  	update_selection();
+	  } else {
+	  	main.selectAll(".point").classed("training", function(d) { return d.training; });
+		context.selectAll(".point").classed("training", function(d) { return d.training; });
+	  }
+
 	}
 
 	$(function () {
@@ -154,6 +160,7 @@ function labeller () {
 	            post([point])
 	            update_selection();
 	        });
+
 	  }
 	  main.append("g")
 	  .attr("class", "x axis")

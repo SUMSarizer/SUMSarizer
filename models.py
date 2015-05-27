@@ -101,6 +101,11 @@ class Studies(db.Model):
         db.session.delete(self)
         db.session.commit()
 
+    def labellers(self):
+        return Users.query.join(StudyUsers).\
+            filter(StudyUsers.role == "labeller").\
+            filter(StudyUsers.study_id == self.id)
+
 
 class Datasets(db.Model):
     __tablename__ = 'datasets'

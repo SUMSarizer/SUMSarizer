@@ -166,12 +166,16 @@ def study(study_id):
     datasets = study.datasets\
         .order_by(Datasets.created_at.desc())\
         .paginate(page, per_page=15)
+
+    study.users.filter_by(role="labeller").all()
     labellers = Users.query.\
-        filter(study.is_labeller(user)).\
+        filter(study.is_labeller(Users)).\
         all()
 
-    users = labellers  # study.users.all()
-    notusers = []  # Users.query.except_(study.users).all()
+    labellers = study.labellers()
+    users = labellers.all()
+    notusers = Users.query.except_(labellers).all()
+
     return render_template('study.html',
                            study=study,
                            datasets=datasets.items,
@@ -275,7 +279,8 @@ def dataset(dataset_id):
         graph_points = [{
             "id": x.id,
             "temp_c": x.value,
-            "time": x.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+            "time": x.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "training": x.training
         } for x in dataset.data_points.order_by(DataPoints.timestamp)]
 
     is_owner = dataset.study.is_owner(user)

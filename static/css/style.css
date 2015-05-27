@@ -92,6 +92,13 @@ svg {
   clip-path: url(#clip);
 }
 
+.point.training {
+  fill: blue;
+  fill-opacity: 1;
+  stroke: blue;
+  clip-path: url(#clip);
+}
+
 .axis path,
 .axis line {
   fill: none;
