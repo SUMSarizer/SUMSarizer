@@ -71,6 +71,8 @@
 			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.deleteModal()"><span class="glyphicon glyphicon-remove" aria-hidden="true"> </span> Delete Study</a> 
 			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.openModal()"><span class="glyphicon glyphicon-upload" aria-hidden="true"> </span>
  			Upload Sensor Data</a>
+			<a href="{{url_for('label_study', study_id=study.id)}}" class="tinyText studyTextButton pull-right"><span class="glyphicon glyphicon-tag" aria-hidden="true"> </span>
+ 			Switch to Labelling</a>
 		</h1>
 
   		<div class="upload-container">				
@@ -89,7 +91,7 @@
 				{% for dataset in datasets %}
 				<li class='list-group-item col-xs-4'>
 					<p>
-						<a href="{{url_for('label_dataset', dataset_id=dataset.id)}}">
+						<a href="{{url_for('dataset', dataset_id=dataset.id, mode='view')}}">
 							<span class="glyphicon glyphicon-file" aria-hidden="true"> </span> 
 							{{ dataset.title }}</a></p>
 				</li>
@@ -100,7 +102,7 @@
 
 		<div id="usersContainer" class='col-xs-12'>
 			<div id='userPanel1' class='col-xs-6'>						
-		        <h6>Current Users</h6>				
+		        <h6>Current Labellers</h6>				
 					<ul id='currentUsers'>
 						{% for user in users %}
 						<li>
@@ -113,14 +115,14 @@
 				</div>
 			<div id='userPanel2' class='col-xs-6'>
 		        <h6>
-		        	Add Other Users
+		        	Add Other Labellers
 		        	<input type="text" id="searchDingus" placeholder="Filter Users..." name="search" class='pull-right'>
 		        </h6>
 					<ul id='otherUsers'>
 						{% for user in notusers %}
 						<li>
 							<p> 
-								<a href="{{url_for('add_study_user', study_id=study.id,user_id=user.id)}}"> 
+								<a href="{{url_for('add_study_labeller', study_id=study.id,user_id=user.id)}}"> 
 									<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"> </span>
 								{{user.email}}
 								</a>

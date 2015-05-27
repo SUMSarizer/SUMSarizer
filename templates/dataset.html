@@ -22,8 +22,18 @@
 
 	<div class="row">	
 		<div id='fileInfo' class='col-md-4 pull-left'>
-			<p style='margin-top:30px;'> Files from study         		
-    			<a href="{{ url_for('study', study_id=studyid) }}">{{study}}</a>
+			<p style='margin-top:30px;'> Now 
+				{% if mode == "label" %}
+					labelling
+				{% else %}
+					viewing
+				{% endif %}
+					study 
+				{% if is_owner %}
+    				<a href="{{ url_for('study', study_id=studyid) }}">{{study}}</a>
+    			{% else %}
+    				{{study}}
+				{% endif %}	
     		</p>
 
 	    	<div id='fileList'>
@@ -32,7 +42,7 @@
 		    		{% for all_d in all_ds %}
 				        <tr>
 				        	<td colspan="1">
-				        		<a href="{{ url_for('label_dataset', dataset_id=all_d.id) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
+				        		<a href="{{ url_for('dataset', dataset_id=all_d.id, mode=mode) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
 			        		</td>
 				        	<td colspan="1">
 				        		<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
@@ -52,17 +62,19 @@
 		</div>	
 		<div class="col-md-8">
 	        <h1 class='nobottom'>Datapoints for {{title}}</h1>
-			<div class='pull-right btn btn-xs btn-default' id='next'>
-				{% if next_ds %}
-					<a href="{{ url_for('label_dataset', dataset_id=next_ds.id) }}">Done? Next&rarr;</a>
-				{% endif %}	
-			</div>
-		
-        	<div class="" ng-controller="DatasetCtrl as vm">
-		       	<div class='pull-left btn btn-xs btn-default' id='clear'>
-						<a href="" ng-click="vm.resetModal()"><span class="glyphicon glyphicon-erase" aria-hidden="true"> </span>Clear Labels</a>
+	        {% if mode == "label" %}
+				<div class='pull-right btn btn-xs btn-default' id='next'>
+					{% if next_ds %}
+						<a href="{{ url_for('dataset', dataset_id=next_ds.id, mode=mode) }}">Done? Next&rarr;</a>
+					{% endif %}	
 				</div>
-			</div>
+			
+	        	<div class="" ng-controller="DatasetCtrl as vm">
+			       	<div class='pull-left btn btn-xs btn-default' id='clear'>
+							<a href="" ng-click="vm.resetModal()"><span class="glyphicon glyphicon-erase" aria-hidden="true"> </span>Clear Labels</a>
+					</div>
+				</div>
+			{% endif %}
 			<div id='maindiv'></div>
         
 		</div>
@@ -71,6 +83,7 @@
 	
 	<script>
 	window.PLOTDATA = {{ points_json | safe}}
+	window.view_or_label = {{ mode_json | safe}}
 	</script>
 	
 {% endblock %}

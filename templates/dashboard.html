@@ -24,15 +24,25 @@
     <div class="row">
       <div class="col-lg-12">
 				
-				<h1>Studies</h1>
+				<h1>My Studies</h1>
 				<div class="pull-right">				
 					<a href="" class="btn btn-success" ng-click="vm.openModal()">New Study</a>
 				</div>
 				
 				<ul>
-					{% for study in studies %}
+					{% for study in mystudies %}
 					<li>
-						<a href="{{ url_for('study', study_id=study.id) }}">{{ study.title }}</a>
+						<a href="{{ url_for('study', study_id=study.Studies.id) }}">{{ study.Studies.title }}</a>
+					</li>
+					{% endfor %}
+				</ul>
+
+				<h1>Studies to Label</h1>
+				
+				<ul>
+					{% for study in tolabel %}
+					<li>
+						<a href="{{ url_for('label_study', study_id=study.Studies.id) }}">{{ study.Studies.title }}</a>
 					</li>
 					{% endfor %}
 				</ul>

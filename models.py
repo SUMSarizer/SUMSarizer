@@ -2,10 +2,25 @@ import datetime
 from app import db
 from dateutil.parser import parse as date_parse
 
-study_users = db.Table('study_users',
-                       db.Column('study_id', db.Integer, db.ForeignKey('studies.id'),index=True),
-                       db.Column('user_id', db.Integer, db.ForeignKey('users.id'),index=True)
-                       )
+# study_users = db.Table('study_users',
+#                        db.Column('study_id', db.Integer, db.ForeignKey('studies.id'), index=True),
+#                        db.Column('user_id', db.Integer, db.ForeignKey('users.id'), index=True)
+#                        )
+
+
+class StudyUsers(db.Model):
+    __tablename__ = 'study_users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
+    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'), index=True)
+    role = db.Column(db.Enum('labeller', 'owner', name='user_role'))
+
+    def __init__(self, user_id, study_id, role):
+        self.study_id = study_id
+        self.user_id = user_id
+        self.study_id = study_id
+        self.role = role
 
 
 class Users(db.Model):
@@ -14,20 +29,23 @@ class Users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     stormpath_id = db.Column(db.Unicode)
     email = db.Column(db.Unicode)
-    studies = db.relationship('Studies', secondary=study_users,
-                              backref=db.backref('users', lazy='dynamic'))
+    study_roles = db.relationship('StudyUsers',
+                                  backref=db.backref('users'), lazy='dynamic')
 
     labels = db.relationship('UserLabels',
                              backref='users', lazy='dynamic')
 
-    def __init__(self, user):
-        self.stormpath_id = user.get_id()
-        self.email = user.email
+    def __init__(self, stormpath_user):
+        self.stormpath_id = stormpath_user.get_id()
+        self.email = stormpath_user.email
 
     @classmethod
-    def fromStormpath(cls, user):
-        print user.get_id()
-        return Users.query.filter_by(stormpath_id=user.get_id()).first()
+    def from_stormpath(cls, stormpath_user):
+        return Users.query.filter_by(stormpath_id=stormpath_user.get_id()).first()
+
+    def studies(self):
+        return db.session.query(Studies, StudyUsers).\
+            join(StudyUsers).filter_by(user_id=self.id)
 
 
 class StudyUploads(db.Model):
@@ -37,9 +55,7 @@ class StudyUploads(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     filename = db.Column(db.Unicode)
     data = db.Column(db.LargeBinary)
-    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'),index=True)
-    # users = db.relationship('Users', secondary=study_users,
-    #      backref=db.backref('studies', lazy='dynamic'))
+    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'), index=True)
 
     def __init__(self, filename, data, study_id):
         self.filename = filename
@@ -53,19 +69,30 @@ class Studies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     title = db.Column(db.Unicode)
-    owner = db.Column(db.Unicode)
 
     datasets = db.relationship('Datasets', lazy="dynamic", cascade="all, delete-orphan", backref="study")
     uploads = db.relationship('StudyUploads', lazy="dynamic", cascade="all, delete-orphan", backref="study")
-    # users = db.relationship('Users', secondary=study_users,
-    #      backref=db.backref('studies', lazy='dynamic'))
 
-    def __init__(self, title, owner):
+    users = db.relationship('StudyUsers',
+                            backref=db.backref('studies'), lazy='dynamic')
+
+    def __init__(self, title):
         self.title = title
-        self.owner = owner.get_id()
 
-    def authorizedUser(self, user):
-        return (self.users.filter_by(stormpath_id=user.get_id()).count() > 0)
+    def add_user(self, user, role):
+        study_user = StudyUsers(user.id, self.id, role)
+        self.users.append(study_user)
+        db.session.commit()
+
+    def get_roles(self, user):
+        roles = [study_user.role for study_user in self.users.filter_by(user_id=user.id).all()]
+        return roles
+
+    def is_labeller(self, user):
+        return ("labeller" in self.get_roles(user)) or ("owner" in self.get_roles(user))
+
+    def is_owner(self, user):
+        return "owner" in self.get_roles(user)
 
     def delete(self):
         for dataset in self.datasets:
@@ -87,7 +114,7 @@ class Datasets(db.Model):
     user_labels = db.relationship('UserLabels', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
     data_points = db.relationship('DataPoints', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
 
-    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'),index=True)
+    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'), index=True)
 
     def __init__(self, title, study_id, notes=[], data_points=[]):
         self.title = title
@@ -96,37 +123,39 @@ class Datasets(db.Model):
         self.data_points = data_points
 
     def next(self):
-        return Datasets.query\
-            .filter(Datasets.study_id == self.study_id)\
-            .filter(Datasets.created_at < self.created_at)\
-            .order_by(Datasets.created_at.desc())\
-            .first()
+        return Datasets.query.\
+            filter(Datasets.study_id == self.study_id).\
+            filter(Datasets.created_at < self.created_at).\
+            order_by(Datasets.created_at.desc()).\
+            first()
 
     def prev(self):
-        return Datasets.query\
-            .filter(Datasets.study_id == self.study_id)\
-            .filter(Datasets.created_at > self.created_at)\
-            .order_by(Datasets.created_at)\
-            .first()
+        return Datasets.query.\
+            filter(Datasets.study_id == self.study_id).\
+            filter(Datasets.created_at > self.created_at).\
+            order_by(Datasets.created_at).\
+            first()
 
     def items(self):
-        return Datasets.query\
-            .filter(Datasets.study_id == self.study_id)\
-            .order_by(Datasets.created_at.desc())\
-            .all()
+        return Datasets.query.\
+            filter(Datasets.study_id == self.study_id).\
+            order_by(Datasets.created_at.desc()).\
+            all()
 
-    def labels_for_id(self, user_id):
-        return db.session.query(Datasets,DataPoints, UserLabels).\
+    def labels_for_user(self, user):
+        return db.session.query(Datasets, DataPoints, UserLabels).\
             filter_by(id=self.id).\
-            join(UserLabels).filter_by(user_id=user_id).\
+            join(UserLabels).filter_by(user_id=user.id).\
             join(DataPoints).\
             order_by(DataPoints.timestamp)
+
     def delete(self):
         self.user_labels.delete()
         self.notes.delete()
         self.data_points.delete()
         db.session.delete(self)
         db.session.commit()
+
 
 class Notes(db.Model):
     __tablename__ = 'notes'
@@ -135,7 +164,7 @@ class Notes(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     text = db.Column(db.Unicode)
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'),index=True)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'), index=True)
 
     def __init__(self, text):
         self.text = text
@@ -160,7 +189,7 @@ class DataPoints(db.Model):
     # Add Boolean training set column
     training = db.Column(db.Boolean)
 
-    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'),index=True)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'), index=True)
     user_labels = db.relationship('UserLabels', backref="datapoint", lazy="dynamic", passive_deletes=True)
 
     def __init__(self, timestamp, unit, value):
@@ -185,9 +214,9 @@ class UserLabels(db.Model):
     __tablename__ = 'user_labels'
 
     id = db.Column(db.Integer, primary_key=True)
-    datapoint_id = db.Column(db.Integer, db.ForeignKey('datapoints.id'),index=True)
-    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'),index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),index=True)
+    datapoint_id = db.Column(db.Integer, db.ForeignKey('datapoints.id'), index=True)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), index=True)
     label = db.Column(db.Boolean)
 
     def __init__(self, datapoint_id, dataset_id, user_id, label=False):

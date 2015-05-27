@@ -132,11 +132,12 @@ function labeller () {
 	  .datum(data)
 	  .attr("class", "line")
 	  .attr("d", main_line);
-
-	  main.append("g")
-	  .attr("class", "main_brush")
-	  .call(main_brush);
-	  //.call(main_brush.event);
+	  if(window.view_or_label=="label"){
+	  	main.append("g")
+	  	.attr("class", "main_brush")
+	  	.call(main_brush);
+	  	//.call(main_brush.event);
+	  }
 
 	  main.selectAll(".point")
 	  .data(data)
@@ -144,14 +145,16 @@ function labeller () {
 	  .attr("class", "point")
 	  .attr("cx", function(d) { return main_xscale(d.time); })
 	  .attr("cy", function(d) { return main_yscale(d.temp_c); })
-	  .attr("r", 4)
-	  .on("click", function(point){
-	  		//allow clicking on single points
-            point.selected=1-point.selected;
-            post([point])
-            update_selection();
-        });
-
+	  .attr("r", 4);
+	  if(window.view_or_label=="label"){
+		  main.selectAll(".point")
+		  .on("click", function(point){
+		  		//allow clicking on single points
+	            point.selected=1-point.selected;
+	            post([point])
+	            update_selection();
+	        });
+	  }
 	  main.append("g")
 	  .attr("class", "x axis")
 	  .attr("transform", "translate(0," + main_height + ")")
