@@ -20,6 +20,8 @@ a { cursor: pointer; color: steelblue;}
 #welcome li {font-size: 1.5em;}
 
 #next a{color:white;}
+#clear a{color:white;}
+#clear{margin-left: 50px;}
 
 #fileList{
   max-height: 200px;
