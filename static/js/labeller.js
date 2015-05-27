@@ -97,7 +97,7 @@ function labeller () {
 
 	  //set scales based on loaded data
 	  main_xscale.domain(pad_extent(d3.extent(data.map(function(d) { return d.time; }))));
-	  main_yscale.domain(pad_extent(d3.extent(data.map(function(d) { return d.temp_c; }))));
+	  main_yscale.domain(pad_extent([window.y_min, window.y_max]));
 		
 	  context_xscale.domain(main_xscale.domain());
 	  context_yscale.domain(main_yscale.domain());
@@ -133,7 +133,7 @@ function labeller () {
 	  svg.select(".context_brush").call(context_brush.extent(defaultExtent));
 
 	  //run brushing functions to make sure everything highlighted right
-	  brushed_context();
+	  brushed_context();	
 	  if(window.view_or_label=="label"){
 	  	update_selection();
 	  	document.getElementById("next").style.display = 'none';

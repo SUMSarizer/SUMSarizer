@@ -64,6 +64,8 @@ class Studies(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     title = db.Column(db.Unicode)
+    y_min = db.Column(db.Float, default=0)
+    y_max = db.Column(db.Float, default=200)
 
     datasets = db.relationship('Datasets', lazy="dynamic", cascade="all, delete-orphan", backref="study")
     uploads = db.relationship('StudyUploads', lazy="dynamic", cascade="all, delete-orphan", backref="study")
@@ -100,6 +102,13 @@ class Studies(db.Model):
         return Users.query.join(StudyUsers).\
             filter(StudyUsers.role == "labeller").\
             filter(StudyUsers.study_id == self.id)
+
+    def update_range(self):
+        maxmin = db.session.query(db.func.max(DataPoints.value), db.func.min(DataPoints.value)).\
+            join(Datasets).filter(Datasets.study_id == self.id).first()
+        self.y_max = maxmin[0]
+        self.y_min = maxmin[1]
+        db.session.commit()
 
 
 class Datasets(db.Model):

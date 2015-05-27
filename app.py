@@ -284,6 +284,8 @@ def dataset(dataset_id):
         } for x in dataset.data_points.order_by(DataPoints.timestamp)]
 
     is_owner = dataset.study.is_owner(user)
+    y_min = dataset.study.y_min
+    y_max = dataset.study.y_max
     return render_template('dataset.html',
                            dataset=dataset,
                            title=dataset.title,
@@ -292,6 +294,8 @@ def dataset(dataset_id):
                            notes=dataset.notes,
                            points_json=json.dumps(graph_points),
                            mode_json=json.dumps(mode),
+                           y_min_json=json.dumps(y_min),
+                           y_max_json=json.dumps(y_max),
                            mode=mode,
                            next_ds=next_ds,
                            prev_ds=prev_ds,
@@ -406,6 +410,8 @@ def zip_ingress(data, study_id):
         # db.session.bulk_insert_mappings(Notes, notes)
         conn.execute(Notes.__table__.insert(), notes)
     db.session.commit()
+    study = Studies.query.get(study_id)
+    study.update_range()
 
 
 @app.route('/upload/<study_id>', methods=['POST'])

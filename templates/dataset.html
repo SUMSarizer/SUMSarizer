@@ -112,6 +112,8 @@
 	<script>
 	window.PLOTDATA = {{ points_json | safe}}
 	window.view_or_label = {{ mode_json | safe}}
+	window.y_min = {{ y_min_json | safe}}
+	window.y_max = {{ y_max_json | safe}}
 	</script>
 	
 {% endblock %}
