@@ -9,7 +9,9 @@
 	<div class="modal-body">
 			
 		<p>Are you sure you want to clear all the labels?</p>
-			
+		<div ng-if="vm.resetting">
+				Clearing...
+		</div>			
 	</div>
 	<div class="modal-footer">
 		<input id="action" type="hidden" name="action" value="{{ url_for('reset_labels', dataset_id=dataset.id) }}" />

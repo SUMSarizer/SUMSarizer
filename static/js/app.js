@@ -49,6 +49,7 @@ angular.module('myApp', [
 			} else {
 				vm.complete = true;
 				vm.uploading = false;
+				$window.location.reload()
 				vm.cancel();
 			}
 		}
@@ -66,8 +67,7 @@ angular.module('myApp', [
 	
 	vm.submit = function () {
 		
-		vm.uploading = true;
-		vm.complete = false;
+		vm.deleting = true;
 		
 		var elAction = document.getElementById('action');
 		var action = elAction.getAttribute('value');
@@ -84,13 +84,15 @@ angular.module('myApp', [
 	
 	vm.submit = function () {
 		
-		vm.uploading = true;
-		vm.complete = false;
+		vm.resetting = true;
 		
+		$timeout(function () {
+				vm.resetting = true;
+		});
 		var elAction = document.getElementById('action');
 		var action = elAction.getAttribute('value');
 		var request = new XMLHttpRequest();
-		request.open("GET", action, true);
+		request.open("GET", action, false);
 		request.send();
     	$window.location.reload()
 	};
