@@ -1,6 +1,6 @@
 $(function() {
     $("a.btn-link").each(function(){
-        if($(this).attr("href") == window.location.pathname)
+        if($(this).attr("href") == (window.location.pathname+window.location.search))
         $(this).addClass("btn-danger");
     	$(this).removeClass('btn-link');
     })

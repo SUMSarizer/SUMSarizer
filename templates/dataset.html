@@ -34,8 +34,22 @@
     			{% else %}
     				{{study}}
 				{% endif %}	
-    		</p>
 
+
+			<span class='tinyText pull-right'> 
+				{% if mode == "label" %}
+					<a href="{{ url_for('dataset', dataset_id=dataset.id, mode='view') }}" title='Switch to View Mode'>
+						<span class="glyphicon glyphicon-eye-open" style="color:steelblue; padding-right:15px" aria-hidden="true"></span>
+						<!--<small> Go to View Mode</small>-->
+					</a>
+				{% else %}
+					<a href="{{ url_for('dataset', dataset_id=dataset.id, mode='label') }}" title='Switch to View Mode'>
+						<span class="glyphicon glyphicon-tag btn btn-xs" style="color:steelblue; padding-right:15px" aria-hidden="true"></span>
+ 						<!--<small> Go to Labelling Mode</small>-->
+					</a>
+				{% endif %}
+    		</span>
+    		</p>
 	    	<div id='fileList'>
 	    		<table class="table table-condensed">
 				    <tbody>
@@ -45,6 +59,7 @@
 				        		<a href="{{ url_for('dataset', dataset_id=all_d.id, mode=mode) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
 			        		</td>
 				        	<td colspan="1">
+				        		<a href="{{ url_for('dataset', dataset_id=all_d.id, mode='label') }}"  title="Switch to labeling">
 				        		<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
 				        	</td>
 				        </tr>
