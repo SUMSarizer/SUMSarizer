@@ -54,19 +54,24 @@
 	    		<table class="table table-condensed">
 				    <tbody>
 		    		{% for ds in all_ds %}
+		    			{% if ds.id == dataset.id %}
+						<div id="active-ds"></div>
+						{% endif %}
+
 				        <tr>
 				        	<td colspan="1">
 				        		<a href="{{ url_for('dataset', dataset_id=ds.id, mode=mode) }}" class='btn btn-link btn-xs pull-left'>{{ds.title}}</a>
 			        		</td>
 			        		<td>
-			        			{% if ds.user_has_labelled(current_user) %}
-			        			<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
-			        			{% endif %}
+        						{% if mode == "label" %}
+				        			{% if ds.user_has_labelled(current_user) %}
+					        			<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
+				        			{% endif %}
+								{% else %}
+									{{ds.labelled.count()}}		
+								{% endif %}
+
 			        		</td>
-<!--				        	<td colspan="1">
-				        		<a href="{{ url_for('dataset', dataset_id=ds.id, mode='label') }}"  title="Switch to labeling">
-				        		<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
-				        	</td> -->
 				        </tr>
 					{% endfor %}
 				    </tbody>

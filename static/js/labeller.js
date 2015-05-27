@@ -133,8 +133,8 @@ function labeller () {
 	  svg.select(".context_brush").call(context_brush.extent(defaultExtent));
 
 	  //run brushing functions to make sure everything highlighted right
+	  brushed_context();
 	  if(window.view_or_label=="label"){
-	  	brushed_context();
 	  	update_selection();
 	  	document.getElementById("next").style.display = 'none';
 	  } else {

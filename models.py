@@ -152,6 +152,7 @@ class Datasets(db.Model):
         self.user_labels.delete()
         self.notes.delete()
         self.data_points.delete()
+        self.labelled.delete()
         db.session.delete(self)
         db.session.commit()
 

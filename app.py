@@ -309,9 +309,11 @@ def labelled_dataset(dataset_id):
     if not dataset.study.is_labeller(user):
         abort(401)
 
-    labelled = LabelledDatasets(dataset.id, user.id)
-    db.session.add(labelled)
-    db.session.commit()
+    # mark as labelled if not already
+    if not dataset.user_has_labelled(user):
+        labelled = LabelledDatasets(dataset.id, user.id)
+        db.session.add(labelled)
+        db.session.commit()
 
     next_ds = dataset.next()
     if(next_ds):
@@ -330,6 +332,11 @@ def reset_labels(dataset_id):
         abort(401)
 
     data_labels = dataset.labels_for_user(user)
+
+    # mark as unlabelled
+    if dataset.user_has_labelled(user):
+        dataset.labelled.filter_by(user_id=user.id).delete()
+        db.session.commit()
 
     dicts = [dict(id=data_label.UserLabels.id, label=False) for data_label in data_labels]
     db.session.bulk_update_mappings(UserLabels, dicts)
