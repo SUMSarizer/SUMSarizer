@@ -108,7 +108,9 @@
 						<li>
 							<p>
 								<span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
-								{{user.email}}</p>
+								{{user.email}}
+								({{user.study_labels(study.id)}}/{{study.datasets.count()}})
+								</p>
 						</li>
 						{% endfor %}
 					</ul>

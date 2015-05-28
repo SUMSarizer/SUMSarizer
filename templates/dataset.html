@@ -68,7 +68,7 @@
 					        			<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
 				        			{% endif %}
 								{% else %}
-									{{ds.labelled.count()}}		
+									({{ds.labelled.count()}}/{{ds.study.labellers().count()}})
 								{% endif %}
 
 			        		</td>

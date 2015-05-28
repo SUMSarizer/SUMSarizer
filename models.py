@@ -42,6 +42,11 @@ class Users(db.Model):
         return db.session.query(Studies, StudyUsers).\
             join(StudyUsers).filter_by(user_id=self.id)
 
+    def study_labels(self, study_id):
+        return db.session.query(LabelledDatasets).\
+            filter_by(user_id=self.id).\
+            join(Datasets).filter_by(study_id=study_id).count()
+
 
 class StudyUploads(db.Model):
     __tablename__ = 'study_uploads'
