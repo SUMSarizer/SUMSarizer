@@ -77,7 +77,7 @@ def register():
         _user.__class__ = User
     except StormpathError, err:
         # If something fails, we'll display a user-friendly error message.
-        return render_template('register.html', error=err.message)
+        return render_template('register.html', error=err.message['message'])
 
     login_user(_user, remember=True)
 
@@ -109,7 +109,7 @@ def login():
             request.form.get('password'),
         )
     except StormpathError, err:
-        return render_template('login.html', error=err.message)
+        return render_template('login.html', error=err.message['message'])
 
     login_user(_user, remember=True)
     print stormpath_user.get_id()
