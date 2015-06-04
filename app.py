@@ -453,3 +453,7 @@ def logout():
     """
     logout_user()
     return redirect(url_for('index'))
+
+@app.errorhandler(401)
+def page_not_found(e):
+    return render_template('401.html'), 401
