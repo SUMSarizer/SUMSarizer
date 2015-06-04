@@ -31,8 +31,14 @@
       {% block body %}{% endblock %}
     </div>
 		
-    <footer></footer>
-		
+    <footer class="footer">
+      <div class="container small text-center col-xs-1"></div>
+      <div class="container small text-center col-xs-10">
+        <p class="small"><br><strong>SUMsarizer created by Daniel Wilson, Jeremy Coyle, and Ajay Pillarisetti</strong> <br> <a href="https://github.com/SUMSarizer/">github.com/SUMSarizer</a> • SUMSarizer works best with <a href="http://google.com/chrome">Google Chrome</a> • <a href="{{url_for('eula')}}" >EULA</a></p>
+      </div>
+      <div class="container small text-center col-xs-1"></div>
+    </footer>
+
     <script src="{{ url_for('static', filename='js/vendor/jquery-1.11.2.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/vendor/bootstrap.min.js') }}"></script>
 		<script src="{{ url_for('static', filename='js/vendor/angular.min.js') }}"></script>

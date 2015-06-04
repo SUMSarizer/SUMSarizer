@@ -50,6 +50,10 @@ def index():
     """Basic home page."""
     return render_template('index.html')
 
+@app.route('/eula')
+def eula():
+    """Basic EULA page."""
+    return render_template('eula.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
