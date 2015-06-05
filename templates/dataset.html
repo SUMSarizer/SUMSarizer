@@ -104,7 +104,12 @@
 				</div>
 			{% endif %}
 			<div id='maindiv'></div>
-        
+			<br>
+			{% if mode == "view" %}
+			<p class='text-center'>
+				<span style="color:blue;" class='small'> • Blue points</span> <span class='small'> indicate those randomly selected as part of the training set.</span>
+			</p>
+			{% endif %}
 		</div>
 
     </div>
