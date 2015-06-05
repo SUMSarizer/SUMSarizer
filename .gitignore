@@ -2,4 +2,3 @@ venv
 env
 *.pyc
 .env
-migrations/*.*
