@@ -50,10 +50,12 @@ def index():
     """Basic home page."""
     return render_template('index.html')
 
+
 @app.route('/eula')
 def eula():
     """Basic EULA page."""
     return render_template('eula.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -454,6 +456,23 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+
+@app.route('/sumsarize_study/<study_id>', methods=['POST'])
+@login_required
+def sumsarize_study(study_id):
+    queryfile = open("querydump.sql", "r")
+    query = queryfile.read()
+
+    query.replace("[study_id]", study_id)
+
+    conn = db.session.connection()
+    conn.execute(query)
+
+    return jsonify({
+        'success': True
+    })
+
+
 @app.errorhandler(401)
 def unauthorized(e):
     return render_template('401.html'), 401
@@ -461,3 +480,6 @@ def unauthorized(e):
 # @app.errorhandler(404)
 # def page_not_found(e):
 #     return render_template('404.html'), 404
+4
+4
+4
