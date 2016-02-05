@@ -16,11 +16,9 @@ def parse(file):
       if re.match('^Date', row):
         state = DATA
       else:
-
         # Strip non-ascii characters.
         # This should really live in some sort of lib module, but it's only used here so far.
         row = ''.join([i if ord(i) < 128 else ' ' for i in row])
-
 
         notes.append(row)
     elif state == DATA:

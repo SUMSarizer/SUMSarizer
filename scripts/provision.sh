@@ -22,6 +22,8 @@ cd /vagrant
 pip install -r requirements.txt
 
 echo 'cd /vagrant' >> ~/.bash_profile
+echo 'source ~/venv/bin/activate' >> ~/.bash_profile
+echo 'source .env' >> ~/.bash_profile
 
 #
 ## Database
