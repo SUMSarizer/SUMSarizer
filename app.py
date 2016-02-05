@@ -388,15 +388,19 @@ def generate_selector(data):
 
 
 def zip_ingress(data, study_id):
+    print "Starting zip ingress for study %s" % study_id
+
     conn = db.engine.connect()
     zpf = zipfile.ZipFile(data)
 
-    valCSV = re.compile("[^\.\_.*\.csv]")
+    print zpf.namelist()
+
     for file in zpf.namelist():
-        # make sure we have a real csv and not a folder or some other file type
-        if valCSV.match(file) is None:
+
+        if not file.endswith(".csv"):
             continue
-        print file
+
+        print "Trying to parse %s" % file
 
         # first add empty dataset to get key
         dataset = Datasets(file, study_id)
