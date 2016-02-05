@@ -37,28 +37,6 @@ Login to the machine:
 
     vagrant ssh
 
-Config
----
-
-The file `.env` contains API ids and secrets.
-
-See the file `env.sample` for what needs to go here. API keys are stored in the encrypted `secrets.txt`.
-
-You can also retrieve API keys from the Heroku management UI.
-
-Secrets
----
-
-Secrets stored in the repository with Ansible Vault. Contact the repository maintainer for the password.
-
-Install [Ansible](http://www.ansible.com/home).
-
-Edit files:
-
-	ansible-value edit secrets.txt
-
-More: http://docs.ansible.com/playbooks_vault.html#id6
-
 Run
 ---
 
@@ -67,15 +45,6 @@ Run
 Run like prod (useful to test if foreman is crashing on deploy):
 
 	./scripts/prod.sh
-
-Deploy
----
-
-	git push heroku master
-
-Make sure there is a web process running:
-
-	heroku ps:scale web=1
 
 Migrations
 ---
@@ -95,3 +64,36 @@ to generate the migration file. Inspect the migration file in `migrations/versio
 Running the migration on prod:
 
 	heroku run python manage.py db upgrade
+
+Secrets
+---
+
+Secrets stored in the repository with Ansible Vault in the `secrets` directory.
+
+Run
+
+  ./scripts/open-secret <secret name>
+
+to unencrypt a secret to the `secrets_` directory.
+
+To re-encrypt the secret, copy the new file to the `secrets` directory, then run:
+
+  ./scripts/encrypt-secret <secret name>
+
+**If you commit and push an unencrypted file in the `secrets` directory it will no longer be secret!**
+
+Config
+---
+
+The secret file `.env` contains API ids and secrets.
+
+Deploy
+---
+
+	git push heroku master
+
+Make sure there is a web process running:
+
+	heroku ps:scale web=1
+
+
