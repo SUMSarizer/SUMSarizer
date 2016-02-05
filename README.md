@@ -27,9 +27,9 @@ Install Dev Environment
 
 First clone this repository.
 
-**TODO: note about secrets.txt and the .env file**
+Then, add a file `.vault_pass.txt` to the root of the repo with the Vault password in it (contact the maintainer to get this password).
 
-Then, provision and start WATT in a virtual machine using:
+Then, provision and start the virtual machine using:
 
     vagrant up
 
