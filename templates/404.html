@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+  <div class="">
+    <div class="row">
+    <br>
+      <div class="col-lg-6 col-lg-offset-3">
+        <div class="alert alert-dismissable alert-danger login-fail">
+         Nothing to see here. <a href="{{url_for('dashboard')}}">Click here to go home.</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

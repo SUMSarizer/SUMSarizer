@@ -1,22 +1,77 @@
 {% extends "base.html" %}
 {% block body %}
+
+	<script type="text/ng-template" id="modal_reset.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Clear Points</h3>
+    </div>
+    
+	<div class="modal-body">
+			
+		<p>Are you sure you want to clear all the labels?</p>
+		<div ng-if="vm.resetting">
+				Clearing...
+		</div>			
+	</div>
+	<div class="modal-footer">
+		<input id="action" type="hidden" name="action" value="{{ url_for('reset_labels', dataset_id=dataset.id) }}" />
+		<button class="btn btn-success" ng-click="vm.submit()">Yes</button>
+	    <a class="btn" ng-click="vm.cancel()">Cancel</a>
+	</div>
+  	</script>
+
 	<div class="row">	
 		<div id='fileInfo' class='col-md-4 pull-left'>
-			<p style='margin-top:30px;'> Files from study         		
-    			<a href="{{ url_for('study', id=studyid) }}">{{study}}</a>
-    		</p>
+			<p style='margin-top:30px;'> Now 
+				{% if mode == "label" %}
+					labelling
+				{% else %}
+					viewing
+				{% endif %}
+					study 
+				{% if is_owner %}
+    				<a href="{{ url_for('study', study_id=studyid) }}">{{study}}</a>
+    			{% else %}
+    				{{study}}
+				{% endif %}	
 
+
+			<span class='tinyText pull-right'> 
+				{% if mode == "label" %}
+					<a href="{{ url_for('dataset', dataset_id=dataset.id, mode='view') }}" title='Switch to View Mode'>
+						<span class="glyphicon glyphicon-eye-open" style="color:steelblue; padding-right:15px" aria-hidden="true"></span>
+						<!--<small> Go to View Mode</small>-->
+					</a>
+				{% else %}
+					<a href="{{ url_for('dataset', dataset_id=dataset.id, mode='label') }}" title='Switch to View Mode'>
+						<span class="glyphicon glyphicon-tag btn btn-xs" style="color:steelblue; padding-right:15px" aria-hidden="true"></span>
+ 						<!--<small> Go to Labelling Mode</small>-->
+					</a>
+				{% endif %}
+    		</span>
+    		</p>
 	    	<div id='fileList'>
 	    		<table class="table table-condensed">
 				    <tbody>
-		    		{% for all_d in all_ds %}
+		    		{% for ds in all_ds %}
+		    			{% if ds.id == dataset.id %}
+						<div id="active-ds"></div>
+						{% endif %}
+
 				        <tr>
 				        	<td colspan="1">
-				        		<a href="{{ url_for('dataset', id=all_d.id) }}" class='btn btn-link btn-xs pull-left'>{{all_d.title}}</a>
+				        		<a href="{{ url_for('dataset', dataset_id=ds.id, mode=mode) }}" class='btn btn-link btn-xs pull-left'>{{ds.title}}</a>
 			        		</td>
-				        	<td colspan="1">
-				        		<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
-				        	</td>
+			        		<td>
+        						{% if mode == "label" %}
+				        			{% if ds.user_has_labelled(current_user) %}
+					        			<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
+				        			{% endif %}
+								{% else %}
+									({{ds.labelled.count()}}/{{ds.study.labellers().count()}})
+								{% endif %}
+
+			        		</td>
 				        </tr>
 					{% endfor %}
 				    </tbody>
@@ -31,18 +86,39 @@
 			</div>
 		</div>	
 		<div class="col-md-8">
-	        <h1 class='nobottom'>Datapoints</h1>
-			<div class='pull-right btn btn-xs btn-default' id='next'>
-				{% if next_ds %}
-					<a href="{{ url_for('dataset', id=next_ds.id) }}">Done? Next. &rarr;</a>
-				{% endif %}	
-			</div>
+	        <h1 class='nobottom'>Datapoints for {{title}}</h1>
+	        {% if mode == "label" %}
+				<div class='pull-right btn btn-xs btn-default' id='next'>
+					
+						<a href="{{ url_for('labelled_dataset', dataset_id=dataset.id, mode=mode) }}">
+						Done?
+						{% if next_ds %}
+							Next&rarr;</a>
+						{% endif %}	
+				</div>
+			
+	        	<div class="" ng-controller="DatasetCtrl as vm">
+			       	<div class='pull-left btn btn-xs btn-default' id='clear'>
+							<a href="" ng-click="vm.resetModal()"><span class="glyphicon glyphicon-erase" aria-hidden="true"> </span>Clear Labels</a>
+					</div>
+				</div>
+			{% endif %}
 			<div id='maindiv'></div>
-        </div>
+			<br>
+			{% if mode == "view" %}
+			<p class='text-center'>
+				<span style="color:blue;" class='small'> • Blue points</span> <span class='small'> indicate those randomly selected as part of the training set.</span>
+			</p>
+			{% endif %}
+		</div>
+
     </div>
 	
 	<script>
 	window.PLOTDATA = {{ points_json | safe}}
+	window.view_or_label = {{ mode_json | safe}}
+	window.y_min = {{ y_min_json | safe}}
+	window.y_max = {{ y_max_json | safe}}
 	</script>
 	
 {% endblock %}

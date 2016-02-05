@@ -49,6 +49,8 @@ angular.module('myApp', [
 			} else {
 				vm.complete = true;
 				vm.uploading = false;
+				$window.location.reload()
+				vm.cancel();
 			}
 		}
 	
@@ -56,8 +58,47 @@ angular.module('myApp', [
 	};
 	
   vm.cancel = function () {
-		$window.location.reload();
     $modalInstance.dismiss('cancel');
+  };
+})
+
+.controller('DeleteModalInstanceCtrl', function ($scope, $modalInstance, $timeout, $window) {
+	var vm = this;
+	
+	vm.submit = function () {
+		
+		vm.deleting = true;
+		
+		var elAction = document.getElementById('action');
+		var action = elAction.getAttribute('value');
+		$window.location.href = action
+	};
+	
+    vm.cancel = function () {
+	    $modalInstance.dismiss('cancel');
+  };
+})
+
+.controller('ResetModalInstanceCtrl', function ($scope, $modalInstance, $timeout, $window) {
+	var vm = this;
+	
+	vm.submit = function () {
+		
+		vm.resetting = true;
+		
+		$timeout(function () {
+				vm.resetting = true;
+		});
+		var elAction = document.getElementById('action');
+		var action = elAction.getAttribute('value');
+		var request = new XMLHttpRequest();
+		request.open("GET", action, false);
+		request.send();
+    	$window.location.reload()
+	};
+	
+    vm.cancel = function () {
+	    $modalInstance.dismiss('cancel');
   };
 })
 
@@ -79,6 +120,17 @@ angular.module('myApp', [
 		});
 	};
 	
+	
+	vm.deleteModal = function () {
+		var modalInstance = $modal.open({
+			templateUrl: 'modal_delete.html',
+			controller: 'DeleteModalInstanceCtrl',
+			controllerAs: 'vm'
+		});
+	};
+
+
+	
 })
 
 .controller('NewStudyModalCtrl', function ($scope, $modalInstance, $timeout, $window) {
@@ -97,5 +149,26 @@ angular.module('myApp', [
 			controllerAs: 'vm'
 		});
 	};
-});
+})
 
+
+.controller('DatasetCtrl', function ($timeout, $modal) {
+	var vm = this;
+	vm.uploadCount = 0;
+	
+	vm.resetModal = function () {
+		var modalInstance = $modal.open({
+			templateUrl: 'modal_reset.html',
+			controller: 'ResetModalInstanceCtrl',
+			controllerAs: 'vm'
+		});
+
+		modalInstance.result.then(function () {
+
+		}, function () {
+			
+		});
+	};
+	
+	
+});

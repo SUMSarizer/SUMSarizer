@@ -5,10 +5,11 @@
 
 	{% macro render_pagination(pagination, endpoint) %}
 	  <div class=pagination>
+	  Page &nbsp;
 	  {%- for page in pagination.iter_pages() %}
-	    {% if page %}
-	      {% if page != pagination.page %}
-	        <a href="{{ url_for(endpoint, page=page) }}">{{ page }}</a>
+	    {% if page %} 
+	      {% if page != pagination.page %} 
+	        <a href="{{ url_for(endpoint, study_id=study.id, page=page) }}">{{ page }}</a>
 	      {% else %}
 	        <strong>{{ page }}</strong>
 	      {% endif %}
@@ -25,45 +26,114 @@
         <h3 class="modal-title">Upload</h3>
     </div>
     <div class="modal-body">
-			<p>You can select multiple files at once.</p>
-			<input id="files" type="file" name="file" multiple>
-			<input id="action" type="hidden" name="action" value="{{ url_for('upload', id=study.id) }}" />
-			
-			<div ng-if="vm.uploadCount">
-				Uploads remaining: {[{ vm.uploadCount }]}
-			</div>
-			<div ng-if="vm.complete">
-				Upload complete
-			</div>
+			<p>Please upload a zip file containing all reading files for your study.</p>
+			<input id="files" type="file" name="file">
+			<input id="action" type="hidden" name="action" value="{{ url_for('upload', study_id=study.id) }}" />
+
+			<div ng-if="vm.uploading">
+				Uploading...
+		</div>	
     </div>
     <div class="modal-footer">
         <button class="btn btn-success" ng-click="vm.submit()">Upload</button>
         <button class="btn" ng-click="vm.cancel()">Close</button>
     </div>
-  </script>
+	</script>
+
+
+	<script type="text/ng-template" id="modal_delete.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Delete</h3>
+    </div>
+    <form action="{{ url_for('delete_study', study_id=study.id) }}" method="get">
+		<div class="modal-body">
+				
+			<p>Deleting the study will remove all associated datasets and labels. Are you sure you want to do this?</p>
+
+			<div ng-if="vm.deleting">
+				Deleting...
+			</div>	
+
+				
+		</div>
+		<div class="modal-footer">
+		    <button type="submit" class="btn btn-success">Delete</button>
+		    <a class="btn" ng-click="vm.cancel()">Cancel</a>
+		</div>
+    </form>
+	</script>
 
   <div class="" ng-controller="DashboardCtrl as vm">
-    <div class="row">
+	<div class="row">
       <div class="col-lg-12">
-				
-		<h1>{{study.title}}</h1>
-				
+
+		<h1>{{study.title}} 
+			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.deleteModal()"><span class="glyphicon glyphicon-remove" aria-hidden="true"> </span> Delete Study</a> 
+			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.openModal()"><span class="glyphicon glyphicon-upload" aria-hidden="true"> </span>
+ 			Upload Sensor Data</a>
+			<a href="{{url_for('label_study', study_id=study.id)}}" class="tinyText studyTextButton pull-right"><span class="glyphicon glyphicon-tag" aria-hidden="true"> </span>
+ 			Switch to Labelling</a>
+		</h1>
+
+  		<div class="upload-container">				
+			{% for upload in uploads %}
+			<div class="alert alert-info" role="alert">
+				<span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
+				<b>Pending upload: {{upload.filename}}</b>
+			</div>
+			{% endfor %}
+		</div>
+
+		<br>
+					
         <h2>Data Sets</h2>
-				
-				<div class="upload-container">				
-					<a href="" class="btn btn-success" ng-click="vm.openModal()">Upload</a>
+			<ul id='datasets' class='list-group row'>
+				{% for dataset in datasets %}
+				<li class='list-group-item col-xs-4'>
+					<p>
+						<a href="{{url_for('dataset', dataset_id=dataset.id, mode='view')}}">
+							<span class="glyphicon glyphicon-file" aria-hidden="true"> </span> 
+							{{ dataset.title }}</a></p>
+				</li>
+				{% endfor %}				
+			</ul>
+
+		{{ render_pagination(pagination, 'study') }}
+
+		<div id="usersContainer" class='col-xs-12'>
+			<div id='userPanel1' class='col-xs-6'>						
+		        <h6>Current Labellers</h6>				
+					<ul id='currentUsers'>
+						{% for user in users %}
+						<li>
+							<p>
+								<span class="glyphicon glyphicon-user" aria-hidden="true"> </span>
+								{{user.email}}
+								({{user.study_labels(study.id)}}/{{study.datasets.count()}})
+								</p>
+						</li>
+						{% endfor %}
+					</ul>
 				</div>
-								
-				<ul>
-					{% for dataset in datasets %}
-					<li>
-						<p><a href="{{url_for('dataset', id=dataset.id)}}">{{ dataset.title }}</a></p>
-					</li>
-					{% endfor %}
-				</ul>
-				
-				{{ render_pagination(pagination, 'dashboard') }}
-				
+			<div id='userPanel2' class='col-xs-6'>
+		        <h6>
+		        	Add Other Labellers
+		        	<input type="text" id="searchDingus" placeholder="Filter Users..." name="search" class='pull-right'>
+		        </h6>
+					<ul id='otherUsers'>
+						{% for user in notusers %}
+						<li>
+							<p> 
+								<a href="{{url_for('add_study_labeller', study_id=study.id,user_id=user.id)}}"> 
+									<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"> </span>
+								{{user.email}}
+								</a>
+							</p>
+						</li>
+						{% endfor %}
+					</ul>
+			</div>
+		</div>
       </div>
     </div>
   </div>

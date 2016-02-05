@@ -5,8 +5,8 @@ function labeller () {
 	// context -- smaller context plot for zooming, scrolling
 
 	//margins
-	var main_margin = {top: 10, right: 10, bottom: 100, left: 20},
-	context_margin = {top: 430, right: 10, bottom: 20, left: 20},
+	var main_margin = {top: 10, right: 10, bottom: 100, left: 40},
+	context_margin = {top: 430, right: 10, bottom: 20, left: 40},
 	maindiv_width = $('#maindiv').width();
 	width = maindiv_width - main_margin.left - main_margin.right,
 	main_height = 500 - main_margin.top - main_margin.bottom,
@@ -26,8 +26,11 @@ function labeller () {
 
 	//plotting areas
 	var svg = d3.select("#maindiv").append("svg")
+	.attr("id", "mainChart")
 	.attr("width", width + main_margin.left + main_margin.right)
-	.attr("height", main_height + main_margin.top + main_margin.bottom);
+	.attr("height", main_height + main_margin.top + main_margin.bottom)
+	.attr("viewBox", "0 0 " + (width + main_margin.left + main_margin.right) + " " + (main_height + main_margin.top + main_margin.bottom))
+	.attr("perserveAspectRatio", "xMinYMid");
 
 	//something about clipping, not sure what this is doing yet
 	svg.append("defs").append("clipPath")
@@ -88,13 +91,13 @@ function labeller () {
 	}
 
 	function init () {
-	
+		
 		data=window.PLOTDATA;
 		data = data.map(type);
 
 	  //set scales based on loaded data
 	  main_xscale.domain(pad_extent(d3.extent(data.map(function(d) { return d.time; }))));
-	  main_yscale.domain(pad_extent(d3.extent(data.map(function(d) { return d.temp_c; }))));
+	  main_yscale.domain(pad_extent([window.y_min, window.y_max]));
 		
 	  context_xscale.domain(main_xscale.domain());
 	  context_yscale.domain(main_yscale.domain());
@@ -110,12 +113,35 @@ function labeller () {
 	  makeplot(data);
 
 	  //set default extent for context
-	  var defaultExtent = [context_xscale.domain()[0],context_xscale.invert(context_xscale.range()[1]*(1/7))];
+	  Date.prototype.addDays = function(days)
+	  {
+    	var dat = new Date(this.valueOf());
+    	dat.setDate(dat.getDate() + days);
+    	return dat;
+	  }
+
+	  var start_date = context_xscale.domain()[0]
+	  if(window.view_or_label=="label"){
+	  	var end_date = new Date(start_date).addDays(1)
+	  } else {
+	  	var end_date = new Date(start_date).addDays(7)
+	  }
+	  
+
+	  var defaultExtent = [start_date,end_date]
+
 	  svg.select(".context_brush").call(context_brush.extent(defaultExtent));
 
 	  //run brushing functions to make sure everything highlighted right
-	  brushed_context();
-	  brushed_main();
+	  brushed_context();	
+	  if(window.view_or_label=="label"){
+	  	update_selection();
+	  	document.getElementById("next").style.display = 'none';
+	  } else {
+	  	main.selectAll(".point").classed("training", function(d) { return d.training; });
+		context.selectAll(".point").classed("training", function(d) { return d.training; });
+	  }
+
 	}
 
 	$(function () {
@@ -129,6 +155,12 @@ function labeller () {
 	  .datum(data)
 	  .attr("class", "line")
 	  .attr("d", main_line);
+	  if(window.view_or_label=="label"){
+	  	main.append("g")
+	  	.attr("class", "main_brush")
+	  	.call(main_brush);
+	  	//.call(main_brush.event);
+	  }
 
 	  main.selectAll(".point")
 	  .data(data)
@@ -137,7 +169,16 @@ function labeller () {
 	  .attr("cx", function(d) { return main_xscale(d.time); })
 	  .attr("cy", function(d) { return main_yscale(d.temp_c); })
 	  .attr("r", 4);
+	  if(window.view_or_label=="label"){
+		  main.selectAll(".point")
+		  .on("click", function(point){
+		  		//allow clicking on single points
+	            point.selected=1-point.selected;
+	            post([point])
+	            update_selection();
+	        });
 
+	  }
 	  main.append("g")
 	  .attr("class", "x axis")
 	  .attr("transform", "translate(0," + main_height + ")")
@@ -146,11 +187,6 @@ function labeller () {
 	  main.append("g")
 	  .attr("class", "y axis")
 	  .call(yaxis);
-
-	  main.append("g")
-	  .attr("class", "main_brush")
-	  .call(main_brush)
-	  .call(main_brush.event);
 
 	  //context plot
 	  context.append("path")
@@ -192,7 +228,14 @@ function labeller () {
 	  .attr("cx", function(d) { return main_xscale(d.time); });
 
 	  main.select(".x.axis").call(main_xaxis);
+	  var limits=context_xscale.domain();
+	  if(context_brush.extent()[1]>=1*context_xscale.domain()[1]){
+	  	console.log("far right")
+	  	if(window.view_or_label=="label"){
+	  		document.getElementById("next").style.display = 'block';
+	  	}
 	  }
+	}
 
 
 
@@ -252,36 +295,43 @@ function labeller () {
 
 	// Find the nodes within the specified rectangle.
 	function search(quadtree, brush_xmin, brush_ymin, brush_xmax, brush_ymax) {
+	  var brushed_points = [];
 	  quadtree.visit(function(node, rect_xmin, rect_ymin, rect_xmax, rect_ymax) {
 	    var p = node.point;
 	    if (p){
 	      //select based on xor (so brushing toggles all points under brush)
 	      p.selected = p.selected ^ ((p.x >= brush_xmin) && (p.x <= brush_xmax) && (p.y >= brush_ymin) && (p.y <= brush_ymax));
-
-				post(p);
+	      		brushed_points.push(p);
+				//post(p);
 	    }
 	    //true if brush and quadtree rectangle don't over lap -- we didn't brush anything in here.
 	    //therefore, don't look at children of this node
 	    return rect_xmin > brush_xmax || rect_ymin > brush_ymax || rect_xmax < brush_xmin || rect_ymax < brush_ymin;
 	  });
+	  post(brushed_points);
+	}
+
+	function update_selection(){
+	  main.selectAll(".point").classed("selected", function(d) { return d.selected; });
+	  context.selectAll(".point").classed("selected", function(d) { return d.selected; });
 	}
 
 	function brushed_main(){
 	  var extent = main_brush.extent();
+	  console.log(extent)
 	  //point.each(function(d) { d.selected = false; });
 	  //convert based on context_xscale because this is what quadtree is defined on
 	  // search(quadtree, context_xscale(extent[0][0]), main_yscale(extent[0][1]), context_xscale(extent[1][0]), main_yscale(extent[1][1]));
 	  search(quadtree, context_xscale(extent[0][0]), main_yscale(extent[1][1]), context_xscale(extent[1][0]), main_yscale(extent[0][1]));
 
-	  main.selectAll(".point").classed("selected", function(d) { return d.selected; });
-	  context.selectAll(".point").classed("selected", function(d) { return d.selected; });
+	  update_selection();
 	  d3.selectAll(".main_brush").call(main_brush.clear());
 	}
 
 	function post (p) {
 		$.ajax({
 			type: "POST",
-			url: "/point",
+			url: "/labels",
 			data: JSON.stringify(p),
 			dataType: 'json',
 			contentType: 'application/json'
