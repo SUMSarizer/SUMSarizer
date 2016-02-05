@@ -3,24 +3,39 @@ SUMSarizer
 
 The Berkeley SUMSarizer
 
-Install
+The SUMSarizer reduces raw SUMS data into a log of "cooking events" using machine learning. Upload your CSV files, train the algorithm by manually annotating a few data sets (with a nice UI), and the SUMSarizer will do the rest.
+
+Guaranteed to save you a month of data wrangling!
+
+Development Prerequisites
 ---
 
-Install Python 2.7 and pip. 
+The development environment uses Vagrant to make it easy to spin up consistent dev environments on any host machine. Install the following:
 
-https://www.python.org/download/releases/2.7/
+* [Vagrant](https://www.vagrantup.com/)
+* [VirtualBox](https://www.virtualbox.org/)
+* The Vagrant-cachier plugin for faster provisions:
 
-https://pip.pypa.io/en/latest/
+    vagrant plugin install vagrant-cachier
 
-Then,
+Installation of Vagrant on Ubuntu can be tricky depending on what version you are using. For 14.04 [these instructions](http://foorious.com/devops/vagrant-virtualbox-trusty-install/) were good.
 
-	./scripts/install.sh
+On Mac, there is sometimes an issue where the Vagrant binary in installed (in `/opt/vagrant/bin/vagrant`) but not symlinked as `/usr/bin/vagrant`.
 
-Install a local Postgres database. The app expects a database named "sums".
+Install Dev Environment
+---
 
-To deploy to the server, install the Heroku toolbelt:
+First clone this repository.
 
-https://toolbelt.heroku.com/
+**TODO: note about secrets.txt and the .env file**
+
+Then, provision and start WATT in a virtual machine using:
+
+    vagrant up
+
+Login to the machine:
+
+    vagrant ssh
 
 Config
 ---
@@ -36,7 +51,7 @@ Secrets
 
 Secrets stored in the repository with Ansible Vault. Contact the repository maintainer for the password.
 
-Install [Ansible](http://www.ansible.com/home). 
+Install [Ansible](http://www.ansible.com/home).
 
 Edit files:
 

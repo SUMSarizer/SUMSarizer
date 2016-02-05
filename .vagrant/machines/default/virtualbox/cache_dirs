@@ -1,0 +1,4 @@
+/var/cache/apt/archives
+/var/lib/gems/1.9.1/cache
+/var/lib/apt/lists
+/home/vagrant/.npm
