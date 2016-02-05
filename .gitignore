@@ -3,5 +3,6 @@ venv
 env
 *.pyc
 .env
+!secrets/.env
 .vault_pass.txt
 secrets_/
