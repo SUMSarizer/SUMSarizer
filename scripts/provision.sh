@@ -21,10 +21,9 @@ source venv/bin/activate
 cd /vagrant
 pip install -r requirements.txt
 
-echo 'cd /vagrant' >> ~/.bash_profile
-echo 'source ~/venv/bin/activate' >> ~/.bash_profile
-echo './scripts/open_secret.sh .env' >> ~/.bash_profile
-echo 'source secrets_/.env' >> ~/.bash_profile
+echo 'source scripts/env.sh' >> ~/.bash_profile
+
+source scripts/env.sh
 
 #
 ## Database
