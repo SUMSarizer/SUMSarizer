@@ -90,10 +90,15 @@ The secret file `.env` contains API ids and secrets.
 Deploy
 ---
 
-	git push heroku master
+*We're using a linode at http://50.116.4.99/
+*The app lives in /home/jrcoyle/SUMSarizer
+*www group has permissions
+*Currently on port 5005
+**If you want to change the port, forward the new port in iptables
+*Logs in /var/log/supervisor
 
-Make sure there is a web process running:
-
-	heroku ps:scale web=1
+To deploy:
+*git pull
+*restart workers with supervisorctl
 
 
