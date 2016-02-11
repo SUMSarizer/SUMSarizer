@@ -90,15 +90,15 @@ The secret file `.env` contains API ids and secrets.
 Deploy
 ---
 
-*We're using a linode at http://50.116.4.99/
-*The app lives in /home/jrcoyle/SUMSarizer
-*www group has permissions
-*Currently on port 5005
-**If you want to change the port, forward the new port in iptables
-*Logs in /var/log/supervisor
+* We're using a linode at http://50.116.4.99/
+* The app lives in /home/jrcoyle/SUMSarizer
+* www group has permissions
+* Currently on port 5005
+** If you want to change the port, forward the new port in iptables
+* Logs in /var/log/supervisor
 
 To deploy:
-*git pull
-*restart workers with supervisorctl
+* git pull
+* restart workers with supervisorctl
 
 
