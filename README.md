@@ -72,13 +72,13 @@ Secrets stored in the repository with Ansible Vault in the `secrets` directory.
 
 Run
 
-  ./scripts/open-secret <secret name>
+    ./scripts/open-secret <secret name>
 
 to unencrypt a secret to the `secrets_` directory.
 
 To re-encrypt the secret, copy the new file to the `secrets` directory, then run:
 
-  ./scripts/encrypt-secret <secret name>
+    ./scripts/encrypt-secret <secret name>
 
 **If you commit and push an unencrypted file in the `secrets` directory it will no longer be secret!**
 
