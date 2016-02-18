@@ -11,13 +11,5 @@ def deploy():
     run("git pull")
     sudo("supervisorctl restart all")
 
-# Deploy
-
-  # ssh
-  # git pull
-  # restart staging version of app
-
-
-# Migrations
-
+# TODO: Migrations
   # run alembic on db

@@ -16,7 +16,7 @@ The development environment uses Vagrant to make it easy to spin up consistent d
 * [VirtualBox](https://www.virtualbox.org/)
 * The Vagrant-cachier plugin for faster provisions:
 
-    vagrant plugin install vagrant-cachier
+        vagrant plugin install vagrant-cachier
 
 Installation of Vagrant on Ubuntu can be tricky depending on what version you are using. For 14.04 [these instructions](http://foorious.com/devops/vagrant-virtualbox-trusty-install/) were good.
 
@@ -90,14 +90,13 @@ The secret file `.env` contains API ids and secrets.
 Deploy
 ---
 
+To push app changes to Linode:
+
+    fab deploy
+
 * We're using a linode at http://50.116.4.99/
 * The app lives in /home/jrcoyle/SUMSarizer
 * www group has permissions
 * Currently on port 5005. If you want to change the port, forward the new port in iptables
 * Logs in /var/log/supervisor
-
-To deploy:
-* `git pull`
-* restart workers with `supervisorctl`
-
 
