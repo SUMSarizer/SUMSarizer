@@ -99,6 +99,12 @@ To push app changes to Linode:
 * www group has permissions
 * Currently on port 5005. If you want to change the port, forward the new port in iptables
 * Logs in /var/log/supervisor
+* supervisord manages the app and worker processes
+
+        /etc/supervisor/conf.d/SUMSarizer.conf
+        /home/www/SUMSarizer/scripts/start.sh
+        /home/www/SUMSarizer/scripts/start_worker.sh
+
 * The app runs inside a virtualenv
 
         python /home/jrcoyle/SUMSarizer/venv/bin/gunicorn app:app -b 0.0.0.0:5005
