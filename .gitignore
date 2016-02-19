@@ -6,3 +6,4 @@ env
 !secrets/.env
 .vault_pass.txt
 secrets_/
+dumps/
