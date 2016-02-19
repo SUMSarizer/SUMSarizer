@@ -17,7 +17,9 @@
     <div class="container">
       <div class="header clearfix">
         <ul class="nav nav-pills pull-left">
-          <li {% if 'index' in request.endpoint %}class="active"{% endif %}><a href="{{ url_for('index') }}">Home</a></li>
+          <li {% if 'index' in request.endpoint %}class="active"{% endif %}>
+            <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="" /></a>
+          </li>
           {% if user.is_authenticated() %}
             <li {% if 'dashboard' in request.endpoint %}class="active"{% endif %}><a href="{{ url_for('dashboard') }}">Studies</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>

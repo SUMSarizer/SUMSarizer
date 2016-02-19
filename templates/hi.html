@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="row">
+  <div class="col-lg-6 col-lg-offset-3">
+		<h1>Hi.</h1>
+
+    <div>
+      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" />
+    </div>
+
+		<span>
+		<a href="{{url_for('login')}}" class="btn btn-default">Login</a>
+		</span>
+		<span>
+		<a href="{{url_for('register')}}" class="btn btn-default">Register New Account</a>
+		</span>
+  </div>
+</div>
+{% endblock %}

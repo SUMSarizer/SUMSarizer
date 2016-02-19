@@ -50,6 +50,10 @@ def index():
     """Basic home page."""
     return render_template('index.html')
 
+@app.route('/hi')
+def hi():
+    """New home page."""
+    return render_template('hi.html')
 
 @app.route('/eula')
 def eula():
