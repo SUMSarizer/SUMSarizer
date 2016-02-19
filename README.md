@@ -113,3 +113,9 @@ To push app changes to Linode:
 
         python worker.py
 
+Managing Production
+---
+
+Take a database snapshot:
+
+    fab snapshot
