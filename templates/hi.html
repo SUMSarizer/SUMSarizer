@@ -1,19 +1,162 @@
 {% extends "base.html" %}
 {% block body %}
-<div class="row">
-  <div class="col-lg-6 col-lg-offset-3">
-		<h1>Hi.</h1>
 
+<div class="row">
+  <div class="col-lg-2">
+    <div class="homepage-links-container">
     <div>
-      <img src="{{ url_for('static', filename='img/logo.png') }}" alt="" />
+      <a href="">Home</a>
+    </div>
+    <div>
+      <a href="">Github</a>
+    </div>
+    <div>
+      <a href="">Request a feature</a>
+    </div>
+    <div>
+      <a href="">FAQ</a>
+    </div>
+    <div>
+      <a href="">Research Papers</a>
+    </div>
+    <div>
+      <a href="{{url_for('eula')}}" >EULA</a>
+    </div>
+    </div>
+  </div>
+  <div class="col-lg-10">
+
+    <h1>Welcome</h1>
+
+    <p>
+      The SUMSARIZER tool helps researchers process data collected by SUMS, quickly turning large sets of raw
+      temperature measurements into a useful log of cooking events.
+    </p>
+
+    <div class="section centered">
+      <a href="" class="btn btn-success btn-lg">Get Started</a>
     </div>
 
-		<span>
-		<a href="{{url_for('login')}}" class="btn btn-default">Login</a>
-		</span>
-		<span>
-		<a href="{{url_for('register')}}" class="btn btn-default">Register New Account</a>
-		</span>
+    <h2>What are SUMS?</h2>
+
+    <div class="row">
+      <div class="col-md-8">
+        <blockquote>
+          <div>
+            “The Stove Use Monitoring System (SUMS) provides information on adoption of new technologies and their effect on cooking habits. SUMS are based on low-cost commercially available temperature loggers coupled with our fit-for-purpose processing software developed with the Kirk Smith Research Group at the University of California-Berkeley. By recording stove temperature, SUMS provides insights into usage patterns, number of meals cooked and time of use.”
+          </div>
+          <div>
+            &mdash;<a href="http://berkeleyair.com/services/stove-use-monitoring-system-sums/">
+              Berkeley Air
+            </a>
+          </div>
+        </blockquote>
+      </div>
+      <div class="col-md-4">
+        <img src="{{ url_for('static', filename='img/homepage/sum.jpg') }}" alt="" />
+      </div>
+    </div>
+
+
+
+    <h2>Why SUMSARIZER?</h2>
+
+    <p>
+    The raw data that SUMS collect is not that useful by itself: it must be analyzed to determine when someone is cooking and for how long. This turns out to be difficult to automate and tedious to do by hand.
+    </p>
+
+    <div class="centered">
+      <img src="{{ url_for('static', filename='img/homepage/why.png') }}" alt="" width=800 />
+    </div>
+
+    <h2>How does the SUMSARIZER work?</h2>
+
+    <p>
+      The SUMSARIZER uses machine learning to turn a small amount of work into a full analysis of a data set.
+    </p>
+    <p>
+      Researchers upload SUMS data files for a stove study, then the application prompts the labelling of a small subset of the data. The machine learning algorithms learn from this hand-labelled data and label the rest automatically.
+    </p>
+    <p>
+      The result is an easy-to-use data set of cooking events, ready for insightful analysis.
+    </p>
+
+    <div class="centered section">
+    <img src="{{ url_for('static', filename='img/homepage/flow.png') }}" alt="" />
+    </div>
+
+    <h2>
+      Who built SUMSARIZER?
+    </h2>
+
+    <p>
+      SUMS was the brainchild of three Berkeley researchers
+    </p>
+
+    <div class="row section">
+      <div class="col-md-4 centered">
+        <div>
+          <img src="{{ url_for('static', filename='img/homepage/danny.png') }}" alt="" width=80 />
+        </div>
+        <div>
+          Daniel Wilson
+        </div>
+        <div>
+          Lab for XYZ
+        </div>
+      </div>
+      <div class="col-md-4 centered">
+        <div>
+          <img src="{{ url_for('static', filename='img/homepage/danny.png') }}" alt="" width=80 />
+        </div>
+        <div>
+          Jeremy Coyle
+        </div>
+        <div>
+          Lab for XYZ
+        </div>
+      </div>
+      <div class="col-md-4 centered">
+        <div>
+          <img src="{{ url_for('static', filename='img/homepage/danny.png') }}" alt="" width=80 />
+        </div>
+        <div>
+          Ajay Pillarisetti
+        </div>
+        <div>
+          Lab for XYZ
+        </div>
+      </div>
+    </div>
+
+    <p>The web application was architected and is currently maintained by</p>
+
+    <div class="centered section">
+      <div>
+        <img src="{{ url_for('static', filename='img/homepage/marc.png') }}" alt="" width=80 />
+      </div>
+      <div>
+        Marc Paré
+      </div>
+    </div>
+
+    <h2>Open Source</h2>
+    <p>
+    The full source for the SUMSARIZER application is available on Github. We welcome pull requests and forks. Let us know how we can help you make use of SUMS.
+    </p>
+
+    <p>
+    Please feel free to submit feature requests using <a href="https://github.com/sumsarizer/sumsarizer/issues">Github Issues.</a>
+    </p>
+
+    <p>
+    If you have questions, contact the current maintainer: <a href="">sumsarizer@gmail.com</a>
+    </p>
+
+    <div class="section centered">
+      <a href="" class="btn btn-success btn-lg">Get Started</a>
+    </div>
+
   </div>
 </div>
 {% endblock %}

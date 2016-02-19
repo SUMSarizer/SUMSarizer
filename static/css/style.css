@@ -1,4 +1,16 @@
-body {background-color:white; color: black;}
+body { background-color: white; color: black; font-size: 18px; }
+
+h1, h2, h3, h4, h5, h5, .nav { font-family: 'Montserrat', sans-serif; }
+h2 { margin: 80px 0 40px 0; }
+
+.nav { font-size: 14px; }
+
+/* homepage */
+blockquote { font-size: 16px; }
+.homepage-links-container { padding-top: 80px; }
+
+.centered { text-align: center; }
+.section { margin: 40px 0; }
 
 .header { margin: 0; border-bottom: 1px solid lightgrey; background-color: aliceblue}
 h1 { font-size: 24px; border-bottom: 1px dotted lightgrey; padding: 5px; margin-bottom: 30px; }
