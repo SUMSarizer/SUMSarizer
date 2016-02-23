@@ -29,7 +29,7 @@ class StagingConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'postgresql:///sums'
+    SQLALCHEMY_DATABASE_URI = 'postgresql://sums:sums@localhost/sums'
 
 class TestingConfig(Config):
     TESTING = True
