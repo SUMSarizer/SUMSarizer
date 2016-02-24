@@ -10,6 +10,10 @@ def host_type():
 
 def deploy():
   code_dir = '/home/jrcoyle/SUMSarizer'
+
+  put('/home/www/.bashrc', 'deployments/linode/.bashrc')
+  put('/home/www', 'secrets_/prod_env')
+
   with cd(code_dir):
     sudo("git pull")
     sudo("supervisorctl restart all")
