@@ -14,7 +14,8 @@ def deploy():
   put('secrets_/prod_env', '/home/www', use_sudo=True)
 
   with cd(code_dir):
-    sudo("git pull")
+    sudo("git fetch --all")
+    sudo("git reset --hard origin/master")
     sudo("supervisorctl restart all")
 
 # TODO: Migrations
@@ -32,3 +33,9 @@ def snapshot():
 def logs():
   # Does this filename change from time to time?
   sudo('tail -n 300 /var/log/supervisor/SUMSarizer_worker-stderr---supervisor-Oopgek.log')
+
+def push_supervisor_conf():
+  put('deployments/linode/SUMSarizer.conf', '/etc/supervisor/conf.d', use_sudo=True)
+  sudo('supervisorctl reread')
+  sudo('supervisorctl update')
+  sudo('supervisorctl restart all')
