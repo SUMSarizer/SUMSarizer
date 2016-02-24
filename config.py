@@ -18,6 +18,7 @@ class Config(object):
 
 class ProductionConfig(Config):
     DEBUG = False
+    SQLALCHEMY_DATABASE_URI = 'postgresql:///sums'
 
 
 class StagingConfig(Config):
