@@ -31,8 +31,10 @@ def snapshot():
   get('/home/www/mydb.dump', outpath)
 
 def logs():
-  # Does this filename change from time to time?
-  sudo('tail -n 300 /var/log/supervisor/SUMSarizer_worker-stderr---supervisor-Oopgek.log')
+  sudo('tail -n 300 /home/www/log/web.log')
+
+def error_logs():
+  sudo('tail -n 300 /home/www/log/web_err.log')
 
 def push_supervisor_conf():
   put('deployments/linode/SUMSarizer.conf', '/etc/supervisor/conf.d', use_sudo=True)
