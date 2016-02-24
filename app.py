@@ -48,8 +48,7 @@ SUBSET_SIZE = datetime.timedelta(7)
 @app.route('/')
 def index():
     """Basic home page."""
-    return render_template('index.html')
-
+    return render_template('hi.html')
 
 @app.route('/eula')
 def eula():
