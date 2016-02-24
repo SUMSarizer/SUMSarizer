@@ -11,7 +11,7 @@ def host_type():
 def deploy():
   code_dir = '/home/jrcoyle/SUMSarizer'
   with cd(code_dir):
-    run("git pull")
+    sudo("git pull")
     sudo("supervisorctl restart all")
 
 # TODO: Migrations

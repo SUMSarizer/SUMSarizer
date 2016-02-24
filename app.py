@@ -33,6 +33,7 @@ from stormpath.error import Error as StormpathError
 from werkzeug import secure_filename
 
 app = Flask(__name__)
+print os.environ.get('APP_SETTINGS')
 app.config.from_object(os.environ.get('APP_SETTINGS'))
 # app.config['PROFILE'] = True
 # app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
