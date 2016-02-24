@@ -13,7 +13,7 @@ blockquote { font-size: 16px; }
 .centered { text-align: center; }
 .section { margin: 40px 0; }
 
-.header { margin: 0; background-color: #3187DD; color: white; }
+.header { margin: 0; padding: 0 10px; background-color: #3187DD; color: white; }
 h1 { font-size: 24px; border-bottom: 1px dotted lightgrey; padding: 5px; margin-bottom: 30px; }
 .nobottom{margin-bottom:0px;}
 .nomargin{margin:0;}
@@ -65,7 +65,7 @@ tr td a.btn.btn-xs:hover{color:steelblue; text-decoration: underline;}
 tr td a.btn.btn-xs.btn-danger:hover{color:white; text-decoration: none;}
 
 .nav-pills>li>a{ color: white; }
-.nav-pills>li>a:hover{color: white; background-color: #3187DD;}
+.nav-pills>li>a:hover{color: white; background-color: inherit; }
 
 .nav-pills > li.active > a,
 .nav-pills > li.active > a:hover,
