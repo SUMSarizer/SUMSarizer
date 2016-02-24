@@ -107,3 +107,12 @@ Managing Production
 Take a database snapshot:
 
     fab snapshot
+
+Misc Provisioning
+---
+
+Eventually this should live in some sort of script to automate reprovisions.
+
+Setting up iptables forwarding:
+
+    sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-port 5005
