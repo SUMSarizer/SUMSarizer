@@ -23,7 +23,7 @@ pip install -r requirements.txt
 
 echo 'source /vagrant/scripts/env.sh' >> ~/.bash_profile
 
-source scripts/env.sh
+source /vagrant/scripts/env.sh
 
 #
 ## Database

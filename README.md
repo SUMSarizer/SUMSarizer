@@ -42,10 +42,6 @@ Run
 
 	./scripts/start.sh
 
-Run like prod (useful to test if foreman is crashing on deploy):
-
-	./scripts/prod.sh
-
 Migrations
 ---
 
@@ -85,33 +81,23 @@ To re-encrypt the secret, copy the new file to the `secrets` directory, then run
 Config
 ---
 
-The secret file `.env` contains API ids and secrets.
+The secret file `.env` contains API keys and secrets.
 
 Deploy
 ---
+
+Setup:
+
+**Add a file `login.txt` with your ssh login. e.g. `marc@sumsarizer.com`**
 
 To push app changes to Linode:
 
     fab deploy
 
-* We're using a linode at http://50.116.4.99/
-* The app lives in /home/jrcoyle/SUMSarizer
-* www group has permissions
+Check out `fabfile.py` to see how the app is laid out.
+
 * Currently on port 5005. If you want to change the port, forward the new port in iptables
 * Logs in /var/log/supervisor
-* supervisord manages the app and worker processes
-
-        /etc/supervisor/conf.d/SUMSarizer.conf
-        /home/www/SUMSarizer/scripts/start.sh
-        /home/www/SUMSarizer/scripts/start_worker.sh
-
-* The app runs inside a virtualenv
-
-        python /home/jrcoyle/SUMSarizer/venv/bin/gunicorn app:app -b 0.0.0.0:5005
-
-* The worker does not appear to run in a virtualenv (probably a bug)
-
-        python worker.py
 
 Managing Production
 ---

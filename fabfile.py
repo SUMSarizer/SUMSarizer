@@ -3,7 +3,7 @@ import datetime
 import time
 from fabric.api import *
 
-env.hosts = ['marc@50.116.4.99']
+env.hosts = [open('login.txt').read()]
 
 def host_type():
   run('uname -s')

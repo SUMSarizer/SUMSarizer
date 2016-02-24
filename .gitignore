@@ -7,3 +7,4 @@ env
 .vault_pass.txt
 secrets_/
 dumps/
+login.txt
