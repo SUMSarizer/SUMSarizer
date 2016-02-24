@@ -25,3 +25,7 @@ def snapshot():
   with cd(snapshot_dir):
     sudo('pg_dump -Fc --no-acl --no-owner sums > mydb.dump', user='www')
   get('/home/www/mydb.dump', outpath)
+
+def logs():
+  # Does this filename change from time to time?
+  sudo('tail -n 300 /var/log/supervisor/SUMSarizer_worker-stderr---supervisor-Oopgek.log')
