@@ -22,11 +22,11 @@
             <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='img/logo-white.png') }}" alt="" height=14 /></a>
           </li>
           {% if user.is_authenticated() %}
-            <li {% if 'dashboard' in request.endpoint %}class="active"{% endif %}><a href="{{ url_for('dashboard') }}">Studies</a></li>
+            <li {% if 'dashboard' in request.endpoint %}class=""{% endif %}><a href="{{ url_for('dashboard') }}">Studies</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
           {% else %}
-            <li {% if 'login' in request.endpoint %}class="active"{% endif %}><a href="{{ url_for('login') }}">Login</a></li>
-						<li {% if 'register' in request.endpoint %}class="active"{% endif %}><a href="{{ url_for('register') }}">Register</a></li>
+            <li {% if 'login' in request.endpoint %}class=""{% endif %}><a href="{{ url_for('login') }}">Login</a></li>
+						<li {% if 'register' in request.endpoint %}class=""{% endif %}><a href="{{ url_for('register') }}">Register</a></li>
           {% endif %}
         </ul>
         <ul class="nav nav-pills pull-right">
