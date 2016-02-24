@@ -3,6 +3,7 @@ import datetime
 import time
 from fabric.api import *
 
+env.password = open('sudo.txt').read()
 env.hosts = [open('login.txt').read()]
 
 def host_type():

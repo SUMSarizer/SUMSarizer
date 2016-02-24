@@ -90,6 +90,8 @@ Setup:
 
 **Add a file `login.txt` with your ssh login. e.g. `marc@sumsarizer.com`**
 
+**Also add a file `sudo.txt` with your sudo password**
+
 To push app changes to Linode:
 
     fab deploy
