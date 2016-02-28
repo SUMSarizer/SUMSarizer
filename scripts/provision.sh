@@ -1,10 +1,18 @@
+sudo sh -c 'echo "deb http://cran.rstudio.com/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list'
+gpg --keyserver keyserver.ubuntu.com --recv-key E084DAB9
+gpg -a --export E084DAB9 | sudo apt-key add -
+
+
 sudo apt-get update
 
 # libpq-dev, python-dev: necessary for compiling C extensions
 sudo apt-get install -y \
   git-core \
   htop \
+  libcurl4-gnutls-dev \
   libpq-dev \
+  libxml2-dev \
+  libssl-dev \
   python-dev \
   python-pip \
   r-base
@@ -39,3 +47,10 @@ echo 'alias psql="sudo -u postgres psql sums"' >> ~/.bash_profile
 echo 'Running Migrations'
 ./scripts/upgrade.sh
 
+#
+# R
+#
+
+sudo R -e "install.packages('plyr', repos = 'http://cran.rstudio.com/')"
+sudo R -e "install.packages('devtools', repos = 'http://cran.rstudio.com/')"
+sudo R -e "devtools::install_github('jeremyrcoyle/origami')"
