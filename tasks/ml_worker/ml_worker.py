@@ -1,4 +1,5 @@
 import logging
+import subprocess
 
 def work():
 
@@ -34,10 +35,9 @@ def work():
     ) To '/tmp/%s' With CSV HEADER;
   """ % (1, "new_studydata.csv"))
 
-
-
-
   # Generate a unique filename with guid
+
+  subprocess.check_output(["Rscript", "ml_script.R", "/tmp/new_studydata.csv", "/tmp/new_userlabels.csv", "/tmp/ml_output.csv"], cwd="/vagrant/ml_labeler")
 
   # Export the required studydata_<guid>.csv
 
