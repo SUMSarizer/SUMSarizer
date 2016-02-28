@@ -37,7 +37,9 @@ def work():
 
   # Generate a unique filename with guid
 
-  subprocess.check_output(["Rscript", "ml_script.R", "/tmp/new_studydata.csv", "/tmp/new_userlabels.csv", "/tmp/ml_output.csv"], cwd="/vagrant/ml_labeler")
+  resp = subprocess.check_output(["Rscript", "ml_script.R", "/tmp/new_studydata.csv", "/tmp/new_userlabels.csv", "/tmp/ml_output.csv"], cwd="/vagrant/ml_labeler")
+
+  print resp
 
   # Export the required studydata_<guid>.csv
 

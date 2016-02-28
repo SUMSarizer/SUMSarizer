@@ -58,13 +58,29 @@ meanlabels$combinedlabel=as.numeric(meanlabels$meanlabel>0.5)
 #combine labels and ml features
 meanlabels=merge(meanlabels,studyfeats)
 
+print("Making folds")
+
 #use SL to learn mapping between features and labels
-folds=make_folds(cluster_id=meanlabels$filename)
-sl=origami_SuperLearner(meanlabels$combinedlabel,meanlabels[,FEATURE_NAMES],folds=folds,SL.library=c("SL.rpart","SL.glmnet","SL.glm","SL.mean"),family=binomial())
+folds <- make_folds(cluster_id=meanlabels$filename)
+
+print("Made folds")
+print("Learning")
+
+sl <- origami_SuperLearner(
+    meanlabels$combinedlabel,
+    meanlabels[,FEATURE_NAMES],
+    folds=folds,
+    SL.library=c("SL.rpart", "SL.glm", "SL.mean", "SL.glmnet"),
+    family=binomial())
 #SL might produce warnings if some algorithms are not behaving well.
 
+print("Learned")
+print("Predicting")
+
 #predict labels on full dataset
-studyfeats$pred=predict(sl,studyfeats[,FEATURE_NAMES])$pred
+studyfeats$pred <- predict(sl,studyfeats[,FEATURE_NAMES])$pred
+
+print("Predicted")
 
 #OUTPUT
 #predicted labels for full dataset
