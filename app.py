@@ -399,6 +399,8 @@ def zip_ingress(data, study_id):
 
         if not file.endswith(".csv"):
             continue
+        if file.startswith("__MACOSX"):
+            continue
 
         print "Trying to parse %s" % file
 
