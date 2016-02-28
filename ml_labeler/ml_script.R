@@ -1,21 +1,18 @@
-print("Starting")
+#
+# Usage: Rscript ml_script.R ../data/studydata.csv ../data/userlabels.csv ../data/studydata_ml.csv
+#
+# Note: should be invoked from the `ml_labeler` directory
+#
 
 library(plyr)
 library(origami)
 source("features.R")
 
-# setwd("~/Dropbox/SUMs/SUMSarizerAnalysis/")
-
 args = commandArgs(trailingOnly=TRUE)
-# studydatafile="studydata.csv"
-# userlabelfile="userlabels.csv"
-# outputfile="studydata_ml.csv"
-studydatafile=args[1]
-userlabelfile=args[2]
+
+studydatafile=args[1] # e.g. studydata.csv
+userlabelfile=args[2] # e.g. userlabels.csv
 outputfile=args[3]
-
-print(studydatafile)
-
 
 
 #INPUT DATA
