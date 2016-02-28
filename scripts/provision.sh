@@ -6,7 +6,8 @@ sudo apt-get install -y \
   htop \
   libpq-dev \
   python-dev \
-  python-pip
+  python-pip \
+  r-base
 
 sudo pip install memory_profiler \
                  virtualenv
