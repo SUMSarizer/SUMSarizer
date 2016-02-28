@@ -53,4 +53,7 @@ echo 'Running Migrations'
 
 sudo R -e "install.packages('plyr', repos = 'http://cran.rstudio.com/')"
 sudo R -e "install.packages('devtools', repos = 'http://cran.rstudio.com/')"
+sudo R -e "install.packages('pspline', repos = 'http://cran.rstudio.com/')"
+sudo R -e "install.packages('caTools', repos = 'http://cran.rstudio.com/')"
+sudo R -e "install.packages('glmnet', repos = 'http://cran.rstudio.com/')"
 sudo R -e "devtools::install_github('jeremyrcoyle/origami')"

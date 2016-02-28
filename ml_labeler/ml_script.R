@@ -1,0 +1,75 @@
+print("Starting")
+
+library(plyr)
+library(origami)
+source("features.R")
+
+# setwd("~/Dropbox/SUMs/SUMSarizerAnalysis/")
+
+args = commandArgs(trailingOnly=TRUE)
+# studydatafile="studydata.csv"
+# userlabelfile="userlabels.csv"
+# outputfile="studydata_ml.csv"
+studydatafile=args[1]
+userlabelfile=args[2]
+outputfile=args[3]
+
+print(studydatafile)
+
+
+
+#INPUT DATA
+#generated from querydump.sql
+studydata=read.csv(studydatafile) #the sensor readings
+userlabels=read.csv(userlabelfile) #users's labels for the sensor readings
+
+#parse time, break into chunks
+studydata$timestamp=as.POSIXct(studydata$timestamp)
+halfhoursecs=60*30
+studydata$timechunk=as.POSIXct(round(as.numeric(studydata$timestamp)/halfhoursecs)*halfhoursecs,origin="1970-01-01",tz="UTC")
+
+#estimate ambient temperature as 10th percentile of all sensors
+timemodes=ddply(studydata,.(timechunk),function(timeslice){
+  tempquant=quantile(timeslice$value,c(0.10))
+  names(tempquant)=NULL
+
+  return(c(amb_temp=tempquant))
+})
+
+studydata=merge(timemodes,studydata)
+studydata=studydata[order(studydata$filename,studydata$timestamp),]
+studydata$temp_c=studydata$value-studydata$amb_temp
+
+#generate ml features from data
+studyfeats=ddply(studydata,.(filename),makefeatures)
+
+#format userlabel data
+userlabels$cooking_label=as.numeric(userlabels$cooking_label=="t")
+userlabels$timestamp=as.POSIXct(userlabels$timestamp)
+
+#drop labels for users that did not complete labelling (labelled less than other users)
+userlabels$count=1
+labelcounts=aggregate(count~email,userlabels,sum)
+complete=labelcounts$email[labelcounts$count==max(labelcounts$count)]
+userlabels=userlabels[userlabels$email%in%complete,]
+
+#average labels across users
+meanlabels=aggregate(cooking_label~filename+timestamp,userlabels,mean)
+names(meanlabels)[3]=c("meanlabel")
+meanlabels$combinedlabel=as.numeric(meanlabels$meanlabel>0.5)
+
+#combine labels and ml features
+meanlabels=merge(meanlabels,studyfeats)
+
+#use SL to learn mapping between features and labels
+folds=make_folds(cluster_id=meanlabels$filename)
+sl=origami_SuperLearner(meanlabels$combinedlabel,meanlabels[,FEATURE_NAMES],folds=folds,SL.library=c("SL.rpart","SL.glmnet","SL.glm","SL.mean"),family=binomial())
+#SL might produce warnings if some algorithms are not behaving well.
+
+#predict labels on full dataset
+studyfeats$pred=predict(sl,studyfeats[,FEATURE_NAMES])$pred
+
+#OUTPUT
+#predicted labels for full dataset
+write.csv(studyfeats,file=outputfile,row.names=F)
+#save(studyfeats,file="studydata_ml.rdata")
