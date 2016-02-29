@@ -7,8 +7,8 @@
 	  <div class=pagination>
 	  Page &nbsp;
 	  {%- for page in pagination.iter_pages() %}
-	    {% if page %} 
-	      {% if page != pagination.page %} 
+	    {% if page %}
+	      {% if page != pagination.page %}
 	        <a href="{{ url_for(endpoint, study_id=study.id, page=page) }}">{{ page }}</a>
 	      {% else %}
 	        <strong>{{ page }}</strong>
@@ -32,7 +32,7 @@
 
 			<div ng-if="vm.uploading">
 				Uploading...
-		</div>	
+		</div>
     </div>
     <div class="modal-footer">
         <button class="btn btn-success" ng-click="vm.submit()">Upload</button>
@@ -47,14 +47,14 @@
     </div>
     <form action="{{ url_for('delete_study', study_id=study.id) }}" method="get">
 		<div class="modal-body">
-				
+
 			<p>Deleting the study will remove all associated datasets and labels. Are you sure you want to do this?</p>
 
 			<div ng-if="vm.deleting">
 				Deleting...
-			</div>	
+			</div>
 
-				
+
 		</div>
 		<div class="modal-footer">
 		    <button type="submit" class="btn btn-success">Delete</button>
@@ -67,15 +67,15 @@
 	<div class="row">
       <div class="col-lg-12">
 
-		<h1>{{study.title}} 
-			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.deleteModal()"><span class="glyphicon glyphicon-remove" aria-hidden="true"> </span> Delete Study</a> 
-			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.openModal()"><span class="glyphicon glyphicon-upload" aria-hidden="true"> </span>
- 			Upload Sensor Data</a>
-			<a href="{{url_for('label_study', study_id=study.id)}}" class="tinyText studyTextButton pull-right"><span class="glyphicon glyphicon-tag" aria-hidden="true"> </span>
- 			Switch to Labelling</a>
+		<h1>
+      {{study.title}}
+			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.deleteModal()">
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"> </span>
+        Delete Study
+      </a>
 		</h1>
 
-  		<div class="upload-container">				
+  	<div class="upload-container">
 			{% for upload in uploads %}
 			<div class="alert alert-info" role="alert">
 				<span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
@@ -84,25 +84,40 @@
 			{% endfor %}
 		</div>
 
+    <div class="study-actions-container">
+
+      {% if has_datasets == 0 %}
+        <a href="" class="btn btn-success" ng-click="vm.openModal()">Upload Sensor Data</a>
+      {% else %}
+        <span class="study-action">
+          <a href="{{url_for('label_study', study_id=study.id)}}" class="btn btn-success">Label Data</a>
+        </span>
+        <span class="study-action">
+          <a href="" class="" ng-click="vm.openModal()">Upload More Sensor Data</a>
+        </span>
+      {% endif %}
+
+    </div>
+
 		<br>
-					
-        <h2>Data Sets</h2>
+
+    <h2>Data Sets</h2>
 			<ul id='datasets' class='list-group row'>
 				{% for dataset in datasets %}
 				<li class='list-group-item col-xs-4'>
 					<p>
 						<a href="{{url_for('dataset', dataset_id=dataset.id, mode='view')}}">
-							<span class="glyphicon glyphicon-file" aria-hidden="true"> </span> 
+							<span class="glyphicon glyphicon-file" aria-hidden="true"> </span>
 							{{ dataset.title }}</a></p>
 				</li>
-				{% endfor %}				
+				{% endfor %}
 			</ul>
 
 		{{ render_pagination(pagination, 'study') }}
 
 		<div id="usersContainer" class='col-xs-12'>
-			<div id='userPanel1' class='col-xs-6'>						
-		        <h6>Current Labellers</h6>				
+			<div id='userPanel1' class='col-xs-6'>
+		        <h6>Current Labellers</h6>
 					<ul id='currentUsers'>
 						{% for user in users %}
 						<li>
@@ -123,8 +138,8 @@
 					<ul id='otherUsers'>
 						{% for user in notusers %}
 						<li>
-							<p> 
-								<a href="{{url_for('add_study_labeller', study_id=study.id,user_id=user.id)}}"> 
+							<p>
+								<a href="{{url_for('add_study_labeller', study_id=study.id,user_id=user.id)}}">
 									<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"> </span>
 								{{user.email}}
 								</a>

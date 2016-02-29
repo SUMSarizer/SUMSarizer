@@ -173,6 +173,8 @@ def study(study_id):
         .order_by(Datasets.created_at.desc())\
         .paginate(page, per_page=15)
 
+    has_datasets = datasets.total > 0
+
     study.users.filter_by(role="labeller").all()
     labellers = Users.query.\
         filter(study.is_labeller(Users)).\
@@ -188,7 +190,8 @@ def study(study_id):
                            pagination=datasets,
                            users=users,
                            notusers=notusers,
-                           uploads=study.uploads)
+                           uploads=study.uploads,
+                           has_datasets=has_datasets)
 
 
 @app.route('/delete_study/<study_id>', methods=['GET'])

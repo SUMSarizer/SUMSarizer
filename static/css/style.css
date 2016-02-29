@@ -177,3 +177,11 @@ body {
   height: 60px;
   background-color: #f5f5f5;
 }
+
+
+/* Study page */
+.study-actions-container { padding: 30px 0;}
+.study-action { padding-right: 30px; }
+/* END Study page */
+
+
