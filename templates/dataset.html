@@ -31,7 +31,7 @@
         <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='view') }}">Explore</a>
       </div>
       <div class="col-md-6">
-        <a href="" class="btn btn-success">SUMSARIZE</a>
+        <a href="" class="btn btn-success {% if not all_labelled %} disabled {% endif %}">SUMSARIZE</a>
       </div>
     </div>
   </div>

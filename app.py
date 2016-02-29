@@ -295,6 +295,12 @@ def dataset(dataset_id):
     is_owner = dataset.study.is_owner(user)
     y_min = dataset.study.y_min
     y_max = dataset.study.y_max
+
+    # Compute flag that is True is all the datasets have been labelled by all
+    # the labellers.
+    count_labellers = dataset.study.labellers().count()
+    all_labelled = all([ds.labelled.count() == count_labellers for ds in all_ds])
+
     return render_template('dataset.html',
                            dataset=dataset,
                            title=dataset.title,
@@ -310,6 +316,7 @@ def dataset(dataset_id):
                            prev_ds=prev_ds,
                            all_ds=all_ds,
                            is_owner=is_owner,
+                           all_labelled=all_labelled,
                            current_user=user)
 
 
