@@ -261,3 +261,19 @@ class UserLabels(db.Model):
                       user_id=user_id,
                       label=False) for data_point in data_points]
         return dicts
+
+
+
+class SZJob(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    study_id = db.Column(db.Integer, db.ForeignKey('studies.id'), index=True)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now)
+    state = db.Column(db.String(64), default='submitted')
+
+
+
+
+
+
+
+
