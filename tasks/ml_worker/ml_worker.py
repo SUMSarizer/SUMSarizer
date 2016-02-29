@@ -1,13 +1,20 @@
+import traceback
 import logging
 import subprocess
+import uuid
 
-def work():
+def run_ml(study_id):
 
-  from app import db
-  from models import StudyUploads
+    from app import db
 
-  logging.info("Exporting user labels to CSV")
-  db.session.execute("""
+    guid = uuid.uuid4()
+
+    userlabels_filename = "/tmp/userlabels_%s.csv" % guid
+    studydata_filename = "/tmp/studydata_%s.csv" % guid
+    output_filename = "/tmp/ml_output_%s.csv" % guid
+
+    logging.info("Exporting user labels to CSV")
+    db.session.execute("""
     COPY (SELECT dp.id as datapoint_id,
          ds.title as filename,
          dp.timestamp as timestamp, dp.value as value,
@@ -19,11 +26,11 @@ def work():
     INNER JOIN users ON ul.user_id=users.id
     WHERE ds.study_id=%s
     ORDER BY ds.id, user, timestamp
-    ) To '/tmp/%s' With CSV HEADER;
-  """ % (36, "new_userlabels.csv"))
+    ) To '%s' With CSV HEADER;
+    """ % (study_id, userlabels_filename))
 
-  logging.info("Exporting study data to CSV")
-  db.session.execute("""
+    logging.info("Exporting study data to CSV")
+    db.session.execute("""
     COPY (
     SELECT dp.id as datapoint_id,
          ds.title as filename,
@@ -32,28 +39,50 @@ def work():
     INNER JOIN datapoints as dp ON ds.id=dp.dataset_id
     WHERE ds.study_id=%s
     ORDER BY ds.id, timestamp
-    ) To '/tmp/%s' With CSV HEADER;
-  """ % (36, "new_studydata.csv"))
+    ) To '%s' With CSV HEADER;
+    """ % (study_id, studydata_filename))
 
-  # Generate a unique filename with guid
+    # Generate a unique filename with guid
 
-  resp = subprocess.check_output(["Rscript", "ml_script.R", "/tmp/new_studydata.csv", "/tmp/new_userlabels.csv", "/tmp/ml_output.csv"], cwd="/vagrant/ml_labeler")
+    resp = subprocess.check_output([
+        "Rscript",
+        "ml_script.R",
+        studydata_filename,
+        userlabels_filename,
+        output_filename],
+        cwd="/vagrant/ml_labeler")
 
-  print resp
+    print resp
 
-  # Export the required studydata_<guid>.csv
+def work():
 
-  # Export the required userlabels_<guid>.csv
+    from app import db
+    from models import SZJob
 
-  # cd and execute the R script on these files
+    job = SZJob.query.filter(SZJob.state == 'submitted').first()
 
-  # Toggle the status field on the job
+    if not job:
+      return
 
-  # wait...
+    logging.info("Running SZ job for study %s" % job.study_id)
 
-  # Upload the results
+    job.state = 'running'
+    db.session.add(job)
+    db.session.commit()
 
-  # Toggle the status field on the job
+    failed = False
+    try:
+        result = run_ml(job.study_id)
+    except :
+        failed = True
+        error_message = traceback.format_exc()
 
+    if failed:
+        job.state = 'failed'
+        job.message = error_message
+    else:
+        job.state = 'success'
+        job.message = result
 
-  # Catch exceptions and toggle "Failed"
+    db.session.add(job)
+    db.session.commit()

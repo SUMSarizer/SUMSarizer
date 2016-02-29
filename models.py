@@ -272,6 +272,7 @@ class SZJob(db.Model):
     study_id = db.Column(db.Integer, db.ForeignKey('studies.id'), index=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     state = db.Column(db.String(64), default='submitted')
+    message = db.Column(db.Unicode, nullable=True)
 
     study = db.relationship('Studies', backref='szjobs')
 

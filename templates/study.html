@@ -90,7 +90,7 @@
 
       {% for job in study.szjobs %}
       <div class="sz-job">
-        <div>Started {{ job.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        <div>Submitted {{ job.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
         <div>Status <span class="label label-info">{{ job.state }}</span></div>
       </div>
       {% endfor %}
