@@ -18,7 +18,8 @@ from flask import (
     request,
     url_for,
     jsonify,
-    abort
+    abort,
+    make_response
 )
 from flask.ext.stormpath import (
     StormpathManager,
@@ -490,4 +491,12 @@ def sumsarize(study_id):
     db.session.commit()
     return redirect(url_for('study', study_id=study_id))
 
+@app.route('/job/<id>/download_csv', methods=['GET'])
+@login_required
+def download_csv_blob(id):
+    job = SZJob.query.get(id)
+    output = make_response(job.csv_blob)
+    output.headers["Content-Disposition"] = "attachment; filename=%s_sumsarized.csv" % job.study.title
+    output.headers["Content-type"] = "text/csv"
+    return output
 
