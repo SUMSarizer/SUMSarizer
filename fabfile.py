@@ -37,6 +37,12 @@ def logs():
 def error_logs():
   sudo('tail -n 300 /home/www/log/web_err.log')
 
+def ml_logs():
+  sudo('tail -n 300 /home/www/log/ml_worker.log')
+
+def ml_error_logs():
+  sudo('tail -n 300 /home/www/log/ml_worker_err.log')
+
 def push_supervisor_conf():
   put('deployments/linode/SUMSarizer.conf', '/etc/supervisor/conf.d', use_sudo=True)
   sudo('supervisorctl reread')
