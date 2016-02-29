@@ -32,6 +32,11 @@
       </div>
       <div class="col-md-6">
         <a href="" class="btn btn-success {% if not all_labelled %} disabled {% endif %}">SUMSARIZE</a>
+
+        {% if not all_labelled %}
+        <span>Label all the datasets.</span>
+        {% endif %}
+
       </div>
     </div>
   </div>
