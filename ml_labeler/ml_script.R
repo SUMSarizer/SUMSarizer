@@ -66,12 +66,24 @@ folds <- make_folds(cluster_id=meanlabels$filename)
 print("Made folds")
 print("Learning")
 
+# Original stack of algorithms:
+# sl <- origami_SuperLearner(
+#     meanlabels$combinedlabel,
+#     meanlabels[,FEATURE_NAMES],
+#     folds=folds,
+#     SL.library=c("SL.rpart", "SL.glm", "SL.mean", "SL.glmnet"),
+#     family=binomial())
+
+# Simpler stack. Much faster. Within something like 5% of the full stack.
 sl <- origami_SuperLearner(
     meanlabels$combinedlabel,
     meanlabels[,FEATURE_NAMES],
     folds=folds,
-    SL.library=c("SL.rpart", "SL.glm", "SL.mean", "SL.glmnet"),
+    SL.library=c("SL.glm"),
     family=binomial())
+
+
+
 #SL might produce warnings if some algorithms are not behaving well.
 
 print("Learned")

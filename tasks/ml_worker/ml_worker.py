@@ -20,7 +20,7 @@ def work():
     WHERE ds.study_id=%s
     ORDER BY ds.id, user, timestamp
     ) To '/tmp/%s' With CSV HEADER;
-  """ % (1, "new_userlabels.csv"))
+  """ % (37, "new_userlabels.csv"))
 
   logging.info("Exporting study data to CSV")
   db.session.execute("""
@@ -33,7 +33,7 @@ def work():
     WHERE ds.study_id=%s
     ORDER BY ds.id, timestamp
     ) To '/tmp/%s' With CSV HEADER;
-  """ % (1, "new_studydata.csv"))
+  """ % (37, "new_studydata.csv"))
 
   # Generate a unique filename with guid
 
