@@ -89,9 +89,9 @@
       <h5>SUMSARIZE Jobs</h5>
 
       {% for job in study.szjobs %}
-      <div>
-        <div>Started: {{ job.created_at}}</div>
-        <div>Status: {{ job.state }}</div>
+      <div class="sz-job">
+        <div>Started {{ job.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        <div>Status <span class="label label-info">{{ job.state }}</span></div>
       </div>
       {% endfor %}
     </div>
