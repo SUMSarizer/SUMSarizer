@@ -5,51 +5,40 @@
     <div class="modal-header">
         <h3 class="modal-title">Clear Points</h3>
     </div>
-    
-	<div class="modal-body">
-			
-		<p>Are you sure you want to clear all the labels?</p>
-		<div ng-if="vm.resetting">
-				Clearing...
-		</div>			
-	</div>
-	<div class="modal-footer">
-		<input id="action" type="hidden" name="action" value="{{ url_for('reset_labels', dataset_id=dataset.id) }}" />
-		<button class="btn btn-success" ng-click="vm.submit()">Yes</button>
-	    <a class="btn" ng-click="vm.cancel()">Cancel</a>
-	</div>
-  	</script>
 
-	<div class="row">	
+  	<div class="modal-body">
+  		<p>Are you sure you want to clear all the labels?</p>
+  		<div ng-if="vm.resetting">
+  				Clearing...
+  		</div>
+  	</div>
+
+  	<div class="modal-footer">
+  		<input id="action" type="hidden" name="action" value="{{ url_for('reset_labels', dataset_id=dataset.id) }}" />
+  		<button class="btn btn-success" ng-click="vm.submit()">Yes</button>
+  	    <a class="btn" ng-click="vm.cancel()">Cancel</a>
+  	</div>
+  </script>
+
+  <div class="study-subnav">
+    <div class="row">
+      <div class="col-md-2">
+        <h4>{{ study }}</h4>
+      </div>
+      <div class="col-md-4">
+        <a class="btn btn-link" href="{{ url_for('study', study_id=studyid) }}">Overview</a>
+        <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='label') }}">Label</a>
+        <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='view') }}">Explore</a>
+      </div>
+      <div class="col-md-6">
+        <a href="" class="btn btn-success">SUMSARIZE</a>
+      </div>
+    </div>
+  </div>
+
+	<div class="row">
 		<div id='fileInfo' class='col-md-4 pull-left'>
-			<p style='margin-top:30px;'> Now 
-				{% if mode == "label" %}
-					labelling
-				{% else %}
-					viewing
-				{% endif %}
-					study 
-				{% if is_owner %}
-    				<a href="{{ url_for('study', study_id=studyid) }}">{{study}}</a>
-    			{% else %}
-    				{{study}}
-				{% endif %}	
-
-
-			<span class='tinyText pull-right'> 
-				{% if mode == "label" %}
-					<a href="{{ url_for('dataset', dataset_id=dataset.id, mode='view') }}" title='Switch to View Mode'>
-						<span class="glyphicon glyphicon-eye-open" style="color:steelblue; padding-right:15px" aria-hidden="true"></span>
-						<!--<small> Go to View Mode</small>-->
-					</a>
-				{% else %}
-					<a href="{{ url_for('dataset', dataset_id=dataset.id, mode='label') }}" title='Switch to View Mode'>
-						<span class="glyphicon glyphicon-tag btn btn-xs" style="color:steelblue; padding-right:15px" aria-hidden="true"></span>
- 						<!--<small> Go to Labelling Mode</small>-->
-					</a>
-				{% endif %}
-    		</span>
-    		</p>
+      <h5>Datasets</h5>
 	    	<div id='fileList'>
 	    		<table class="table table-condensed">
 				    <tbody>
@@ -82,21 +71,20 @@
 	    		<p>Active File Notes</p>
 				{% for note in notes %}
 				<div>{{ note.text }}</div>
-				{% endfor %}					
+				{% endfor %}
 			</div>
-		</div>	
+		</div>
 		<div class="col-md-8">
-	        <h1 class='nobottom'>Datapoints for {{title}}</h1>
-	        {% if mode == "label" %}
+	       {% if mode == "label" %}
 				<div class='pull-right btn btn-xs btn-default' id='next'>
-					
+
 						<a href="{{ url_for('labelled_dataset', dataset_id=dataset.id, mode=mode) }}">
 						Done?
 						{% if next_ds %}
 							Next&rarr;</a>
-						{% endif %}	
+						{% endif %}
 				</div>
-			
+
 	        	<div class="" ng-controller="DatasetCtrl as vm">
 			       	<div class='pull-left btn btn-xs btn-default' id='clear'>
 							<a href="" ng-click="vm.resetModal()"><span class="glyphicon glyphicon-erase" aria-hidden="true"> </span>Clear Labels</a>
@@ -113,14 +101,14 @@
 		</div>
 
     </div>
-	
+
 	<script>
 	window.PLOTDATA = {{ points_json | safe}}
 	window.view_or_label = {{ mode_json | safe}}
 	window.y_min = {{ y_min_json | safe}}
 	window.y_max = {{ y_max_json | safe}}
 	</script>
-	
+
 {% endblock %}
 
     		<table class="table table-condensed">
