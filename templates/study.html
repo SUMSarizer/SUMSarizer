@@ -84,6 +84,19 @@
 			{% endfor %}
 		</div>
 
+    {% if study.has_jobs() %}
+    <div class="sz-jobs-container">
+      <h5>SUMSARIZE Jobs</h5>
+
+      {% for job in study.szjobs %}
+      <div>
+        <div>Started: {{ job.created_at}}</div>
+        <div>Status: {{ job.state }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
     <div class="study-actions-container">
 
       {% if has_datasets == 0 %}

@@ -40,7 +40,8 @@ app.config.from_object(os.environ.get('APP_SETTINGS'))
 db = SQLAlchemy(app)
 stormpath_manager = StormpathManager(app)
 
-from models import Datasets, Studies, StudyUploads, DataPoints, Notes, Users, StudyUsers, UserLabels, LabelledDatasets
+from models import Datasets, Studies, StudyUploads, DataPoints, Notes, \
+                   Users, StudyUsers, UserLabels, LabelledDatasets, SZJob
 
 SUBSET_SIZE = datetime.timedelta(7)
 # Website
@@ -472,23 +473,6 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-
-@app.route('/sumsarize_study/<study_id>', methods=['POST'])
-@login_required
-def sumsarize_study(study_id):
-    queryfile = open("querydump.sql", "r")
-    query = queryfile.read()
-
-    query.replace("[study_id]", study_id)
-
-    conn = db.session.connection()
-    conn.execute(query)
-
-    return jsonify({
-        'success': True
-    })
-
-
 @app.errorhandler(401)
 def unauthorized(e):
     return render_template('401.html'), 401
@@ -496,3 +480,14 @@ def unauthorized(e):
 # @app.errorhandler(404)
 # def page_not_found(e):
 #     return render_template('404.html'), 404
+
+@app.route('/study/<study_id>/sumsarize', methods=['GET'])
+@login_required
+def sumsarize(study_id):
+    job = SZJob()
+    job.study_id = study_id
+    db.session.add(job)
+    db.session.commit()
+    return redirect(url_for('study', study_id=study_id))
+
+

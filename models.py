@@ -115,6 +115,9 @@ class Studies(db.Model):
         self.y_min = maxmin[1]
         db.session.commit()
 
+    def has_jobs(self):
+        return self.szjobs is not None and len(self.szjobs) > 0
+
 
 class Datasets(db.Model):
     __tablename__ = 'datasets'
@@ -270,7 +273,7 @@ class SZJob(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     state = db.Column(db.String(64), default='submitted')
 
-
+    study = db.relationship('Studies', backref='szjobs')
 
 
 
