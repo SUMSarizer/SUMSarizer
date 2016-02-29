@@ -2,6 +2,7 @@ import traceback
 import logging
 import subprocess
 import uuid
+import csv
 
 def run_ml(study_id):
 
@@ -42,9 +43,7 @@ def run_ml(study_id):
     ) To '%s' With CSV HEADER;
     """ % (study_id, studydata_filename))
 
-    # Generate a unique filename with guid
-
-    resp = subprocess.check_output([
+    ml_script_resp = subprocess.check_output([
         "Rscript",
         "ml_script.R",
         studydata_filename,
@@ -52,7 +51,33 @@ def run_ml(study_id):
         output_filename],
         cwd="/vagrant/ml_labeler")
 
-    print resp
+    logging.info(ml_script_resp)
+
+    # Prepare output CSV
+    out = []
+    with open(output_filename) as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            new_row = {
+                'timestamp': row['timestamp'],
+                'temp_c': row['temp_c'],
+                'is_cooking': float(row['pred']) > 0.5
+            }
+            out.append(new_row)
+    with open(output_filename, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, ['timestamp', 'temp_c', 'is_cooking'])
+        writer.writeheader()
+        for row in out:
+            writer.writerow(row)
+
+    out_blob = open(output_filename).read()
+
+    # Prepare output PDF
+
+    return {
+        'message': ml_script_resp,
+        'csv_blob': out_blob
+    }
 
 def work():
 
@@ -82,7 +107,8 @@ def work():
         job.message = error_message
     else:
         job.state = 'success'
-        job.message = result
+        job.message = result['message']
+        job.csv_blob = result['csv_blob']
 
     db.session.add(job)
     db.session.commit()

@@ -273,6 +273,7 @@ class SZJob(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now)
     state = db.Column(db.String(64), default='submitted')
     message = db.Column(db.Unicode, nullable=True)
+    csv_blob = db.Column(db.Unicode, nullable=True)
 
     study = db.relationship('Studies', backref='szjobs')
 
