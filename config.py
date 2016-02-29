@@ -14,11 +14,13 @@ class Config(object):
     STORMPATH_ENABLE_LOGIN = False
     STORMPATH_ENABLE_LOGOUT = False
     UPLOAD_FOLDER = 'uploads/'
+    ML_FOLDER = '/vagrant/ml_labeler'
 
 
 class ProductionConfig(Config):
     DEBUG = False
     SQLALCHEMY_DATABASE_URI = 'postgresql:///sums'
+    ML_FOLDER = '/home/www/SUMSarizer/ml_labeler'
 
 
 class StagingConfig(Config):

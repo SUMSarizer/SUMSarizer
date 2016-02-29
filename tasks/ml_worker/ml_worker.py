@@ -14,7 +14,7 @@ def write_csv(items, headers, filename):
 
 def run_ml(study_id):
 
-    from app import db
+    from app import db, app
 
     guid = uuid.uuid4()
 
@@ -63,7 +63,7 @@ def run_ml(study_id):
         studydata_filename,
         userlabels_filename,
         output_filename],
-        cwd="/vagrant/ml_labeler")
+        cwd=app.config['ML_FOLDER'])
 
     logging.info(ml_script_resp)
 
