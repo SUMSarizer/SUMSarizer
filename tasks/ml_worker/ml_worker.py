@@ -4,6 +4,14 @@ import subprocess
 import uuid
 import csv
 
+def write_csv(items, headers, filename):
+    with open(filename, 'w') as csvfile:
+        writer = csv.DictWriter(csvfile, headers)
+        writer.writeheader()
+        for row in items:
+            writer.writerow(row)
+
+
 def run_ml(study_id):
 
     from app import db
@@ -15,8 +23,8 @@ def run_ml(study_id):
     output_filename = "/tmp/ml_output_%s.csv" % guid
 
     logging.info("Exporting user labels to CSV")
-    db.session.execute("""
-    COPY (SELECT dp.id as datapoint_id,
+    resp = db.session.execute("""
+    SELECT dp.id as datapoint_id,
          ds.title as filename,
          dp.timestamp as timestamp, dp.value as value,
          ul.user_id as labeller, users.email as email, ul.label as cooking_label
@@ -27,12 +35,15 @@ def run_ml(study_id):
     INNER JOIN users ON ul.user_id=users.id
     WHERE ds.study_id=%s
     ORDER BY ds.id, user, timestamp
-    ) To '%s' With CSV HEADER;
-    """ % (study_id, userlabels_filename))
+    """ % (study_id))
+
+    write_csv(map(dict, resp),
+              ['datapoint_id', 'filename', 'timestamp', 'value', 'labeller', 'email', 'cooking_label'],
+              userlabels_filename)
+
 
     logging.info("Exporting study data to CSV")
-    db.session.execute("""
-    COPY (
+    resp = db.session.execute("""
     SELECT dp.id as datapoint_id,
          ds.title as filename,
          dp.timestamp as timestamp, dp.value as value
@@ -40,8 +51,11 @@ def run_ml(study_id):
     INNER JOIN datapoints as dp ON ds.id=dp.dataset_id
     WHERE ds.study_id=%s
     ORDER BY ds.id, timestamp
-    ) To '%s' With CSV HEADER;
-    """ % (study_id, studydata_filename))
+    """ % (study_id))
+
+    write_csv(map(dict, resp),
+              ['datapoint_id', 'filename', 'timestamp', 'value'],
+              studydata_filename)
 
     ml_script_resp = subprocess.check_output([
         "Rscript",
