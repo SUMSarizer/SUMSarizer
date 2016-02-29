@@ -45,7 +45,7 @@ def push_supervisor_conf():
 
 def upgrade():
   with cd('/home/jrcoyle/SUMSarizer'):
-    sudo('bash /home/jrcoycle/SUMSarizer/deployments/linode/upgrade.sh')
+    sudo('bash /home/jrcoyle/SUMSarizer/deployments/linode/upgrade.sh', user='www')
 
 def provision():
   sudo('bash /home/jrcoyle/SUMSarizer/deployments/linode/provision.sh')
