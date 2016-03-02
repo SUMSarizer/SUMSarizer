@@ -47,7 +47,6 @@ from models import Datasets, Studies, StudyUploads, DataPoints, Notes, \
 SUBSET_SIZE = datetime.timedelta(7)
 # Website
 
-
 @app.route('/')
 def index():
     """Basic home page."""
