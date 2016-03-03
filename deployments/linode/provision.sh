@@ -20,6 +20,7 @@ sudo apt-get install -y \
   libpq-dev \
   libxml2-dev \
   libssl-dev \
+  nginx \
   python-dev \
   python-pip \
   r-base

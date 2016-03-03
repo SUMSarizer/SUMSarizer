@@ -113,7 +113,20 @@ Misc Provisioning
 
 Eventually this should live in some sort of script to automate reprovisions.
 
-Setting up iptables forwarding:
+Nginx fronts the gunicorn server. The config file (`/etc/nginx/sites-available/smzr`) is in `deployments/linode/smzr`
 
-    sudo iptables -A PREROUTING -t nat -p tcp --dport 80 -j REDIRECT --to-port 5005
+Enable the site:
 
+    sudo ln -s /etc/nginx/sites-available/smzr /etc/nginx/sites-enabled
+
+Restart nginx:
+
+    sudo service nginx restart
+
+Test configs:
+
+    sudo nginx -t
+
+If nginx has issues starting, check the logs:
+
+    sudo tail -n 100 /var/log/nginx/error.log
