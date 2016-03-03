@@ -15,24 +15,26 @@
     <![endif]-->
   </head>
   <body>
+
+    <div class="header clearfix">
+      <ul class="nav nav-pills pull-left">
+        <li>
+          <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="" height=14 /></a>
+        </li>
+      </ul>
+      <ul class="nav nav-pills pull-right">
+        {% if user.is_authenticated() %}
+          <li {% if 'dashboard' in request.endpoint %}class=""{% endif %}><a href="{{ url_for('dashboard') }}">Studies</a></li>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        {% else %}
+          <li {% if 'login' in request.endpoint %}class=""{% endif %}><a href="{{ url_for('login') }}">Login</a></li>
+					<li {% if 'register' in request.endpoint %}class=""{% endif %}><a class="btn btn-success" href="{{ url_for('register') }}">Register</a></li>
+        {% endif %}
+      </ul>
+      <h3 class="text-muted"></h3>
+    </div>
+
     <div class="container">
-      <div class="header clearfix">
-        <ul class="nav nav-pills pull-left">
-          <li>
-            <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="" height=14 /></a>
-          </li>
-        </ul>
-        <ul class="nav nav-pills pull-right">
-          {% if user.is_authenticated() %}
-            <li {% if 'dashboard' in request.endpoint %}class=""{% endif %}><a href="{{ url_for('dashboard') }}">Studies</a></li>
-            <li><a href="{{ url_for('logout') }}">Logout</a></li>
-          {% else %}
-            <li {% if 'login' in request.endpoint %}class=""{% endif %}><a href="{{ url_for('login') }}">Login</a></li>
-						<li {% if 'register' in request.endpoint %}class=""{% endif %}><a class="btn btn-success" href="{{ url_for('register') }}">Register</a></li>
-          {% endif %}
-        </ul>
-        <h3 class="text-muted"></h3>
-      </div>
       {% block body %}{% endblock %}
     </div>
 
