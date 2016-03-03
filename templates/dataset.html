@@ -81,7 +81,7 @@
 		</div>
 		<div class="col-md-8">
 	       {% if mode == "label" %}
-				<div class='pull-right btn btn-xs btn-default' id='next'>
+				<div class='pull-right btn btn-xs btn-info' id='next'>
 
 						<a href="{{ url_for('labelled_dataset', dataset_id=dataset.id, mode=mode) }}">
 						Done?
@@ -91,7 +91,7 @@
 				</div>
 
 	        	<div class="" ng-controller="DatasetCtrl as vm">
-			       	<div class='pull-left btn btn-xs btn-default' id='clear'>
+			       	<div class='pull-left btn btn-xs btn-info' id='clear'>
 							<a href="" ng-click="vm.resetModal()"><span class="glyphicon glyphicon-erase" aria-hidden="true"> </span>Clear Labels</a>
 					</div>
 				</div>
