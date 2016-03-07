@@ -1,6 +1,29 @@
 {% extends "base.html" %}
 {% block body %}
 
+	<script type="text/ng-template" id="modal_tips.html">
+    <div class="modal-header">
+        <h3 class="modal-title">Algorithm Training Tips</h3>
+    </div>
+
+  	<div class="modal-body">
+  		<p>The more events that you label, the better the machine learning algorithms employed by the SUMSARIZER will perform.</p>
+
+      <p>The app chooses a subset of data from the uploaded data sets for "training sets". You can label all or some of the training sets before SUMSARIZING.</p>
+
+      <p>You should completely label individual data sets, making sure to click "Done".
+        Skipping an event in the data set and clicking "Done" could lead to poor results
+        since it trains the algorithm to ignore the unlabelled event.</p>
+
+      <p>If you have many similar data sets (e.g. same stove type and cooking patterns), it may be safe to
+        skip labelling them.</p>
+  	</div>
+
+  	<div class="modal-footer">
+  	  <a class="btn btn-info" ng-click="vm.cancel()">Got it</a>
+  	</div>
+  </script>
+
 	<script type="text/ng-template" id="modal_reset.html">
     <div class="modal-header">
         <h3 class="modal-title">Clear Points</h3>
@@ -20,92 +43,94 @@
   	</div>
   </script>
 
-  <div class="study-subnav">
-    <div class="row">
-      <div class="col-md-2">
-        <h4>{{ study }}</h4>
-      </div>
-      <div class="col-md-4">
-        <a class="btn btn-link" href="{{ url_for('study', study_id=studyid) }}">Overview</a>
-        <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='label') }}">Label</a>
-        <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='view') }}">Explore</a>
-      </div>
-      <div class="col-md-6">
-        <a href="{{ url_for('sumsarize', study_id=studyid) }}" class="btn btn-success {% if not all_labelled %} disabled {% endif %}">SUMSARIZE</a>
+  <div ng-controller="DatasetCtrl as vm">
 
-        {% if not all_labelled %}
-        <span>Label all the datasets.</span>
-        {% endif %}
+    <div class="study-subnav">
+      <div class="row">
+        <div class="col-md-2">
+          <h4>{{ study }}</h4>
+        </div>
+        <div class="col-md-4">
+          <a class="btn btn-link" href="{{ url_for('study', study_id=studyid) }}">Overview</a>
+          <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='label') }}">Label</a>
+          <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='view') }}">Explore</a>
+        </div>
+        <div class="col-md-6">
+          <a href="{{ url_for('sumsarize', study_id=studyid) }}" class="btn btn-success">SUMSARIZE</a>
 
+          <span>
+            <a ng-click="vm.tipsModal()" class="btn btn-link">Tips for best results</a>
+          </span>
+        </div>
       </div>
     </div>
+
+  	<div class="row">
+  		<div id='fileInfo' class='col-md-4 pull-left'>
+        <h5>Datasets</h5>
+  	    	<div id='fileList'>
+  	    		<table class="table table-condensed">
+  				    <tbody>
+  		    		{% for ds in all_ds %}
+  		    			{% if ds.id == dataset.id %}
+  						<div id="active-ds"></div>
+  						{% endif %}
+
+  				        <tr>
+  				        	<td colspan="1">
+  				        		<a href="{{ url_for('dataset', dataset_id=ds.id, mode=mode) }}" class='btn btn-link btn-xs pull-left'>{{ds.title}}</a>
+  			        		</td>
+  			        		<td>
+          						{% if mode == "label" %}
+  				        			{% if ds.user_has_labelled(current_user) %}
+  					        			<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
+  				        			{% endif %}
+  								{% else %}
+  									({{ds.labelled.count()}}/{{ds.study.labellers().count()}})
+  								{% endif %}
+
+  			        		</td>
+  				        </tr>
+  					{% endfor %}
+  				    </tbody>
+  			    </table>
+  			</div>
+
+  			<div id="fileNotes">
+  	    		<p>Active File Notes</p>
+  				{% for note in notes %}
+  				<div>{{ note.text }}</div>
+  				{% endfor %}
+  			</div>
+  		</div>
+  		<div class="col-md-8">
+  	       {% if mode == "label" %}
+  				<div class='pull-right btn btn-xs btn-info' id='next'>
+
+  						<a href="{{ url_for('labelled_dataset', dataset_id=dataset.id, mode=mode) }}">
+  						Done?
+  						{% if next_ds %}
+  							Next&rarr;</a>
+  						{% endif %}
+  				</div>
+
+  	        	<div class="">
+  			       	<div class='pull-left btn btn-xs btn-info' id='clear'>
+  							<a href="" ng-click="vm.resetModal()"><span class="glyphicon glyphicon-erase" aria-hidden="true"> </span>Clear Labels</a>
+  					</div>
+  				</div>
+  			{% endif %}
+  			<div id='maindiv'></div>
+  			<br>
+  			{% if mode == "view" %}
+  			<p class='text-center'>
+  				<span style="color:blue;" class='small'> • Blue points</span> <span class='small'> indicate those randomly selected as part of the training set.</span>
+  			</p>
+  			{% endif %}
+  		</div>
+    </div>
+
   </div>
-
-	<div class="row">
-		<div id='fileInfo' class='col-md-4 pull-left'>
-      <h5>Datasets</h5>
-	    	<div id='fileList'>
-	    		<table class="table table-condensed">
-				    <tbody>
-		    		{% for ds in all_ds %}
-		    			{% if ds.id == dataset.id %}
-						<div id="active-ds"></div>
-						{% endif %}
-
-				        <tr>
-				        	<td colspan="1">
-				        		<a href="{{ url_for('dataset', dataset_id=ds.id, mode=mode) }}" class='btn btn-link btn-xs pull-left'>{{ds.title}}</a>
-			        		</td>
-			        		<td>
-        						{% if mode == "label" %}
-				        			{% if ds.user_has_labelled(current_user) %}
-					        			<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
-				        			{% endif %}
-								{% else %}
-									({{ds.labelled.count()}}/{{ds.study.labellers().count()}})
-								{% endif %}
-
-			        		</td>
-				        </tr>
-					{% endfor %}
-				    </tbody>
-			    </table>
-			</div>
-
-			<div id="fileNotes">
-	    		<p>Active File Notes</p>
-				{% for note in notes %}
-				<div>{{ note.text }}</div>
-				{% endfor %}
-			</div>
-		</div>
-		<div class="col-md-8">
-	       {% if mode == "label" %}
-				<div class='pull-right btn btn-xs btn-info' id='next'>
-
-						<a href="{{ url_for('labelled_dataset', dataset_id=dataset.id, mode=mode) }}">
-						Done?
-						{% if next_ds %}
-							Next&rarr;</a>
-						{% endif %}
-				</div>
-
-	        	<div class="" ng-controller="DatasetCtrl as vm">
-			       	<div class='pull-left btn btn-xs btn-info' id='clear'>
-							<a href="" ng-click="vm.resetModal()"><span class="glyphicon glyphicon-erase" aria-hidden="true"> </span>Clear Labels</a>
-					</div>
-				</div>
-			{% endif %}
-			<div id='maindiv'></div>
-			<br>
-			{% if mode == "view" %}
-			<p class='text-center'>
-				<span style="color:blue;" class='small'> • Blue points</span> <span class='small'> indicate those randomly selected as part of the training set.</span>
-			</p>
-			{% endif %}
-		</div>
-
-    </div>
 
 	<script>
 	window.PLOTDATA = {{ points_json | safe}}
@@ -115,20 +140,3 @@
 	</script>
 
 {% endblock %}
-
-    		<table class="table table-condensed">
-			    <thead>
-					<tr>
-			        	<th>#</th>
-			        	<th>Filename</th>
-			        	<th>Status</th>
-			        </tr>
-			    </thead>
-			    <tbody>
-			        <tr>
-			        	<th scope="row">3</th>
-			        	<td colspan="2">Larry the Bird</td>
-			        	<td>@twitter</td>
-			        </tr>
-			    </tbody>
-		    </table>
