@@ -44,11 +44,15 @@ studyfeats=ddply(studydata,.(filename),makefeatures)
 userlabels$cooking_label=as.numeric(userlabels$cooking_label=="t")
 userlabels$timestamp=as.POSIXct(userlabels$timestamp)
 
-#drop labels for users that did not complete labelling (labelled less than other users)
-userlabels$count=1
-labelcounts=aggregate(count~email,userlabels,sum)
-complete=labelcounts$email[labelcounts$count==max(labelcounts$count)]
-userlabels=userlabels[userlabels$email%in%complete,]
+
+# Drop labels for users that did not complete labelling (labelled less than other users)
+#
+# MP: this was commented out 2016-03 to support partial labelling.
+#
+# userlabels$count=1
+# labelcounts=aggregate(count~email,userlabels,sum)
+# complete=labelcounts$email[labelcounts$count==max(labelcounts$count)]
+# userlabels=userlabels[userlabels$email%in%complete,]
 
 #average labels across users
 meanlabels=aggregate(cooking_label~filename+timestamp,userlabels,mean)
