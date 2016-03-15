@@ -75,12 +75,12 @@ def run_ml(study_id):
             new_row = {
                 'filename': row['filename'],
                 'timestamp': row['timestamp'],
-                'value': row['value'],
+                'measured_temp': row['value'],
                 'is_cooking': float(row['pred']) > 0.5
             }
             out.append(new_row)
     with open(output_filename, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, ['filename', 'timestamp', 'value', 'is_cooking'])
+        writer = csv.DictWriter(csvfile, ['filename', 'timestamp', 'measured_temp', 'is_cooking'])
         writer.writeheader()
         for row in out:
             writer.writerow(row)
