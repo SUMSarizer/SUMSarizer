@@ -41,7 +41,7 @@ studydata$temp_c=studydata$value-studydata$amb_temp
 studyfeats=ddply(studydata,.(filename),makefeatures)
 
 #format userlabel data
-userlabels$cooking_label=as.numeric(userlabels$cooking_label=="t")
+userlabels$cooking_label=as.numeric(userlabels$cooking_label=="True")
 userlabels$timestamp=as.POSIXct(userlabels$timestamp)
 
 
