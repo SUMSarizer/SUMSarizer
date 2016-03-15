@@ -80,7 +80,7 @@ def run_ml(study_id):
             }
             out.append(new_row)
     with open(output_filename, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, ['filename', 'timestamp', 'value', 'is_cooking'])
+        writer = csv.DictWriter(csvfile, ['filename', 'timestamp', 'measured_temp', 'is_cooking'])
         writer.writeheader()
         for row in out:
             writer.writerow(row)
