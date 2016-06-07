@@ -38,6 +38,10 @@ class Users(db.Model):
     def from_stormpath(cls, stormpath_user):
         return Users.query.filter_by(stormpath_id=stormpath_user.get_id()).first()
 
+    @classmethod
+    def by_email(cls, email):
+        return Users.query.filter(Users.email == email).first()
+
     def studies(self):
         return db.session.query(Studies, StudyUsers).\
             join(StudyUsers).filter_by(user_id=self.id)

@@ -106,18 +106,25 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
 
-    try:
-        _user = User.from_login(
-            request.form.get('email'),
-            request.form.get('password'),
-        )
-    except StormpathError, err:
-        return render_template('login.html', error=err.message['message'])
+    _user = None
+
+    # In development mode, you can just enter a user's email to login
+    if os.environ.get('APP_SETTINGS') == 'config.DevelopmentConfig':
+        user = Users.by_email(request.form.get('email'))
+        if user:
+            _user = StormpathManager.load_user(user.stormpath_id)
+
+    if _user is None:
+        try:
+            _user = User.from_login(
+                request.form.get('email'),
+                request.form.get('password'),
+            )
+        except StormpathError, err:
+            return render_template('login.html', error=err.message['message'])
 
     login_user(_user, remember=True)
-    print stormpath_user.get_id()
     user = Users.from_stormpath(stormpath_user)
-    print user.id
     return redirect(request.args.get('next') or url_for('dashboard'))
 
 
