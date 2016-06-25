@@ -7,40 +7,15 @@ The SUMSarizer reduces raw SUMS data into a log of "cooking events" using machin
 
 Guaranteed to save you a month of data wrangling!
 
-Development Prerequisites
+Development
 ---
 
-The development environment uses Vagrant to make it easy to spin up consistent dev environments on any host machine. Install the following:
-
-* [Vagrant](https://www.vagrantup.com/)
-* [VirtualBox](https://www.virtualbox.org/)
-* The Vagrant-cachier plugin for faster provisions:
-
-        vagrant plugin install vagrant-cachier
-
-Installation of Vagrant on Ubuntu can be tricky depending on what version you are using. For 14.04 [these instructions](http://foorious.com/devops/vagrant-virtualbox-trusty-install/) were good.
-
-On Mac, there is sometimes an issue where the Vagrant binary in installed (in `/opt/vagrant/bin/vagrant`) but not symlinked as `/usr/bin/vagrant`.
-
-Install Dev Environment
----
-
-First clone this repository.
-
-Then, add a file `.vault_pass.txt` to the root of the repo with the Vault password in it (contact the maintainer to get this password).
-
-Then, provision and start the virtual machine using:
-
-    vagrant up
-
-Login to the machine:
-
-    vagrant ssh
+Check out the [sample development environment](https://github.com/SUMSarizer/develop) for getting started on SUMSARIZER development.
 
 Run
 ---
 
-	./scripts/start.sh
+	python run.py
 
 Migrations
 ---
@@ -56,10 +31,6 @@ If you change a model file in `models.py`, run:
 to generate the migration file. Inspect the migration file in `migrations/versions/...py` If it looks good, run it with:
 
 	python manage.py db upgrade
-
-Running the migration on prod:
-
-	heroku run python manage.py db upgrade
 
 Secrets
 ---
