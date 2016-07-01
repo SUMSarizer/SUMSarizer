@@ -10,3 +10,4 @@ dumps/
 login.txt
 sudo.txt
 data/
+.DS_Store
