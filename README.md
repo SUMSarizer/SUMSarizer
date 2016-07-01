@@ -12,6 +12,33 @@ Development
 
 Check out the [sample development environment](https://github.com/SUMSarizer/develop) for getting started on SUMSARIZER development.
 
+Install
+---
+
+SUMSarizer is a Python 2.7 app.
+
+Install its requirements:
+
+    pip install -r requirements.txt
+
+R should also be installed with the following packages:
+
+    plyr
+    devtools
+    pspline
+    caTools
+    glmnet
+    devtools::install_github('jeremyrcoyle/origami')
+
+Configure
+---
+
+The current config expects a Postgres database at the following URI: `postgresql://sums:sums@localhost/sums`
+
+The following environment variables should be set:
+
+    APP_SETTINGS="config.DevelopmentConfig"
+
 Run
 ---
 
