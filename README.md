@@ -7,40 +7,15 @@ The SUMSarizer reduces raw SUMS data into a log of "cooking events" using machin
 
 Guaranteed to save you a month of data wrangling!
 
-Development Prerequisites
+Development
 ---
 
-The development environment uses Vagrant to make it easy to spin up consistent dev environments on any host machine. Install the following:
-
-* [Vagrant](https://www.vagrantup.com/)
-* [VirtualBox](https://www.virtualbox.org/)
-* The Vagrant-cachier plugin for faster provisions:
-
-        vagrant plugin install vagrant-cachier
-
-Installation of Vagrant on Ubuntu can be tricky depending on what version you are using. For 14.04 [these instructions](http://foorious.com/devops/vagrant-virtualbox-trusty-install/) were good.
-
-On Mac, there is sometimes an issue where the Vagrant binary in installed (in `/opt/vagrant/bin/vagrant`) but not symlinked as `/usr/bin/vagrant`.
-
-Install Dev Environment
----
-
-First clone this repository.
-
-Then, add a file `.vault_pass.txt` to the root of the repo with the Vault password in it (contact the maintainer to get this password).
-
-Then, provision and start the virtual machine using:
-
-    vagrant up
-
-Login to the machine:
-
-    vagrant ssh
+Check out the [sample development environment](https://github.com/SUMSarizer/develop) for getting started on SUMSARIZER development.
 
 Run
 ---
 
-	./scripts/start.sh
+	python run.py
 
 Migrations
 ---
@@ -57,76 +32,3 @@ to generate the migration file. Inspect the migration file in `migrations/versio
 
 	python manage.py db upgrade
 
-Running the migration on prod:
-
-	heroku run python manage.py db upgrade
-
-Secrets
----
-
-Secrets stored in the repository with Ansible Vault in the `secrets` directory.
-
-Run
-
-    ./scripts/open-secret <secret name>
-
-to unencrypt a secret to the `secrets_` directory.
-
-To re-encrypt the secret, copy the new file to the `secrets` directory, then run:
-
-    ./scripts/encrypt-secret <secret name>
-
-**If you commit and push an unencrypted file in the `secrets` directory it will no longer be secret!**
-
-Config
----
-
-The secret file `.env` contains API keys and secrets.
-
-Deploy
----
-
-Setup:
-
-**Add a file `login.txt` with your ssh login. e.g. `marc@sumsarizer.com`**
-
-**Also add a file `sudo.txt` with your sudo password**
-
-To push app changes to Linode:
-
-    fab deploy
-
-Check out `fabfile.py` to see how the app is laid out.
-
-* Currently on port 5005. If you want to change the port, forward the new port in iptables
-* Logs in /var/log/supervisor
-
-Managing Production
----
-
-Take a database snapshot:
-
-    fab snapshot
-
-Misc Provisioning
----
-
-Eventually this should live in some sort of script to automate reprovisions.
-
-Nginx fronts the gunicorn server. The config file (`/etc/nginx/sites-available/smzr`) is in `deployments/linode/smzr`
-
-Enable the site:
-
-    sudo ln -s /etc/nginx/sites-available/smzr /etc/nginx/sites-enabled
-
-Restart nginx:
-
-    sudo service nginx restart
-
-Test configs:
-
-    sudo nginx -t
-
-If nginx has issues starting, check the logs:
-
-    sudo tail -n 100 /var/log/nginx/error.log

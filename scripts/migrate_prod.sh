@@ -1,1 +1,0 @@
-heroku run python manage.py db upgrade
