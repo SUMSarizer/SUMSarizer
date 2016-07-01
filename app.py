@@ -21,21 +21,13 @@ from flask import (
     abort,
     make_response
 )
-from flask.ext.stormpath import (
-    StormpathManager,
-    User,
-    login_required,
-    login_user,
-    logout_user,
-    user as stormpath_user,
-)
-from flask.ext.sqlalchemy import SQLAlchemy
-from flask.ext.security import (
+from flask_sqlalchemy import SQLAlchemy
+from flask_security import (
     Security,
     SQLAlchemyUserDatastore,
     login_required,
 )
-from stormpath.error import Error as StormpathError
+from flask_login import current_user
 from werkzeug import secure_filename
 
 app = Flask(__name__)
@@ -43,9 +35,6 @@ app.config.from_object(os.environ.get('APP_SETTINGS'))
 # app.config['PROFILE'] = True
 # app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 db = SQLAlchemy(app)
-stormpath_manager = StormpathManager()
-stormpath_manager.init_app(app)
-
 
 from models import Datasets, Studies, StudyUploads, DataPoints, Notes, \
                    Users, StudyUsers, UserLabels, LabelledDatasets, SZJob, \
@@ -55,7 +44,7 @@ user_datastore = SQLAlchemyUserDatastore(db, Users, Role)
 security = Security(app, user_datastore)
 
 SUBSET_SIZE = datetime.timedelta(7)
-# Website
+
 
 @app.route('/')
 def index():
@@ -68,76 +57,12 @@ def eula():
     return render_template('eula.html')
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    """
-    This view allows a user to register for the site.
-
-    This will create a new User in Stormpath, and then log the user into their
-    new account immediately (no email verification required).
-    """
-    if request.method == 'GET':
-        return render_template('register.html')
-
-    try:
-        # Create a new Stormpath User.
-        _user = stormpath_manager.application.accounts.create({
-            'email': request.form.get('email'),
-            'password': request.form.get('password'),
-            'given_name': 'John',
-            'surname': 'Doe',
-        })
-        _user.__class__ = User
-    except StormpathError, err:
-        # If something fails, we'll display a user-friendly error message.
-        return render_template('register.html', error=err.message['message'])
-
-    login_user(_user, remember=True)
-
-    # add user to internal DB
-    user = Users(stormpath_user)
-    db.session.add(user)
-    db.session.commit()
-
-    return redirect(url_for('dashboard'))
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    """
-    This view logs in a user given an email address and password.
-
-    This works by querying Stormpath with the user's credentials, and either
-    getting back the User object itself, or an exception (in which case well
-    tell the user their credentials are invalid).
-
-    If the user is valid, we'll log them in, and store their session for later.
-    """
-    if request.method == 'GET':
-        return render_template('login.html')
-
-    try:
-        _user = User.from_login(
-            request.form.get('email'),
-            request.form.get('password'),
-        )
-    except StormpathError, err:
-        return render_template('login.html', error=err.message['message'])
-
-    login_user(_user, remember=True)
-    print stormpath_user.get_id()
-    user = Users.from_stormpath(stormpath_user)
-    print user.id
-    return redirect(request.args.get('next') or url_for('dashboard'))
-
-
 @app.route('/dashboard', methods=['GET'])
 @login_required
 def dashboard():
     page = int(request.args.get('page') or 1)
-    user = Users.from_stormpath(stormpath_user)
-    mystudies = user.studies().filter(StudyUsers.role == "owner").all()
-    tolabel = user.studies().filter(StudyUsers.role == "labeller").all()
+    mystudies = current_user.studies().filter(StudyUsers.role == "owner").all()
+    tolabel = current_user.studies().filter(StudyUsers.role == "labeller").all()
     return render_template('dashboard.html',
                            mystudies=mystudies,
                            tolabel=tolabel
@@ -149,9 +74,8 @@ def dashboard():
 def new_study():
     study = Studies(request.form['title'])
     db.session.add(study)
-    user = Users.from_stormpath(stormpath_user)
-    study.add_user(user, "owner")
-    study.add_user(user, "labeller")
+    study.add_user(current_user, "owner")
+    study.add_user(current_user, "labeller")
     return redirect(url_for('study', study_id=study.id))
 
 
@@ -159,8 +83,8 @@ def new_study():
 @login_required
 def label_study(study_id):
     study = Studies.query.get(study_id)
-    user = Users.from_stormpath(stormpath_user)
-    if not study.is_labeller(user):
+
+    if not study.is_labeller(current_user):
         abort(401)
 
     first_dataset = study.datasets\
@@ -174,8 +98,8 @@ def label_study(study_id):
 @login_required
 def study(study_id):
     study = Studies.query.get(study_id)
-    user = Users.from_stormpath(stormpath_user)
-    if not study.is_owner(user):
+
+    if not study.is_owner(current_user):
         abort(401)
 
     page = int(request.args.get('page') or 1)
@@ -209,8 +133,8 @@ def study(study_id):
 @login_required
 def delete_study(study_id):
     study = Studies.query.get(study_id)
-    user = Users.from_stormpath(stormpath_user)
-    if not study.is_owner(user):
+
+    if not study.is_owner(current_user):
         abort(401)
 
     study.delete()
@@ -223,8 +147,8 @@ def delete_study(study_id):
 def delete_dataset(dataset_id):
     dataset = Datasets.query.get(dataset_id)
     study = dataset.study
-    user = Users.from_stormpath(stormpath_user)
-    if not study.is_owner(user):
+
+    if not study.is_owner(current_user):
         abort(401)
 
     # db.session.delete(dataset)
@@ -238,8 +162,8 @@ def delete_dataset(dataset_id):
 def add_study_labeller(study_id):
 
     study = Studies.query.get(study_id)
-    user = Users.from_stormpath(stormpath_user)
-    if not study.is_owner(user):
+
+    if not study.is_owner(current_user):
         abort(401)
 
     user_id = request.args.get('user_id')
@@ -256,9 +180,9 @@ def dataset(dataset_id):
     if not mode in ["view", "label"]:
         abort(400)
 
-    user = Users.from_stormpath(stormpath_user)
+
     dataset = Datasets.query.get(dataset_id)
-    if not dataset.study.is_labeller(user):
+    if not dataset.study.is_labeller(current_user):
         abort(401)
 
     # Grab the list of datasets in this study
@@ -271,12 +195,12 @@ def dataset(dataset_id):
 
     if mode == "label":
         # join labels for this user with datapoints for this dataset
-        data_labels = dataset.labels_for_user(user)
+        data_labels = dataset.labels_for_user(current_user)
 
         # populate labels if they're currently empty
         if data_labels.count() == 0:
             conn = db.engine.connect()
-            dicts = UserLabels.dicts_from_datapoints(dataset.data_points.filter_by(training=True), dataset.id, user.id)
+            dicts = UserLabels.dicts_from_datapoints(dataset.data_points.filter_by(training=True), dataset.id, current_user.id)
             conn.execute(UserLabels.__table__.insert(), dicts)
             db.session.commit()
 
@@ -303,7 +227,7 @@ def dataset(dataset_id):
             "training": x.training
         } for x in dataset.data_points.order_by(DataPoints.timestamp)]
 
-    is_owner = dataset.study.is_owner(user)
+    is_owner = dataset.study.is_owner(current_user)
     y_min = dataset.study.y_min
     y_max = dataset.study.y_max
 
@@ -328,21 +252,21 @@ def dataset(dataset_id):
                            all_ds=all_ds,
                            is_owner=is_owner,
                            all_labelled=all_labelled,
-                           current_user=user)
+                           current_user=current_user)
 
 
 @app.route('/labelled_dataset/<dataset_id>', methods=['GET'])
 @login_required
 def labelled_dataset(dataset_id):
 
-    user = Users.from_stormpath(stormpath_user)
+
     dataset = Datasets.query.get(dataset_id)
-    if not dataset.study.is_labeller(user):
+    if not dataset.study.is_labeller(current_user):
         abort(401)
 
     # mark as labelled if not already
-    if not dataset.user_has_labelled(user):
-        labelled = LabelledDatasets(dataset.id, user.id)
+    if not dataset.user_has_labelled(current_user):
+        labelled = LabelledDatasets(dataset.id, current_user.id)
         db.session.add(labelled)
         db.session.commit()
 
@@ -358,15 +282,15 @@ def labelled_dataset(dataset_id):
 def reset_labels(dataset_id):
 
     dataset = Datasets.query.get(dataset_id)
-    user = Users.from_stormpath(stormpath_user)
-    if not dataset.study.is_labeller(user):
+
+    if not dataset.study.is_labeller(current_user):
         abort(401)
 
-    data_labels = dataset.labels_for_user(user)
+    data_labels = dataset.labels_for_user(current_user)
 
     # mark as unlabelled
-    if dataset.user_has_labelled(user):
-        dataset.labelled.filter_by(user_id=user.id).delete()
+    if dataset.user_has_labelled(current_user):
+        dataset.labelled.filter_by(user_id=current_user.id).delete()
         db.session.commit()
 
     dicts = [dict(id=data_label.UserLabels.id, label=False) for data_label in data_labels]
@@ -451,8 +375,8 @@ def zip_ingress(data, study_id):
 @login_required
 def upload(study_id):
     study = Studies.query.get(study_id)
-    user = Users.from_stormpath(stormpath_user)
-    if not study.is_owner(user):
+
+    if not study.is_owner(current_user):
         abort(401)
 
     zfile = request.files['file']
@@ -472,16 +396,6 @@ def upload(study_id):
 def api():
     return jsonify({'hello': 'world'})
 
-
-@app.route('/logout')
-@login_required
-def logout():
-    """
-    Log out a logged in user.  Then redirect them back to the main page of the
-    site.
-    """
-    logout_user()
-    return redirect(url_for('index'))
 
 @app.errorhandler(401)
 def unauthorized(e):

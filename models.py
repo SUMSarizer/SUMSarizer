@@ -1,7 +1,7 @@
 import datetime
 from app import db
 from dateutil.parser import parse as date_parse
-from flask.ext.security import UserMixin, RoleMixin
+from flask_security import UserMixin, RoleMixin
 
 roles_users = db.Table('roles_users',
         db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
@@ -45,10 +45,6 @@ class Users(db.Model, UserMixin):
                              backref='users', lazy='dynamic')
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
-
-    def __init__(self, stormpath_user):
-        self.stormpath_id = stormpath_user.get_id()
-        self.email = stormpath_user.email
 
     @classmethod
     def from_stormpath(cls, stormpath_user):
