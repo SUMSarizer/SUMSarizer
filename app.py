@@ -30,6 +30,11 @@ from flask.ext.stormpath import (
     user as stormpath_user,
 )
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.security import (
+    Security,
+    SQLAlchemyUserDatastore,
+    login_required,
+)
 from stormpath.error import Error as StormpathError
 from werkzeug import secure_filename
 
@@ -43,7 +48,11 @@ stormpath_manager.init_app(app)
 
 
 from models import Datasets, Studies, StudyUploads, DataPoints, Notes, \
-                   Users, StudyUsers, UserLabels, LabelledDatasets, SZJob
+                   Users, StudyUsers, UserLabels, LabelledDatasets, SZJob, \
+                   Role
+
+user_datastore = SQLAlchemyUserDatastore(db, Users, Role)
+security = Security(app, user_datastore)
 
 SUBSET_SIZE = datetime.timedelta(7)
 # Website
