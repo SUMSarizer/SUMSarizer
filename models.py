@@ -33,7 +33,6 @@ class Users(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    stormpath_id = db.Column(db.Unicode)
     email = db.Column(db.Unicode)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
@@ -45,10 +44,6 @@ class Users(db.Model, UserMixin):
                              backref='users', lazy='dynamic')
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
-
-    @classmethod
-    def from_stormpath(cls, stormpath_user):
-        return Users.query.filter_by(stormpath_id=stormpath_user.get_id()).first()
 
     def studies(self):
         return db.session.query(Studies, StudyUsers).\
