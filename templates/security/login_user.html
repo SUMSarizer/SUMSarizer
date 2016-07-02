@@ -7,9 +7,7 @@
   <h1>Login</h1>
 
   <p class="bg-warning">
-    We recently changed our login system. If your password isn't working,
-    please contact <a href="mailto:sumsarizer@gmail.com">sumsarizer@gmail.com</a> to have your
-    password reset.
+    We recently changed our login system. If your password isn't working, please <a href="{{ url_for('security.forgot_password') }}">reset your password</a>.
   </p>
 
   <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form" class="form-horizontal">
@@ -20,4 +18,9 @@
     {{ render_field(login_user_form.next) }}
     {{ render_field(login_user_form.submit) }}
   </form>
+
+  <hr />
+  <div>
+    <a href="{{ url_for('security.forgot_password') }}">Reset Password</a>
+  </div>
 {% endblock %}
