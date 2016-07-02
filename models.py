@@ -1,6 +1,17 @@
 import datetime
 from app import db
 from dateutil.parser import parse as date_parse
+from flask_security import UserMixin, RoleMixin
+
+roles_users = db.Table('roles_users',
+        db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+        db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+
+
+class Role(db.Model, RoleMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(80), unique=True)
+    description = db.Column(db.String(255))
 
 
 class StudyUsers(db.Model):
@@ -18,25 +29,21 @@ class StudyUsers(db.Model):
         self.role = role
 
 
-class Users(db.Model):
+class Users(db.Model, UserMixin):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    stormpath_id = db.Column(db.Unicode)
     email = db.Column(db.Unicode)
+    password = db.Column(db.String(255))
+    active = db.Column(db.Boolean())
+    confirmed_at = db.Column(db.DateTime())
+
     study_roles = db.relationship('StudyUsers',
                                   backref=db.backref('users'), lazy='dynamic')
-
     labels = db.relationship('UserLabels',
                              backref='users', lazy='dynamic')
-
-    def __init__(self, stormpath_user):
-        self.stormpath_id = stormpath_user.get_id()
-        self.email = stormpath_user.email
-
-    @classmethod
-    def from_stormpath(cls, stormpath_user):
-        return Users.query.filter_by(stormpath_id=stormpath_user.get_id()).first()
+    roles = db.relationship('Role', secondary=roles_users,
+                            backref=db.backref('users', lazy='dynamic'))
 
     def studies(self):
         return db.session.query(Studies, StudyUsers).\
