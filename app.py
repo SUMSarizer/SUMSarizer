@@ -28,6 +28,7 @@ from flask_security import (
     login_required,
 )
 from flask_login import current_user
+from flask_mail import Mail
 from werkzeug import secure_filename
 
 app = Flask(__name__)
@@ -35,6 +36,7 @@ app.config.from_object(os.environ.get('APP_SETTINGS'))
 # app.config['PROFILE'] = True
 # app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
 db = SQLAlchemy(app)
+mail = Mail(app)
 
 from models import Datasets, Studies, StudyUploads, DataPoints, Notes, \
                    Users, StudyUsers, UserLabels, LabelledDatasets, SZJob, \
