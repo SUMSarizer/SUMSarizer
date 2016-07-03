@@ -178,7 +178,7 @@
 
 		<div id="usersContainer" class='col-xs-12'>
 			<div id='userPanel1' class='col-xs-6'>
-		        <h6>Current Labellers</h6>
+		       <h6>Current Labellers</h6>
 					<ul id='currentUsers'>
 						{% for user in users %}
 						<li>
@@ -194,20 +194,15 @@
 			<div id='userPanel2' class='col-xs-6'>
 		        <h6>
 		        	Add Other Labellers
-		        	<input type="text" id="searchDingus" placeholder="Filter Users..." name="search" class='pull-right'>
 		        </h6>
-					<ul id='otherUsers'>
-						{% for user in notusers %}
-						<li>
-							<p>
-								<a href="{{url_for('add_study_labeller', study_id=study.id,user_id=user.id)}}">
-									<span class="glyphicon glyphicon-plus-sign" aria-hidden="true"> </span>
-								{{user.email}}
-								</a>
-							</p>
-						</li>
-						{% endfor %}
-					</ul>
+
+            <div>
+              Invite others to label this study by sending them the following link:
+            </div>
+
+            <div>
+              {{ url_for('invite_link', id=study.id, token=study.token, _external=True) }}
+            </div>
 			</div>
 		</div>
       </div>

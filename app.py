@@ -104,6 +104,10 @@ def study(study_id):
     if not study.is_owner(current_user):
         abort(401)
 
+    if study.token is None:
+        study.generate_token()
+        db.session.add(study)
+
     page = int(request.args.get('page') or 1)
 
     datasets = study.datasets\
@@ -120,6 +124,8 @@ def study(study_id):
     labellers = study.labellers()
     users = labellers.all()
     notusers = Users.query.except_(labellers).all()
+
+    db.session.commit()
 
     return render_template('study.html',
                            study=study,
@@ -456,3 +462,14 @@ def delete_upload(id):
     db.session.delete(upload)
     db.session.commit()
     return redirect(url_for('study', study_id=upload.study_id))
+
+@app.route('/study/<id>/invite_link', methods=['GET'])
+@login_required
+def invite_link(id):
+    study = Studies.query.get(id)
+
+    if not study.token == request.args.get('token'):
+        abort(401)
+
+    study.add_user(current_user, "labeller")
+    return redirect(url_for('label_study', study_id=id))

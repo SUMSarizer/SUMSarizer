@@ -1,3 +1,5 @@
+import random
+import string
 import datetime
 from app import db
 from dateutil.parser import parse as date_parse
@@ -80,6 +82,7 @@ class Studies(db.Model):
     title = db.Column(db.Unicode)
     y_min = db.Column(db.Float, default=0)
     y_max = db.Column(db.Float, default=200)
+    token = db.Column(db.String, nullable=True)
 
     datasets = db.relationship('Datasets', lazy="dynamic", cascade="all, delete-orphan", backref="study")
     uploads = db.relationship('StudyUploads', lazy="dynamic", cascade="all, delete-orphan", backref="study")
@@ -92,6 +95,9 @@ class Studies(db.Model):
 
     def add_user(self, user, role):
         study_user = StudyUsers(user.id, self.id, role)
+        for existing_user in self.users:
+            if existing_user.user_id == user.id:
+                return
         self.users.append(study_user)
         db.session.commit()
 
@@ -131,6 +137,10 @@ class Studies(db.Model):
     def has_archived_jobs(self):
         resp = SZJob.query.filter(SZJob.study == self, SZJob.archived)
         return resp.count() > 0
+
+    def generate_token(self):
+        self.token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        return self.token
 
 
 class Datasets(db.Model):
