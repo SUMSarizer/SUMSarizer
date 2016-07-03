@@ -185,7 +185,7 @@ def add_study_labeller(study_id):
 def dataset(dataset_id):
 
     mode = request.args.get('mode')
-    if not mode in ["view", "label"]:
+    if not mode in ["view", "label", "results"]:
         abort(400)
 
 

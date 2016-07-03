@@ -12,9 +12,10 @@ def write_csv(items, headers, filename):
             writer.writerow(row)
 
 
-def run_ml(study_id):
+def run_ml(study_id, job_id):
 
     from app import db, app
+    from models import ResultDataPoints
 
     guid = uuid.uuid4()
 
@@ -46,7 +47,9 @@ def run_ml(study_id):
     resp = db.session.execute("""
     SELECT dp.id as datapoint_id,
          ds.title as filename,
-         dp.timestamp as timestamp, dp.value as value
+         dp.timestamp as timestamp,
+         dp.value as value,
+         ds.id as dataset_id
     FROM datasets as ds
     INNER JOIN datapoints as dp ON ds.id=dp.dataset_id
     WHERE ds.study_id=%s
@@ -54,7 +57,7 @@ def run_ml(study_id):
     """ % (study_id))
 
     write_csv(map(dict, resp),
-              ['datapoint_id', 'filename', 'timestamp', 'value'],
+              ['datapoint_id', 'filename', 'timestamp', 'value', 'dataset_id'],
               studydata_filename)
 
     ml_script_resp = subprocess.check_output([
@@ -67,7 +70,25 @@ def run_ml(study_id):
 
     logging.info(ml_script_resp)
 
+    # Update datapoints in DB with prediction values
+    result_datapoints = []
+    with open(output_filename) as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            result_datapoint = ResultDataPoints()
+            result_datapoint.timestamp = row['timestamp']
+            result_datapoint.value = row['value']
+            result_datapoint.prediction = row['pred']
+            result_datapoint.job_id = job_id
+            result_datapoint.datapoint_id = row['datapoint_id']
+            result_datapoint.dataset_id = row['dataset_id']
+            result_datapoints.append(result_datapoint)
+    db.session.bulk_save_objects(result_datapoints)
+    db.session.commit()
+
+
     # Prepare output CSV
+    print "Preparing output CSV"
     out = []
     with open(output_filename) as csvfile:
         reader = csv.DictReader(csvfile)
@@ -112,7 +133,7 @@ def work():
 
     failed = False
     try:
-        result = run_ml(job.study_id)
+        result = run_ml(job.study_id, job.id)
     except :
         failed = True
         error_message = traceback.format_exc()
