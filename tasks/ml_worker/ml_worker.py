@@ -77,8 +77,8 @@ def run_ml(study_id, job_id):
         for row in reader:
             result_datapoint = ResultDataPoints()
             result_datapoint.timestamp = row['timestamp']
-            result_datapoint.value = row['value']
-            result_datapoint.prediction = row['pred']
+            result_datapoint.value = float(row['value'])
+            result_datapoint.prediction = float(row['pred'])
             result_datapoint.job_id = job_id
             result_datapoint.datapoint_id = row['datapoint_id']
             result_datapoint.dataset_id = row['dataset_id']

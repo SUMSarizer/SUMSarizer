@@ -38,9 +38,7 @@ app.config.from_object(os.environ.get('APP_SETTINGS'))
 db = SQLAlchemy(app)
 mail = Mail(app)
 
-from models import Datasets, Studies, StudyUploads, DataPoints, Notes, \
-                   Users, StudyUsers, UserLabels, LabelledDatasets, SZJob, \
-                   Role
+from models import *
 
 user_datastore = SQLAlchemyUserDatastore(db, Users, Role)
 security = Security(app, user_datastore)
@@ -227,13 +225,27 @@ def dataset(dataset_id):
             "time": x.DataPoints.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
             "selected": clean_selected(x.UserLabels.label)
         } for x in data_labels]
-    else:
+    elif mode == 'view':
         graph_points = [{
             "id": x.id,
             "temp_c": x.value,
             "time": x.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
             "training": x.training
         } for x in dataset.data_points.order_by(DataPoints.timestamp)]
+    elif mode == 'results':
+        # Show most recent successful results
+        job = dataset.study.most_recent_successful_job()
+        datapoints = ResultDataPoints.query\
+                                     .filter(ResultDataPoints.job_id == job.id,
+                                             ResultDataPoints.dataset_id == dataset.id)\
+                                     .order_by(ResultDataPoints.timestamp).all()
+        graph_points = [{
+            "id": x.id,
+            "temp_c": x.value,
+            "time": x.timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+            "prediction": x.prediction,
+            "cooking": x.prediction > 0.5
+        } for x in datapoints]
 
     is_owner = dataset.study.is_owner(current_user)
     y_min = dataset.study.y_min

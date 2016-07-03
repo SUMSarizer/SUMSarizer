@@ -93,6 +93,9 @@ class Studies(db.Model):
     def __init__(self, title):
         self.title = title
 
+    def most_recent_successful_job(self):
+        return SZJob.query.filter(SZJob.study == self, SZJob.state == 'success').order_by(SZJob.created_at.desc()).first()
+
     def add_user(self, user, role):
         study_user = StudyUsers(user.id, self.id, role)
         for existing_user in self.users:
@@ -330,8 +333,6 @@ class SZJob(db.Model):
     archived = db.Column(db.Boolean, nullable=True, default=False)
 
     study = db.relationship('Studies', backref='szjobs')
-
-
 
 
 
