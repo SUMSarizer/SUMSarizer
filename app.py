@@ -251,11 +251,6 @@ def dataset(dataset_id):
     y_min = dataset.study.y_min
     y_max = dataset.study.y_max
 
-    # Compute flag that is True is all the datasets have been labelled by all
-    # the labellers.
-    count_labellers = dataset.study.labellers().count()
-    all_labelled = all([ds.labelled.count() == count_labellers for ds in all_ds])
-
     # How many labellers total?
     count_labellers = dataset.study.labellers().count() + 1
 
@@ -272,6 +267,11 @@ def dataset(dataset_id):
     """, {'study_id': dataset.study.id})
 
     labelled_counts = {dataset_id: count_labelled for count_labelled, dataset_id in resp}
+
+    # Flag that is True is all the datasets have been labelled by all
+    # the labellers.
+    all_labelled = sum(labelled_counts.values()) == count_labellers *  dataset.study.datasets.count()
+
 
     return render_template('dataset.html',
                            dataset=dataset,
