@@ -8,7 +8,7 @@ class Config(object):
     SECRET_KEY = 'this-really-needs-to-be-changed'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     UPLOAD_FOLDER = 'uploads/'
-    ML_FOLDER = '/vagrant/ml_labeler'
+    ML_FOLDER = os.environ.get('ML_FOLDER')
     SECURITY_REGISTERABLE = True
     SECURITY_POST_LOGIN_VIEW = 'dashboard'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
