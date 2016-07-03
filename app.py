@@ -196,11 +196,9 @@ def add_study_labeller(study_id):
 @app.route('/dataset/<dataset_id>', methods=['GET'])
 @login_required
 def dataset(dataset_id):
-
     mode = request.args.get('mode')
     if not mode in ["view", "label", "results"]:
         abort(400)
-
 
     dataset = Datasets.query.get(dataset_id)
     if not dataset.study.is_labeller(current_user):
@@ -220,13 +218,11 @@ def dataset(dataset_id):
 
         # populate labels if they're currently empty
         if data_labels.count() == 0:
-            conn = db.engine.connect()
             dicts = UserLabels.dicts_from_datapoints(dataset.data_points.filter_by(training=True), dataset.id, current_user.id)
-            conn.execute(UserLabels.__table__.insert(), dicts)
+            db.session.execute(UserLabels.__table__.insert(), dicts)
             db.session.commit()
 
         # json data for d3
-
         def clean_selected(sel):
             if not sel:
                 return 0
@@ -265,6 +261,10 @@ def dataset(dataset_id):
     is_owner = dataset.study.is_owner(current_user)
     y_min = dataset.study.y_min
     y_max = dataset.study.y_max
+
+    # Which datasets has this user labelled?
+    user_labels = LabelledDatasets.query.filter(LabelledDatasets.user_id == current_user.id).all()
+    labelled_by_user = {label.dataset_id: True for label in user_labels}
 
     # How many labellers total?
     count_labellers = dataset.study.labellers().count() + 1
@@ -306,7 +306,8 @@ def dataset(dataset_id):
                            all_labelled=all_labelled,
                            count_labellers=count_labellers,
                            labelled_counts=labelled_counts,
-                           current_user=current_user)
+                           current_user=current_user,
+                           labelled_by_user=labelled_by_user)
 
 
 @app.route('/labelled_dataset/<dataset_id>', methods=['GET'])

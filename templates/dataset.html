@@ -44,7 +44,7 @@
   			        		</td>
   			        		<td>
           						{% if mode == "label" %}
-  				        			{% if ds.user_has_labelled(current_user) %}
+  				        			{% if labelled_by_user.get(ds.id) %}
   					        			<span class="glyphicon glyphicon-ok" style="color:green;" aria-hidden="true"></span>
   				        			{% endif %}
   								{% else %}
