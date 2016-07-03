@@ -256,6 +256,23 @@ def dataset(dataset_id):
     count_labellers = dataset.study.labellers().count()
     all_labelled = all([ds.labelled.count() == count_labellers for ds in all_ds])
 
+    # How many labellers total?
+    count_labellers = dataset.study.labellers().count() + 1
+
+    # How many labellers have fully labelled each dataset
+    resp = db.session.execute("""
+        SELECT
+            COUNT(*) as count_labelled,
+            datasets.id as dataset_id
+        FROM labelled_datasets
+        JOIN datasets ON labelled_datasets.dataset_id = datasets.id
+        JOIN studies ON studies.id = datasets.study_id
+        WHERE studies.id = :study_id
+        GROUP BY datasets.id
+    """, {'study_id': dataset.study.id})
+
+    labelled_counts = {dataset_id: count_labelled for count_labelled, dataset_id in resp}
+
     return render_template('dataset.html',
                            dataset=dataset,
                            title=dataset.title,
@@ -272,6 +289,8 @@ def dataset(dataset_id):
                            all_ds=all_ds,
                            is_owner=is_owner,
                            all_labelled=all_labelled,
+                           count_labellers=count_labellers,
+                           labelled_counts=labelled_counts,
                            current_user=current_user)
 
 
