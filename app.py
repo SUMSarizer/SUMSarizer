@@ -425,3 +425,11 @@ def download_csv_blob(id):
     output.headers["Content-type"] = "text/csv"
     return output
 
+@app.route('/job/<id>/archive', methods=['GET'])
+@login_required
+def archive_job(id):
+    job = SZJob.query.get(id)
+    job.archived = True
+    db.session.add(job)
+    db.session.commit()
+    return redirect(url_for('study', study_id=job.study_id))

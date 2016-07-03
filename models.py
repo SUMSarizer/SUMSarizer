@@ -123,7 +123,8 @@ class Studies(db.Model):
         db.session.commit()
 
     def has_jobs(self):
-        return self.szjobs is not None and len(self.szjobs) > 0
+        resp = SZJob.query.filter(SZJob.study == self, ~SZJob.archived)
+        return resp.count() > 0
 
 
 class Datasets(db.Model):
@@ -281,6 +282,7 @@ class SZJob(db.Model):
     state = db.Column(db.String(64), default='submitted')
     message = db.Column(db.Unicode, nullable=True)
     csv_blob = db.Column(db.Unicode, nullable=True)
+    archived = db.Column(db.Boolean, nullable=True, default=False)
 
     study = db.relationship('Studies', backref='szjobs')
 
