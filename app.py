@@ -368,10 +368,12 @@ def zip_ingress(data, study_id):
         conn.execute(DataPoints.__table__.insert(), data_points)
         # db.session.bulk_insert_mappings(Notes, notes)
         conn.execute(Notes.__table__.insert(), notes)
-    db.session.commit()
+
     study = Studies.query.get(study_id)
     study.update_range()
 
+    db.session.add(study)
+    db.session.commit()
 
 @app.route('/upload/<study_id>', methods=['POST'])
 @login_required
@@ -444,3 +446,13 @@ def archived_jobs(study_id):
         abort(401)
     return render_template('archived_jobs.html',
                            study=study)
+
+@app.route('/uploads/<id>/delete', methods=['GET'])
+@login_required
+def delete_upload(id):
+    upload = StudyUploads.query.get(id)
+    if not upload.study.is_owner(current_user):
+        abort(401)
+    db.session.delete(upload)
+    db.session.commit()
+    return redirect(url_for('study', study_id=upload.study_id))

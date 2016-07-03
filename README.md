@@ -44,6 +44,14 @@ Run
 
 	python run.py
 
+There are a few different background workers to spin up for various tasks:
+
+  # Uploading
+  python worker.py
+
+  # Running machine learning
+  python -m tasks.ml_worker
+
 Migrations
 ---
 

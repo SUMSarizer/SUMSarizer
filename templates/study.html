@@ -82,6 +82,15 @@
 			<div class="alert alert-info" role="alert">
 				<span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
 				<b>Pending upload: {{upload.filename}}</b>
+
+        {% if upload.error_message %}
+        <pre>
+{{ upload.error_message }}
+        </pre>
+        <div>
+          <a href="{{ url_for('delete_upload', id=upload.id) }}">Delete</a>
+        </div>
+        {% endif %}
 			</div>
 			{% endfor %}
 		</div>

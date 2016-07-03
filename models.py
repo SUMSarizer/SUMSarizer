@@ -63,6 +63,8 @@ class StudyUploads(db.Model):
     filename = db.Column(db.Unicode)
     data = db.Column(db.LargeBinary)
     study_id = db.Column(db.Integer, db.ForeignKey('studies.id'), index=True)
+    state = db.Column(db.String(64), default='submitted', nullable=True)
+    error_message = db.Column(db.Text, nullable=True)
 
     def __init__(self, filename, data, study_id):
         self.filename = filename
