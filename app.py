@@ -123,6 +123,12 @@ def study(study_id):
     users = labellers.all()
     notusers = Users.query.except_(labellers).all()
 
+    first_dataset = study.datasets.order_by(Datasets.created_at.desc()).first()
+    if first_dataset:
+        first_dataset_id = first_dataset.id
+    else:
+        first_dataset_id = None
+
     db.session.commit()
 
     return render_template('study.html',
@@ -132,7 +138,8 @@ def study(study_id):
                            users=users,
                            notusers=notusers,
                            uploads=study.uploads,
-                           has_datasets=has_datasets)
+                           has_datasets=has_datasets,
+                           first_dataset_id=first_dataset_id)
 
 
 @app.route('/delete_study/<study_id>', methods=['GET'])

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% from '_macros.html' import label_class_for_state %}
+{% from '_macros.html' import label_class_for_state, study_subnav %}
 
 {% block body %}
 
@@ -66,16 +66,13 @@
 	</script>
 
   <div class="" ng-controller="DashboardCtrl as vm">
+
+  <div class="row">
+    {{ study_subnav(study.title, study.id, first_dataset_id) }}
+  </div>
+
 	<div class="row">
       <div class="col-lg-12">
-
-		<h1>
-      {{study.title}}
-			<a href="" class="tinyText studyTextButton pull-right" ng-click="vm.deleteModal()">
-        <span class="glyphicon glyphicon-remove" aria-hidden="true"> </span>
-        Delete Study
-      </a>
-		</h1>
 
   	<div class="upload-container">
 			{% for upload in uploads %}
@@ -212,8 +209,19 @@
             </div>
 			</div>
 		</div>
+
+    <div class="col-md-12">
+      <hr />
+      <div>
+  			<a href="" class="studyTextButton" ng-click="vm.deleteModal()">
+          <span class="glyphicon glyphicon-remove" aria-hidden="true"> </span>
+          Delete Study
+        </a>
       </div>
     </div>
+
+    </div>
+  </div>
   </div>
 
 {% endblock %}

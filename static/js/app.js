@@ -127,7 +127,6 @@ angular.module('myApp', [
     });
   };
 
-
   vm.deleteModal = function () {
     var modalInstance = $modal.open({
       templateUrl: 'modal_delete.html',
@@ -136,8 +135,13 @@ angular.module('myApp', [
     });
   };
 
-
-
+  vm.tipsModal = function () {
+    var modalInstance = $modal.open({
+      templateUrl: 'modal_tips.html',
+      controller: 'TipModalInstanceCtrl',
+      controllerAs: 'vm'
+    });
+  };
 })
 
 .controller('NewStudyModalCtrl', function ($scope, $modalInstance, $timeout, $window) {
@@ -177,18 +181,13 @@ angular.module('myApp', [
     });
   };
 
-  console.log("initing");
-
   vm.tipsModal = function () {
-    console.log("showing")
     var modalInstance = $modal.open({
       templateUrl: 'modal_tips.html',
       controller: 'TipModalInstanceCtrl',
       controllerAs: 'vm'
     });
   };
-
-  console.log("inited");
 
 
 });

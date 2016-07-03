@@ -1,28 +1,6 @@
 {% extends "base.html" %}
+{% from '_macros.html' import study_subnav %}
 {% block body %}
-
-	<script type="text/ng-template" id="modal_tips.html">
-    <div class="modal-header">
-        <h3 class="modal-title">Algorithm Training Tips</h3>
-    </div>
-
-  	<div class="modal-body">
-  		<p>The more events that you label, the better the machine learning algorithms employed by the SUMSARIZER will perform.</p>
-
-      <p>The app chooses a subset of data from the uploaded data sets for "training sets". You can label all or some of the training sets before SUMSARIZING.</p>
-
-      <p>You should completely label individual data sets, making sure to click "Done".
-        Skipping an event in the data set and clicking "Done" could lead to poor results
-        since it trains the algorithm to ignore the unlabelled event.</p>
-
-      <p>If you have many similar data sets (e.g. same stove type and cooking patterns), it may be safe to
-        skip labelling them.</p>
-  	</div>
-
-  	<div class="modal-footer">
-  	  <a class="btn btn-info" ng-click="vm.cancel()">Got it</a>
-  	</div>
-  </script>
 
 	<script type="text/ng-template" id="modal_reset.html">
     <div class="modal-header">
@@ -45,27 +23,8 @@
 
   <div ng-controller="DatasetCtrl as vm">
 
-    <div class="study-subnav">
-      <div class="row">
-        <div class="col-md-2">
-          <h4>{{ study }}</h4>
-        </div>
-        <div class="col-md-4">
-          <a class="btn btn-link" href="{{ url_for('study', study_id=studyid) }}">Overview</a>
-          <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='label') }}">Label</a>
-          <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='view') }}">Explore</a>
-        </div>
-        <div class="col-md-4">
-          <a href="{{ url_for('sumsarize', study_id=studyid) }}" class="btn btn-success">SUMSARIZE</a>
-
-          <span>
-            <a ng-click="vm.tipsModal()" class="btn btn-link">Tips for best results</a>
-          </span>
-        </div>
-        <div class="col-md-2">
-          <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='results') }}">Results</a>
-        </div>
-      </div>
+    <div class="row">
+      {{ study_subnav(dataset.study.title, dataset.study.id, dataset.id) }}
     </div>
 
   	<div class="row">
