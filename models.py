@@ -145,6 +145,31 @@ class Studies(db.Model):
         self.token = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(8))
         return self.token
 
+    def user_labels_as_csv(self):
+
+        resp = db.session.execute("""SELECT
+            user_labels.datapoint_id,
+            user_labels.dataset_id,
+            user_labels.user_id,
+            label,
+            users.email,
+            datapoints.timestamp,
+            datasets.title
+        FROM user_labels
+        JOIN datapoints ON user_labels.datapoint_id = datapoints.id
+        JOIN users ON user_labels.user_id = users.id
+        JOIN datasets ON user_labels.dataset_id = datasets.id
+        WHERE study_id = :study_id""", {'study_id': self.id})
+
+        import StringIO
+        import csv
+        output = StringIO.StringIO()
+        writer = csv.writer(output)
+        writer.writerow(['datapoint_id', 'dataset_id', 'user_id', 'label', 'email', 'timestamp', 'title'])
+        for row in resp:
+            writer.writerow(row)
+        return output.getvalue()
+
 
 class Datasets(db.Model):
     __tablename__ = 'datasets'

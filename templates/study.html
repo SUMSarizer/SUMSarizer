@@ -22,7 +22,6 @@
 	  </div>
 	{% endmacro %}
 
-
 	<script type="text/ng-template" id="modal.html">
     <div class="modal-header">
         <h3 class="modal-title">Upload</h3>
@@ -136,6 +135,10 @@
           <a href="" class="" ng-click="vm.openModal()">Upload More Sensor Data</a>
         </span>
       {% endif %}
+
+      <div class="pull-right">
+        <a href="{{ url_for('export_user_labels', id=study.id) }}">Download All User Labels</a>
+      </div>
 
     </div>
 

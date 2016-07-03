@@ -146,13 +146,21 @@ def study(study_id):
 @login_required
 def delete_study(study_id):
     study = Studies.query.get(study_id)
-
     if not study.is_owner(current_user):
         abort(401)
-
     study.delete()
-
     return redirect(url_for('dashboard'))
+
+@app.route('/study/<id>/export_user_labels', methods=['GET'])
+@login_required
+def export_user_labels(id):
+    study = Studies.query.get(id)
+    if not study.is_owner(current_user):
+        abort(401)
+    output = make_response(study.user_labels_as_csv())
+    output.headers["Content-Disposition"] = "attachment; filename=%s_user_labels.csv" % study.title
+    output.headers["Content-type"] = "text/csv"
+    return output
 
 
 @app.route('/delete_dataset/<dataset_id>', methods=['GET'])
