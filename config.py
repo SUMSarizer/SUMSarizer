@@ -37,7 +37,7 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'postgresql://sums:sums@localhost/sums'
-    SQLALCHEMY_ECHO=True
+    SQLALCHEMY_ECHO=False
 
 class TestingConfig(Config):
     TESTING = True

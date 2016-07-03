@@ -267,7 +267,7 @@ def dataset(dataset_id):
     labelled_by_user = {label.dataset_id: True for label in user_labels}
 
     # How many labellers total?
-    count_labellers = dataset.study.labellers().count() + 1
+    count_labellers = dataset.study.labellers().count()
 
     # How many labellers have fully labelled each dataset
     resp = db.session.execute("""
