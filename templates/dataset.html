@@ -55,12 +55,15 @@
           <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='label') }}">Label</a>
           <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='view') }}">Explore</a>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <a href="{{ url_for('sumsarize', study_id=studyid) }}" class="btn btn-success">SUMSARIZE</a>
 
           <span>
             <a ng-click="vm.tipsModal()" class="btn btn-link">Tips for best results</a>
           </span>
+        </div>
+        <div class="col-md-2">
+          <a class="btn btn-link" href="{{ url_for('dataset', dataset_id=dataset.id, mode='results') }}">Results</a>
         </div>
       </div>
     </div>

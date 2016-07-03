@@ -113,6 +113,13 @@ svg {
   clip-path: url(#clip);
 }
 
+.point.cooking {
+  fill: #15d683;
+  fill-opacity: 1;
+  stroke: #15d683;
+  clip-path: url(#clip);
+}
+
 .axis path,
 .axis line {
   fill: none;

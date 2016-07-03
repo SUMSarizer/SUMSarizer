@@ -93,6 +93,9 @@ class Studies(db.Model):
     def __init__(self, title):
         self.title = title
 
+    def most_recent_successful_job(self):
+        return SZJob.query.filter(SZJob.study == self, SZJob.state == 'success').order_by(SZJob.created_at.desc()).first()
+
     def add_user(self, user, role):
         study_user = StudyUsers(user.id, self.id, role)
         for existing_user in self.users:
@@ -242,16 +245,45 @@ class DataPoints(db.Model):
     timestamp = db.Column(db.DateTime, index=True)
     unit = db.Column(db.String(16))
     value = db.Column(db.Float)
-    # Add Boolean training set column
     training = db.Column(db.Boolean)
 
     dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'), index=True)
     user_labels = db.relationship('UserLabels', backref="datapoint", lazy="dynamic", passive_deletes=True)
+    result_data_points = db.relationship('ResultDataPoints', cascade="all, delete-orphan", backref="dataset", lazy="dynamic")
+
 
     def __init__(self, timestamp, unit, value):
         self.timestamp = timestamp
         self.unit = unit
         self.value = value
+
+    @classmethod
+    def dict_from_parsed(cls, parsed_point, dataset_id, training_selector):
+        timestamp = date_parse(parsed_point[0])
+        return dict(
+            created_at=datetime.datetime.now(),
+            timestamp=timestamp,
+            unit=parsed_point[1],
+            value=float(parsed_point[2]),
+            dataset_id=dataset_id,
+            training=training_selector(timestamp)
+        )
+
+class ResultDataPoints(db.Model):
+    __tablename__ = 'resultdatapoints'
+
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now)
+    timestamp = db.Column(db.DateTime, index=True)
+    value = db.Column(db.Float)
+    prediction = db.Column(db.Float)
+
+    job_id = db.Column(db.Integer, db.ForeignKey('sz_job.id'))
+    datapoint_id = db.Column(db.Integer, db.ForeignKey('datapoints.id'), index=True)
+    dataset_id = db.Column(db.Integer, db.ForeignKey('datasets.id'), index=True)
+
+    def __init__(self):
+        pass
 
     @classmethod
     def dict_from_parsed(cls, parsed_point, dataset_id, training_selector):
@@ -301,8 +333,6 @@ class SZJob(db.Model):
     archived = db.Column(db.Boolean, nullable=True, default=False)
 
     study = db.relationship('Studies', backref='szjobs')
-
-
 
 
 
