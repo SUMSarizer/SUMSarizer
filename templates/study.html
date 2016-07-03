@@ -1,5 +1,15 @@
 {% extends "base.html" %}
 
+{% macro label_class_for_state(state) %}
+  {% if state == 'failed' %}
+    label-danger
+  {% elif state == 'success' %}
+    label-success
+  {% else %}
+    label-info
+  {% endif %}
+{%- endmacro %}
+
 {% block body %}
 
 
@@ -91,7 +101,7 @@
       {% for job in study.szjobs %}
       <div class="sz-job">
         <div>Submitted {{ job.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
-        <div>Status <span class="label label-info">{{ job.state }}</span></div>
+        <div>Status <span class="label {{ label_class_for_state(job.state) }}">{{ job.state }}</span></div>
         {% if job.csv_blob %}
         <div>
           <a href="{{ url_for('download_csv_blob', id=job.id) }}">Download CSV Results</a>
