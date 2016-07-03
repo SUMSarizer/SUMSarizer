@@ -80,8 +80,13 @@
   	<div class="upload-container">
 			{% for upload in uploads %}
 			<div class="alert alert-info" role="alert">
-				<span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span>
-				<b>Pending upload: {{upload.filename}}</b>
+				<p><span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Pending upload: {{upload.filename}}</p>
+        <hr />
+        <div>
+          <p>
+            Please note: uploading hundreds of files can sometimes stall and fail. If this happens, you may want to
+            try splitting the large collection of files into multiple zip files and upload one at a time.</p>
+        </div>
 
         {% if upload.error_message %}
         <pre>
