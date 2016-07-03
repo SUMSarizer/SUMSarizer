@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% from '_macros.html' import label_class_for_state %}
+
+{% block body %}
+	<div class="row">
+    <div class="col-lg-12">
+
+    <h1>Archived Jobs for {{ study.title }}</h1>
+
+    <div>
+
+      {% for job in study.szjobs %}
+        {% if job.archived %}
+      <div class="sz-job">
+        <div>Submitted {{ job.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        <div>Status <span class="label {{ label_class_for_state(job.state) }}">{{ job.state }}</span></div>
+        {% if job.csv_blob %}
+        <div>
+          <a href="{{ url_for('download_csv_blob', id=job.id) }}">Download CSV Results</a>
+        </div>
+        {% endif %}
+      </div>
+        {% endif %}
+      {% endfor %}
+
+    </div>
+
+    </div>
+  </div>
+
+{% endblock %}

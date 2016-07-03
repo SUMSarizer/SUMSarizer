@@ -1,0 +1,9 @@
+{% macro label_class_for_state(state) %}
+  {% if state == 'failed' %}
+    label-danger
+  {% elif state == 'success' %}
+    label-success
+  {% else %}
+    label-info
+  {% endif %}
+{%- endmacro %}

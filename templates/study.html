@@ -1,14 +1,6 @@
 {% extends "base.html" %}
 
-{% macro label_class_for_state(state) %}
-  {% if state == 'failed' %}
-    label-danger
-  {% elif state == 'success' %}
-    label-success
-  {% else %}
-    label-info
-  {% endif %}
-{%- endmacro %}
+{% from '_macros.html' import label_class_for_state %}
 
 {% block body %}
 
@@ -93,6 +85,12 @@
 			</div>
 			{% endfor %}
 		</div>
+
+    {% if study.has_archived_jobs() %}
+    <div class="pull-right right-action-container">
+      <a href="{{ url_for('archived_jobs', study_id=study.id) }}">Archived Jobs</a>
+    </div>
+    {% endif %}
 
     {% if study.has_jobs() %}
     <div class="sz-jobs-container">

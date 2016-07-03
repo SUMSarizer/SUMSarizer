@@ -429,7 +429,18 @@ def download_csv_blob(id):
 @login_required
 def archive_job(id):
     job = SZJob.query.get(id)
+    if not job.study.is_owner(current_user):
+        abort(401)
     job.archived = True
     db.session.add(job)
     db.session.commit()
     return redirect(url_for('study', study_id=job.study_id))
+
+@app.route('/study/<study_id>/archived_jobs', methods=['GET'])
+@login_required
+def archived_jobs(study_id):
+    study = Studies.query.get(study_id)
+    if not study.is_owner(current_user):
+        abort(401)
+    return render_template('archived_jobs.html',
+                           study=study)

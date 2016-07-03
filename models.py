@@ -126,6 +126,10 @@ class Studies(db.Model):
         resp = SZJob.query.filter(SZJob.study == self, ~SZJob.archived)
         return resp.count() > 0
 
+    def has_archived_jobs(self):
+        resp = SZJob.query.filter(SZJob.study == self, SZJob.archived)
+        return resp.count() > 0
+
 
 class Datasets(db.Model):
     __tablename__ = 'datasets'
