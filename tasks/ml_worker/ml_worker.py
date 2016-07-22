@@ -120,9 +120,6 @@ def run_ml(study_id, job_id):
     with open(output_zipname, 'rb') as zfile:
         out_blob = zfile.read()
 
-    print len(out_blob)
-    logging.warning(len(out_blob))
-
     # print "Preparing output CSV"
     # out = []
     # with open(output_filename) as csvfile:

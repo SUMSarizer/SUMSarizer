@@ -28,7 +28,7 @@ userlabels=read.csv(userlabelfile)
 print("Making training features")
 
 # Marshall columns
-userlabels$cooking_label=as.numeric(userlabels$cooking_label=="t")
+userlabels$cooking_label=as.numeric(userlabels$cooking_label == "True" | userlabels$cooking_label == "t")
 userlabels$timestamp=as.POSIXct(userlabels$timestamp)
 
 # Adds necessary columns to call `makefeatures` to input CSV files
@@ -96,5 +96,7 @@ for (filename in list.files(studydata_dir)) {
     studyfeats <- datapoints_to_features(studydata)
     studyfeats$pred <- predict(sl,studyfeats[,FEATURE_NAMES])$pred
     print(paste("Predicted ", filename))
+    studyfeats <- studyfeats[c("filename", "timestamp", "value", "pred")]
+    studyfeats$pred <- studyfeats$pred > 0.5
     write.csv(studyfeats, file=file.path(output_dir, filename), row.names=F)
 }

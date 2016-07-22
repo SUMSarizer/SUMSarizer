@@ -355,7 +355,7 @@ class SZJob(db.Model):
     state = db.Column(db.String(64), default='submitted')
     message = db.Column(db.Unicode, nullable=True)
     csv_blob = db.Column(db.Unicode, nullable=True)
-    csv_binary_blob = db.Column(db.BLOB, nullable=True)
+    csv_binary_blob = db.Column(db.LargeBinary, nullable=True)
     archived = db.Column(db.Boolean, nullable=True, default=False)
 
     study = db.relationship('Studies', backref='szjobs')
