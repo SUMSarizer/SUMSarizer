@@ -109,7 +109,7 @@
 {{ job.message }}
 </pre>
         {% endif %}
-        {% if job.csv_blob %}
+        {% if job.csv_binary_blob %}
         <div>
           <a href="{{ url_for('download_csv_blob', id=job.id) }}">Download CSV Results</a>
         </div>

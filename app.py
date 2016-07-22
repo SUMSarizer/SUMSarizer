@@ -475,9 +475,9 @@ def sumsarize(study_id):
 @login_required
 def download_csv_blob(id):
     job = SZJob.query.get(id)
-    output = make_response(job.csv_blob)
-    output.headers["Content-Disposition"] = "attachment; filename=%s_sumsarized.csv" % job.study.title
-    output.headers["Content-type"] = "text/csv"
+    output = make_response(job.csv_binary_blob)
+    output.headers["Content-Disposition"] = "attachment; filename=%s_sumsarized.zip" % job.study.title
+    output.headers["Content-type"] = "application/zip"
     return output
 
 @app.route('/job/<id>/archive', methods=['GET'])

@@ -3,6 +3,9 @@ import logging
 import subprocess
 import uuid
 import csv
+import tempfile
+import os
+import shutil
 
 def write_csv(items, headers, filename):
     with open(filename, 'w') as csvfile:
@@ -20,15 +23,24 @@ def run_ml(study_id, job_id):
     guid = uuid.uuid4()
 
     userlabels_filename = "/tmp/userlabels_%s.csv" % guid
-    studydata_filename = "/tmp/studydata_%s.csv" % guid
-    output_filename = "/tmp/ml_output_%s.csv" % guid
+
+    # studydata_filename = "/tmp/studydata_%s.csv" % guid
+    # output_filename = "/tmp/ml_output_%s.csv" % guid
+
+    studydata_dir = tempfile.mkdtemp()
+    output_dir = tempfile.mkdtemp()
+    output_zipname = "/tmp/ml_output_%s" % guid
 
     logging.info("Exporting user labels to CSV")
     resp = db.session.execute("""
-    SELECT dp.id as datapoint_id,
-         ds.title as filename,
-         dp.timestamp as timestamp, dp.value as value,
-         ul.user_id as labeller, users.email as email, ul.label as cooking_label
+    SELECT 
+        dp.id as datapoint_id,
+        ds.title as filename,
+        dp.timestamp as timestamp, 
+        dp.value as value,
+        ul.user_id as labeller, 
+        users.email as email, 
+        ul.label as cooking_label
     FROM datasets as ds
     INNER JOIN datapoints as dp ON ds.id=dp.dataset_id
     INNER JOIN user_labels as ul ON dp.id=ul.datapoint_id
@@ -42,77 +54,100 @@ def run_ml(study_id, job_id):
               ['datapoint_id', 'filename', 'timestamp', 'value', 'labeller', 'email', 'cooking_label'],
               userlabels_filename)
 
-
     logging.info("Exporting study data to CSV")
-    resp = db.session.execute("""
-    SELECT dp.id as datapoint_id,
-         ds.title as filename,
-         dp.timestamp as timestamp,
-         dp.value as value,
-         ds.id as dataset_id
-    FROM datasets as ds
-    INNER JOIN datapoints as dp ON ds.id=dp.dataset_id
-    WHERE ds.study_id=%s
-    ORDER BY ds.id, timestamp
-    """ % (study_id))
 
-    write_csv(map(dict, resp),
-              ['datapoint_id', 'filename', 'timestamp', 'value', 'dataset_id'],
-              studydata_filename)
+    resp = db.session.execute("""
+        SELECT id,title
+        FROM datasets 
+        WHERE study_id = :study_id
+    """, {"study_id": study_id})
+
+    for (dataset_id, title) in resp:
+        resp = db.session.execute("""
+        SELECT dp.id as datapoint_id,
+             ds.title as filename,
+             dp.timestamp as timestamp,
+             dp.value as value,
+             ds.id as dataset_id
+        FROM datasets as ds
+        INNER JOIN datapoints as dp ON ds.id=dp.dataset_id
+        WHERE ds.id = :dataset_id
+        ORDER BY ds.id, timestamp
+        """, {"dataset_id": dataset_id})
+
+        studydata_filename = os.path.join(studydata_dir, title)
+
+        logging.info("Writing study data to %s" % studydata_filename)
+
+        write_csv(map(dict, resp),
+                  ['datapoint_id', 'filename', 'timestamp', 'value', 'dataset_id'],
+                  studydata_filename)
 
     ml_script_resp = subprocess.check_output([
         "Rscript",
         "ml_script.R",
-        studydata_filename,
         userlabels_filename,
-        output_filename],
+        studydata_dir,
+        output_dir],
         cwd=app.config['ML_FOLDER'])
 
     logging.info(ml_script_resp)
 
     # Update datapoints in DB with prediction values
-    result_datapoints = []
-    with open(output_filename) as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            result_datapoint = ResultDataPoints()
-            result_datapoint.timestamp = row['timestamp']
-            result_datapoint.value = float(row['value'])
-            result_datapoint.prediction = float(row['pred'])
-            result_datapoint.job_id = job_id
-            result_datapoint.datapoint_id = row['datapoint_id']
-            result_datapoint.dataset_id = row['dataset_id']
-            result_datapoints.append(result_datapoint)
-    db.session.bulk_save_objects(result_datapoints)
-    db.session.commit()
+    # for output_filename in os.listdir(output_dir):
+    #     result_datapoints = []
+    #     with open(os.path.join(output_dir, output_filename)) as csvfile:
+    #         reader = csv.DictReader(csvfile)
+    #         for row in reader:
+    #             result_datapoint = ResultDataPoints()
+    #             result_datapoint.timestamp = row['timestamp']
+    #             result_datapoint.value = float(row['value'])
+    #             result_datapoint.prediction = float(row['pred'])
+    #             result_datapoint.job_id = job_id
+    #             result_datapoint.datapoint_id = row['datapoint_id']
+    #             result_datapoint.dataset_id = row['dataset_id']
+    #             result_datapoints.append(result_datapoint)
+    #     db.session.bulk_save_objects(result_datapoints)
+    #     db.session.commit()
 
 
     # Prepare output CSV
-    print "Preparing output CSV"
-    out = []
-    with open(output_filename) as csvfile:
-        reader = csv.DictReader(csvfile)
-        for row in reader:
-            new_row = {
-                'filename': row['filename'],
-                'timestamp': row['timestamp'],
-                'measured_temp': row['value'],
-                'is_cooking': float(row['pred']) > 0.5
-            }
-            out.append(new_row)
-    with open(output_filename, 'w') as csvfile:
-        writer = csv.DictWriter(csvfile, ['filename', 'timestamp', 'measured_temp', 'is_cooking'])
-        writer.writeheader()
-        for row in out:
-            writer.writerow(row)
 
-    out_blob = open(output_filename).read()
+    # TODO: zip up the output directory
+
+    output_zipname = shutil.make_archive(output_zipname, 'zip', output_dir)
+
+    with open(output_zipname, 'rb') as zfile:
+        out_blob = zfile.read()
+
+    print len(out_blob)
+    logging.warning(len(out_blob))
+
+    # print "Preparing output CSV"
+    # out = []
+    # with open(output_filename) as csvfile:
+    #     reader = csv.DictReader(csvfile)
+    #     for row in reader:
+    #         new_row = {
+    #             'filename': row['filename'],
+    #             'timestamp': row['timestamp'],
+    #             'measured_temp': row['value'],
+    #             'is_cooking': float(row['pred']) > 0.5
+    #         }
+    #         out.append(new_row)
+    # with open(output_filename, 'w') as csvfile:
+    #     writer = csv.DictWriter(csvfile, ['filename', 'timestamp', 'measured_temp', 'is_cooking'])
+    #     writer.writeheader()
+    #     for row in out:
+    #         writer.writerow(row)
+
+    # out_blob = open(output_filename).read()
 
     # Prepare output PDF
 
     return {
         'message': ml_script_resp,
-        'csv_blob': out_blob
+        'csv_binary_blob': out_blob
     }
 
 def work():
@@ -144,7 +179,7 @@ def work():
     else:
         job.state = 'success'
         job.message = result['message']
-        job.csv_blob = result['csv_blob']
+        job.csv_binary_blob = result['csv_binary_blob']
 
     db.session.add(job)
     db.session.commit()
