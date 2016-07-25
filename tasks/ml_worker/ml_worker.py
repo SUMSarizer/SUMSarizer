@@ -117,35 +117,10 @@ def run_ml(study_id, job_id):
 
 
     # Prepare output CSV
-
-    # TODO: zip up the output directory
-
     output_zipname = shutil.make_archive(output_zipname, 'zip', output_dir)
 
     with open(output_zipname, 'rb') as zfile:
         out_blob = zfile.read()
-
-    # print "Preparing output CSV"
-    # out = []
-    # with open(output_filename) as csvfile:
-    #     reader = csv.DictReader(csvfile)
-    #     for row in reader:
-    #         new_row = {
-    #             'filename': row['filename'],
-    #             'timestamp': row['timestamp'],
-    #             'measured_temp': row['value'],
-    #             'is_cooking': float(row['pred']) > 0.5
-    #         }
-    #         out.append(new_row)
-    # with open(output_filename, 'w') as csvfile:
-    #     writer = csv.DictWriter(csvfile, ['filename', 'timestamp', 'measured_temp', 'is_cooking'])
-    #     writer.writeheader()
-    #     for row in out:
-    #         writer.writerow(row)
-
-    # out_blob = open(output_filename).read()
-
-    # Prepare output PDF
 
     return {
         'message': ml_script_resp,
