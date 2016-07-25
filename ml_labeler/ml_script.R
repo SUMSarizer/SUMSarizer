@@ -22,7 +22,7 @@ output_dir=args[3]
 
 print("Reading inputs")
 
-# Generated from querydump.sql
+# See ml_worker.py
 userlabels=read.csv(userlabelfile)
 
 print("Making training features")
