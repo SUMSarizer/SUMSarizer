@@ -1,7 +1,13 @@
 #
 # Usage: Rscript ml_script.R ../data/studydata.csv ../data/userlabels.csv ../data/studydata_ml.csv
+# Usage: Rscript ml_script.R <user_labels.csv> <study_data_dir> <output_dir>
 #
-# Note: should be invoked from the `ml_labeler` directory
+# Trains the labeler using `user_labels.csv`, outputing predicted labels for each file in 
+# `study_data_dir` into a corresponding file in `output_dir`.
+#
+# Does not support nested directories.
+#
+# Should be invoked from the `ml_labeler` directory
 #
 
 library(plyr)
@@ -10,95 +16,78 @@ source("features.R")
 
 args = commandArgs(trailingOnly=TRUE)
 
-studydatafile=args[1] # e.g. studydata.csv
-userlabelfile=args[2] # e.g. userlabels.csv
-outputfile=args[3]
+userlabelfile=args[1] # e.g. userlabels.csv
+studydata_dir=args[2] # e.g. studydata.csv
+output_dir=args[3]
 
+print("Reading inputs")
 
-#INPUT DATA
-#generated from querydump.sql
-studydata=read.csv(studydatafile) #the sensor readings
-userlabels=read.csv(userlabelfile) #users's labels for the sensor readings
+# See ml_worker.py
+userlabels=read.csv(userlabelfile)
 
-#parse time, break into chunks
-studydata$timestamp=as.POSIXct(studydata$timestamp)
-halfhoursecs=60*30
-studydata$timechunk=as.POSIXct(round(as.numeric(studydata$timestamp)/halfhoursecs)*halfhoursecs,origin="1970-01-01",tz="UTC")
+print("Making training features")
 
-#estimate ambient temperature as 10th percentile of all sensors
-timemodes=ddply(studydata,.(timechunk),function(timeslice){
-  tempquant=quantile(timeslice$value,c(0.10))
-  names(tempquant)=NULL
+# Marshall columns
+userlabels$timestamp = as.POSIXct(userlabels$timestamp)
+userlabels$combinedlabel = as.numeric(userlabels$combinedlabel > 0.5)
 
-  return(c(amb_temp=tempquant))
-})
+# Adds necessary columns to call `makefeatures` to input CSV files
+# (both user_labels and study_data)
+datapoints_to_features = function(datapoints) {
+    # Parse time, break into chunks
+    # datapoints$timestamp = as.POSIXct(datapoints$timestamp)
+    halfhoursecs = 60*30
+    datapoints$timechunk=as.POSIXct(
+        round(as.numeric(datapoints$timestamp)/halfhoursecs)*halfhoursecs,
+        origin="1970-01-01",
+        tz="UTC")
 
-studydata=merge(timemodes,studydata)
-studydata=studydata[order(studydata$filename,studydata$timestamp),]
-studydata$temp_c=studydata$value-studydata$amb_temp
+    # Estimate ambient temperature as 10th percentile of all sensors
+    timemodes=ddply(datapoints,.(timechunk), function(timeslice) {
+      tempquant=quantile(timeslice$value,c(0.10))
+      names(tempquant)=NULL
+      return(c(amb_temp=tempquant))
+    })
 
-#generate ml features from data
-studyfeats=ddply(studydata,.(filename),makefeatures)
+    datapoints=merge(timemodes,datapoints)
+    datapoints=datapoints[order(datapoints$filename,datapoints$timestamp),]
+    datapoints$temp_c=datapoints$value-datapoints$amb_temp
 
-#format userlabel data
-userlabels$cooking_label=as.numeric(userlabels$cooking_label=="True")
-userlabels$timestamp=as.POSIXct(userlabels$timestamp)
+    # Generate ml features from data
+    features = ddply(datapoints,.(filename), makefeatures)
+    return(features)
+}
 
+training_features <- datapoints_to_features(userlabels)
 
-# Drop labels for users that did not complete labelling (labelled less than other users)
-#
-# MP: this was commented out 2016-03 to support partial labelling.
-#
-# userlabels$count=1
-# labelcounts=aggregate(count~email,userlabels,sum)
-# complete=labelcounts$email[labelcounts$count==max(labelcounts$count)]
-# userlabels=userlabels[userlabels$email%in%complete,]
+# Use SL to learn mapping between features and labels
+folds <- make_folds(cluster_id=training_features$filename)
 
-#average labels across users
-meanlabels=aggregate(cooking_label~filename+timestamp,userlabels,mean)
-names(meanlabels)[3]=c("meanlabel")
-meanlabels$combinedlabel=as.numeric(meanlabels$meanlabel>0.5)
-
-#combine labels and ml features
-meanlabels=merge(meanlabels,studyfeats)
-
-print("Making folds")
-
-#use SL to learn mapping between features and labels
-folds <- make_folds(cluster_id=meanlabels$filename)
-
-print("Made folds")
-print("Learning")
+print("Training model")
 
 # Original stack of algorithms:
-# sl <- origami_SuperLearner(
-#     meanlabels$combinedlabel,
-#     meanlabels[,FEATURE_NAMES],
-#     folds=folds,
-#     SL.library=c("SL.rpart", "SL.glm", "SL.mean", "SL.glmnet"),
-#     family=binomial())
+# algorithms = c("SL.rpart", "SL.glm", "SL.mean", "SL.glmnet")
 
 # Simpler stack. Much faster. Within something like 5% of the full stack.
+algorithms = c("SL.glm")
 sl <- origami_SuperLearner(
-    meanlabels$combinedlabel,
-    meanlabels[,FEATURE_NAMES],
+    training_features$combinedlabel,
+    training_features[,FEATURE_NAMES],
     folds=folds,
-    SL.library=c("SL.glm"),
+    SL.library=algorithms,
     family=binomial())
 
-
-
-#SL might produce warnings if some algorithms are not behaving well.
-
 print("Learned")
+
 print("Predicting")
 
-#predict labels on full dataset
-studyfeats$pred <- predict(sl,studyfeats[,FEATURE_NAMES])$pred
-
-print("Predicted")
-
-#OUTPUT
-#predicted labels for full dataset
-write.csv(studyfeats,file=outputfile,row.names=F)
-#save(studyfeats,file="studydata_ml.rdata")
+for (filename in list.files(studydata_dir)) {
+    studydata = read.csv(file.path(studydata_dir, filename))
+    studydata$timestamp = as.POSIXct(studydata$timestamp)
+    studyfeats <- datapoints_to_features(studydata)
+    studyfeats$pred <- predict(sl,studyfeats[,FEATURE_NAMES])$pred
+    print(paste("Predicted ", filename))
+    studyfeats <- studyfeats[c("filename", "timestamp", "value", "pred", "datapoint_id", "dataset_id")]
+    studyfeats$pred <- studyfeats$pred > 0.5
+    write.csv(studyfeats, file=file.path(output_dir, filename), row.names=F)
+}

@@ -1,12 +1,6 @@
 library(pspline)
 library(caTools)
 
-
-
-
-
-#senlabs=dannydata[dannydata$sid=="A72",]
-
 makefeatures=function(senlabs){
   
   #stuff we need
