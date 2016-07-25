@@ -471,9 +471,18 @@ def sumsarize(study_id):
     db.session.commit()
     return redirect(url_for('study', study_id=study_id))
 
-@app.route('/job/<id>/download_csv', methods=['GET'])
+@app.route('/job/<id>/download_csv_file', methods=['GET'])
 @login_required
-def download_csv_blob(id):
+def download_csv_file(id):
+   job = SZJob.query.get(id)
+   output = make_response(job.csv_blob)
+   output.headers["Content-Disposition"] = "attachment; filename=%s_sumsarized.csv" % job.study.title
+   output.headers["Content-type"] = "text/csv"
+   return output
+
+@app.route('/job/<id>/download_csv_archive', methods=['GET'])
+@login_required
+def download_csv_archive(id):
     job = SZJob.query.get(id)
     output = make_response(job.csv_binary_blob)
     output.headers["Content-Disposition"] = "attachment; filename=%s_sumsarized.zip" % job.study.title
