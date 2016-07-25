@@ -38,20 +38,19 @@ def run_ml(study_id, job_id):
         ds.title as filename,
         dp.timestamp as timestamp, 
         dp.value as value,
-        ul.user_id as labeller, 
-        users.email as email, 
-        ul.label as cooking_label
+        avg(ul.label::integer) as combinedlabel
     FROM datasets as ds
     INNER JOIN datapoints as dp ON ds.id=dp.dataset_id
     INNER JOIN user_labels as ul ON dp.id=ul.datapoint_id
     INNER JOIN labelled_datasets as lab_ds ON ds.id=lab_ds.dataset_id AND ul.user_id=lab_ds.user_id
     INNER JOIN users ON ul.user_id=users.id
     WHERE ds.study_id=%s
+    GROUP BY dp.id, ds.id
     ORDER BY ds.id, user, timestamp
     """ % (study_id))
 
     write_csv(map(dict, resp),
-              ['datapoint_id', 'filename', 'timestamp', 'value', 'labeller', 'email', 'cooking_label'],
+              ['datapoint_id', 'filename', 'timestamp', 'value', 'combinedlabel'],
               userlabels_filename)
 
     logging.info("Exporting study data to CSV")
@@ -75,6 +74,8 @@ def run_ml(study_id, job_id):
         ORDER BY ds.id, timestamp
         """, {"dataset_id": dataset_id})
 
+        title = title.replace("/", "__")
+
         studydata_filename = os.path.join(studydata_dir, title)
 
         logging.info("Writing study data to %s" % studydata_filename)
@@ -94,21 +95,25 @@ def run_ml(study_id, job_id):
     logging.info(ml_script_resp)
 
     # Update datapoints in DB with prediction values
-    # for output_filename in os.listdir(output_dir):
-    #     result_datapoints = []
-    #     with open(os.path.join(output_dir, output_filename)) as csvfile:
-    #         reader = csv.DictReader(csvfile)
-    #         for row in reader:
-    #             result_datapoint = ResultDataPoints()
-    #             result_datapoint.timestamp = row['timestamp']
-    #             result_datapoint.value = float(row['value'])
-    #             result_datapoint.prediction = float(row['pred'])
-    #             result_datapoint.job_id = job_id
-    #             result_datapoint.datapoint_id = row['datapoint_id']
-    #             result_datapoint.dataset_id = row['dataset_id']
-    #             result_datapoints.append(result_datapoint)
-    #     db.session.bulk_save_objects(result_datapoints)
-    #     db.session.commit()
+    for output_filename in os.listdir(output_dir):
+        result_datapoints = []
+        with open(os.path.join(output_dir, output_filename)) as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                result_datapoint = ResultDataPoints()
+                result_datapoint.timestamp = row['timestamp']
+                result_datapoint.value = float(row['value'])
+                assert row['pred'] in ["TRUE", "FALSE"]
+                if row['pred'] == "TRUE":
+                    result_datapoint.prediction = 1.0
+                else:
+                    result_datapoint.prediction = 0.0
+                result_datapoint.job_id = job_id
+                result_datapoint.datapoint_id = row['datapoint_id']
+                result_datapoint.dataset_id = row['dataset_id']
+                result_datapoints.append(result_datapoint)
+        db.session.bulk_save_objects(result_datapoints)
+        db.session.commit()
 
 
     # Prepare output CSV

@@ -28,16 +28,14 @@ userlabels=read.csv(userlabelfile)
 print("Making training features")
 
 # Marshall columns
-userlabels$cooking_label=as.numeric(userlabels$cooking_label == "True" | userlabels$cooking_label == "t")
-userlabels$timestamp=as.POSIXct(userlabels$timestamp)
+userlabels$timestamp = as.POSIXct(userlabels$timestamp)
+userlabels$combinedlabel = as.numeric(userlabels$combinedlabel > 0.5)
 
 # Adds necessary columns to call `makefeatures` to input CSV files
 # (both user_labels and study_data)
 datapoints_to_features = function(datapoints) {
-    datapoints$timestamp=as.POSIXct(datapoints$timestamp)
-
     # Parse time, break into chunks
-    datapoints$timestamp = as.POSIXct(datapoints$timestamp)
+    # datapoints$timestamp = as.POSIXct(datapoints$timestamp)
     halfhoursecs = 60*30
     datapoints$timechunk=as.POSIXct(
         round(as.numeric(datapoints$timestamp)/halfhoursecs)*halfhoursecs,
@@ -62,16 +60,8 @@ datapoints_to_features = function(datapoints) {
 
 training_features <- datapoints_to_features(userlabels)
 
-# Average labels across users
-meanlabels = aggregate(cooking_label~filename+timestamp, userlabels, mean)
-names(meanlabels)[3] = c("meanlabel")
-meanlabels$combinedlabel=as.numeric(meanlabels$meanlabel>0.5)
-
-# Combine labels and ml features
-meanlabels=merge(meanlabels, training_features)
-
 # Use SL to learn mapping between features and labels
-folds <- make_folds(cluster_id=meanlabels$filename)
+folds <- make_folds(cluster_id=training_features$filename)
 
 print("Training model")
 
@@ -81,8 +71,8 @@ print("Training model")
 # Simpler stack. Much faster. Within something like 5% of the full stack.
 algorithms = c("SL.glm")
 sl <- origami_SuperLearner(
-    meanlabels$combinedlabel,
-    meanlabels[,FEATURE_NAMES],
+    training_features$combinedlabel,
+    training_features[,FEATURE_NAMES],
     folds=folds,
     SL.library=algorithms,
     family=binomial())
@@ -93,10 +83,11 @@ print("Predicting")
 
 for (filename in list.files(studydata_dir)) {
     studydata = read.csv(file.path(studydata_dir, filename))
+    studydata$timestamp = as.POSIXct(studydata$timestamp)
     studyfeats <- datapoints_to_features(studydata)
     studyfeats$pred <- predict(sl,studyfeats[,FEATURE_NAMES])$pred
     print(paste("Predicted ", filename))
-    studyfeats <- studyfeats[c("filename", "timestamp", "value", "pred")]
+    studyfeats <- studyfeats[c("filename", "timestamp", "value", "pred", "datapoint_id", "dataset_id")]
     studyfeats$pred <- studyfeats$pred > 0.5
     write.csv(studyfeats, file=file.path(output_dir, filename), row.names=F)
 }
