@@ -66,10 +66,10 @@ folds <- make_folds(cluster_id=training_features$filename)
 print("Training model")
 
 # Original stack of algorithms:
-# algorithms = c("SL.rpart", "SL.glm", "SL.mean", "SL.glmnet")
+algorithms = c("SL.rpart", "SL.glm", "SL.mean", "SL.glmnet")
 
 # Simpler stack. Much faster. Within something like 5% of the full stack.
-algorithms = c("SL.glm")
+# algorithms = c("SL.glm")
 sl <- origami_SuperLearner(
     training_features$combinedlabel,
     training_features[,FEATURE_NAMES],
